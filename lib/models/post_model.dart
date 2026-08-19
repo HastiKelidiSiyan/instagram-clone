@@ -1,6 +1,6 @@
 import 'user.dart';
 
-class Post {
+class PostModel {
   final User user;
   final String subtitle;
   final String postImage;
@@ -9,7 +9,7 @@ class Post {
   final int totalLikes;
   final int totalComments;
 
-  Post({
+  PostModel({
     required this.user,
     required this.subtitle,
     required this.postImage,
@@ -19,7 +19,7 @@ class Post {
     this.totalComments = 0,
   });
 
-  factory Post.fromJson(Map<String, dynamic> json) => Post(
+  factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
     user: User.fromJson(json['user']),
     subtitle: json['subtitle'],
     postImage: json['postImage'],
