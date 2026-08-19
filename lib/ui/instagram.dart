@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/post.dart';
+import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
@@ -17,7 +17,6 @@ class Instagram extends StatefulWidget {
 }
 
 class _InstagramState extends State<Instagram> {
-  List<Post> posts = PostRepository().getPosts();
   User me = UserRepository().getMe();
 
   late List<Widget> heads = [
@@ -28,7 +27,7 @@ class _InstagramState extends State<Instagram> {
     ProfileHeader(me),
   ];
   late List<Widget> bodies = [
-    HomeBody(posts: posts, me: me, onProfileTap: handleProfileTap,),
+    HomeBody(me: me, onProfileTap: handleProfileTap,),
     Placeholder(child: Text("Explore Body"),),
     Placeholder(child: Text("Reel Body")),
     Placeholder(child: Text("Shop Body")),

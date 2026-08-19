@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/story.dart';
+import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
-import '../models/post.dart';
+import '../models/post_model.dart';
 
 class HomeBody extends StatelessWidget {
-  final List<Post> posts;
   final Function(int) onProfileTap;
   final dynamic me;
 
-  const HomeBody({
-    super.key,
-    required this.posts,
-    required this.me,
-    required this.onProfileTap,
-  });
+  const HomeBody({super.key, required this.me, required this.onProfileTap});
 
   @override
   Widget build(BuildContext context) {
@@ -22,36 +18,47 @@ class HomeBody extends StatelessWidget {
       children: [
         HomeStories(me: me, onProfileTap: onProfileTap),
         Container(height: 1, color: Color(0xffcecece)),
-        Expanded(
-          child: PostBody(posts: posts, onProfileTap: onProfileTap),
-        ),
+        Expanded(child: PostBody(onProfileTap: onProfileTap)),
       ],
     );
   }
 }
 
 class PostBody extends StatelessWidget {
-  final List<Post> posts;
   final Function(int) onProfileTap;
 
-  const PostBody({super.key, required this.posts, required this.onProfileTap});
+  const PostBody({super.key, required this.onProfileTap});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) {
-        return HomePost(post: posts[index], onProfileTap: onProfileTap);
+    return FutureBuilder(
+      future: PostRepository().getPosts(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return ListView.separated(
+            itemBuilder: (context, index) {
+              return HomePost(
+                post: snapshot.data![index],
+                onProfileTap: onProfileTap,
+              );
+            },
+            separatorBuilder: (context, index) {
+              return SizedBox(height: 0, width: 0);
+            },
+            itemCount: snapshot.data!.length,
+          );
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
       },
-      separatorBuilder: (context, index) {
-        return SizedBox(height: 0, width: 0);
-      },
-      itemCount: posts.length,
     );
   }
 }
 
 class HomePost extends StatelessWidget {
-  final Post post;
+  final PostModel post;
   final Function(int) onProfileTap;
 
   const HomePost({super.key, required this.post, required this.onProfileTap});
@@ -126,7 +133,7 @@ class NavigationBar extends StatelessWidget {
 }
 
 class PostBottom extends StatelessWidget {
-  final Post post;
+  final PostModel post;
   final Function(int) onProfileTap;
 
   const PostBottom({super.key, required this.post, required this.onProfileTap});
@@ -141,7 +148,7 @@ class PostBottom extends StatelessWidget {
           PostButtons(),
           SizedBox(height: 4),
           PostExtraInfo(post: post, onProfileTap: onProfileTap),
-          PostDescription(post: post, onProfileTap: onProfileTap,),
+          PostDescription(post: post, onProfileTap: onProfileTap),
           PostCommentsText(post: post),
         ],
       ),
@@ -150,7 +157,7 @@ class PostBottom extends StatelessWidget {
 }
 
 class PostCommentsText extends StatelessWidget {
-  final dynamic post;
+  final PostModel post;
 
   const PostCommentsText({super.key, required this.post});
 
@@ -169,7 +176,7 @@ class PostCommentsText extends StatelessWidget {
 }
 
 class PostDescription extends StatelessWidget {
-  final Post post;
+  final PostModel post;
   final Function(int) onProfileTap;
 
   const PostDescription({
@@ -199,7 +206,7 @@ class PostDescription extends StatelessWidget {
 }
 
 class PostExtraInfo extends StatelessWidget {
-  final Post post;
+  final PostModel post;
   final Function(int) onProfileTap;
 
   const PostExtraInfo({
@@ -272,7 +279,7 @@ class PostButtons extends StatelessWidget {
 }
 
 class PostContents extends StatelessWidget {
-  final Post post;
+  final PostModel post;
 
   const PostContents({super.key, required this.post});
 
@@ -287,7 +294,7 @@ class PostContents extends StatelessWidget {
 }
 
 class PostInfo extends StatelessWidget {
-  final Post post;
+  final PostModel post;
   final Function(int) onProfileTap;
 
   const PostInfo({super.key, required this.post, required this.onProfileTap});
