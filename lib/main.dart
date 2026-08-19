@@ -1,13 +1,8 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/user.dart';
-import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/instagram.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-User me = UserRepository().getMe();
 
 void main() {
   runApp(
