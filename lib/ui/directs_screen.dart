@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 
-import '../models/message.dart';
+import '../models/message_model.dart';
 
 class DirectsScreen extends StatelessWidget {
   final me = UserRepository().getMe();

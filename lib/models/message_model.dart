@@ -1,14 +1,14 @@
-import 'user.dart';
+import 'user_model.dart';
 
-class Message {
-  final User user;
+class MessageModel {
+  final UserModel user;
   final String lastMessage;
   final DateTime date;
 
-  Message({required this.user, required this.lastMessage, required this.date});
+  MessageModel({required this.user, required this.lastMessage, required this.date});
 
-  factory Message.fromJson(Map<String, dynamic> json) => Message(
-    user: User.fromJson(json['user']),
+  factory MessageModel.fromJson(Map<String, dynamic> json) => MessageModel(
+    user: UserModel.fromJson(json['user']),
     lastMessage: json['lastMessage'],
     date: DateTime.parse(json['date']),
   );

@@ -1,8 +1,12 @@
+import 'package:instagram_clone/data_source/remote_data_source.dart';
+
 import '../data/data_constants.dart';
-import '../models/message.dart';
+import '../models/message_model.dart';
 
 class MessageRepository {
-  List<Message> getMessages() {
-    return DataConstants.messages.map((e) => Message.fromJson(e)).toList();
+  RemoteDataSource remoteDataSource = RemoteDataSource();
+
+  Future<List<MessageModel>> getMessages() async {
+    return await remoteDataSource.getMessages();
   }
 }
