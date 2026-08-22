@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/post_model.dart';
+import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
+import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/ui/home_body.dart';
 import 'package:instagram_clone/ui/home_head.dart';
 import 'package:instagram_clone/ui/profile_body.dart';
@@ -26,7 +27,11 @@ class _InstagramState extends State<Instagram> {
   }
 
   Future<void> _loadUser() async {
+    try {
     me = await UserRepository().getMe();
+    } on AppFailure catch (e) {
+      AppFeedback.showFailure(context, e);
+    }
     if (mounted) {
       setState(() {});
     }
@@ -57,7 +62,7 @@ class _InstagramState extends State<Instagram> {
 
     if (currentUser == null) {
       return const Scaffold(
-        body: Center(child: Text("Loading...")),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
