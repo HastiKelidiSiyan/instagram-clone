@@ -5,7 +5,23 @@ import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/models/user_model.dart';
 
 class RemoteDataSource {
-  final dio = Dio();
+  final Dio _dio;
+
+  RemoteDataSource()
+    : _dio = Dio(
+        BaseOptions(
+          connectTimeout: Duration(seconds: 30),
+          receiveTimeout: Duration(seconds: 30),
+        ),
+      ) {
+    _dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+        logPrint: (log) => print('[Dio] $log'),
+      ),
+    );
+  }
 
   static const String usersAndStoriesBaseUrl =
       'https://695438ec1cd5294d2c7c33d5.mockapi.io';
