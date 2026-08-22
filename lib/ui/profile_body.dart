@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/user.dart';
+import '../models/user_model.dart';
 
 class ProfileBody extends StatelessWidget {
-  final User me;
+  final UserModel me;
 
   const ProfileBody(this.me, {super.key});
 
@@ -118,7 +118,7 @@ class EditProfileButton extends StatelessWidget {
 }
 
 class ProfileContents extends StatelessWidget {
-  final dynamic me;
+  final UserModel me;
 
   const ProfileContents(this.me, {super.key});
 

@@ -1,5 +1,5 @@
 import '../data/data_constants.dart';
-import '../models/user.dart';
+import '../models/user_model.dart';
 
 class UserRepository {
   List<User> getUsers() {

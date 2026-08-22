@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/user.dart';
+import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -247,8 +247,9 @@ class _SignupFormWithButtonsState extends State<SignupFormWithButtons> {
     _validateGender();
 
     if (_isFormValid) {
-      User user = User(
-        userId: UserRepository().getUsers().length + 1,
+      var newId = (await UserRepository().getUsers()).length + 1;
+      UserModel user = UserModel(
+        userId: newId,
         name: _nameController.text.trim(),
         username: _usernameController.text.trim(),
         avatar: 'https://images.unsplash.    photo-150268510422    32379fefbe',

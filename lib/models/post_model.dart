@@ -1,11 +1,11 @@
-import 'user.dart';
+import 'user_model.dart';
 
 class PostModel {
-  final User user;
+  final UserModel user;
   final String subtitle;
   final String postImage;
   final String caption;
-  final User? likedBy;
+  final UserModel? likedBy;
   final int totalLikes;
   final int totalComments;
 
@@ -20,11 +20,11 @@ class PostModel {
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
-    user: User.fromJson(json['user']),
+    user: UserModel.fromJson(json['user']),
     subtitle: json['subtitle'],
     postImage: json['postImage'],
     caption: json['caption'],
-    likedBy: json['likedBy'] != null ? User.fromJson(json['likedBy']) : null,
+    likedBy: json['likedBy'] != null ? UserModel.fromJson(json['likedBy']) : null,
     totalLikes: json['totalLikes'] ?? 0,
     totalComments: json['totalComments'] ?? 0,
   );

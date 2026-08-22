@@ -1,4 +1,4 @@
-class User {
+class UserModel {
   final int userId;
   final String name;
   final String username;
@@ -8,7 +8,7 @@ class User {
   final int totalFollowings;
   final String bio;
 
-  User({
+  UserModel({
     required this.userId,
     required this.name,
     required this.username,
@@ -19,7 +19,7 @@ class User {
     required this.bio,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
     userId: json['userId'],
     name: json['name'],
     username: json['username'],

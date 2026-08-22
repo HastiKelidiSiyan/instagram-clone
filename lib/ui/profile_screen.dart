@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/user.dart';
+import '../models/user_model.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final User? user;
+  final UserModel? user;
 
   const ProfileScreen({super.key, required this.user});
 
@@ -77,7 +77,7 @@ class Head extends StatelessWidget {
 }
 
 class ProfileBody extends StatelessWidget {
-  final User user;
+  final UserModel user;
 
   const ProfileBody(this.user, {super.key});
 
