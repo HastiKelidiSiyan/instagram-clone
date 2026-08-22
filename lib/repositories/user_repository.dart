@@ -1,30 +1,27 @@
-import '../data/data_constants.dart';
+import 'package:instagram_clone/data_source/remote_data_source.dart';
 import '../models/user_model.dart';
 
 class UserRepository {
-  List<User> getUsers() {
-    return DataConstants.users.map((e) => User.fromJson(e)).toList();
+  RemoteDataSource remoteDataSource = RemoteDataSource();
+
+  Future<List<UserModel>> getUsers() async {
+    return await remoteDataSource.getUsers();
   }
 
-  User? getUserById(int id) {
-    for (final user in getUsers()) {
-      if (user.userId == id) return user;
-    }
-    return null;
+  Future<UserModel?> getUserById(int id) async {
+    return await remoteDataSource.getUserById(id);
   }
 
-  void addUser(User user) {
-    DataConstants.users.add(user.toJson());
+  Future<UserModel?> addUser(UserModel user) async {
+    return await remoteDataSource.addUser(user);
   }
 
-  User? getUserByUsername(String username) {
-    for (final user in getUsers()) {
-      if (user.username == username) return user;
-    }
-    return null;
+  Future<UserModel?> getUserByUsername(String username) async {
+    return await remoteDataSource.getUserByUsername(username);
   }
 
-  User getMe() {
-    return getUserById(1)!;
+  Future<UserModel?> getMe() async {
+    return await getUserById(1);
+  
   }
 }

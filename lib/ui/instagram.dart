@@ -17,34 +17,34 @@ class Instagram extends StatefulWidget {
 }
 
 class _InstagramState extends State<Instagram> {
-  User me = UserRepository().getMe();
+  UserModel? me;
 
-  late List<Widget> heads = [
-    HomeHeader(),
-    Placeholder(child: Text("Explore Head")),
-    Placeholder(child: Text("Reel Head")),
-    Placeholder(child: Text("Shop Head")),
-    ProfileHeader(me),
-  ];
-  late List<Widget> bodies = [
-    HomeBody(me: me, onProfileTap: handleProfileTap,),
-    Placeholder(child: Text("Explore Body"),),
-    Placeholder(child: Text("Reel Body")),
-    Placeholder(child: Text("Shop Body")),
-    ProfileBody(me),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    me = await UserRepository().getMe();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   int index = 0;
 
-  void handleProfileTap(int userId) {
+  void handleProfileTap(int userId) async {
     if (userId == 1) {
       setState(() {
         index = 4;
       });
     } else {
+      UserModel? user = await UserRepository().getUserById(userId);
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ProfileScreen(
-            user: UserRepository().getUserById(userId),
+            user: user,
           ),
         ),
       );
@@ -53,6 +53,29 @@ class _InstagramState extends State<Instagram> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = me;
+
+    if (currentUser == null) {
+      return const Scaffold(
+        body: Center(child: Text("Loading...")),
+      );
+    }
+
+    final heads = [
+      HomeHeader(me: currentUser),
+      const Placeholder(child: Text("Explore Head")),
+      const Placeholder(child: Text("Reel Head")),
+      const Placeholder(child: Text("Shop Head")),
+      ProfileHeader(currentUser),
+    ];
+    final bodies = [
+      HomeBody(me: currentUser, onProfileTap: handleProfileTap),
+      const Placeholder(child: Text("Explore Body")),
+      const Placeholder(child: Text("Reel Body")),
+      const Placeholder(child: Text("Shop Body")),
+      ProfileBody(currentUser),
+    ];
+
     return Scaffold(
       backgroundColor: Color(0xFFFFFFFF),
       appBar: PreferredSize(
@@ -107,7 +130,7 @@ class _InstagramState extends State<Instagram> {
           BottomNavigationBarItem(
             icon: CircleAvatar(
               radius: 9,
-              backgroundImage: NetworkImage(me.avatar),
+              backgroundImage: NetworkImage(currentUser.avatar),
             ),
             label: '',
           ),

@@ -3,7 +3,6 @@ import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
-import '../models/post_model.dart';
 
 class HomeBody extends StatelessWidget {
   final Function(int) onProfileTap;
@@ -348,32 +347,37 @@ class HomeStories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Story> stories = StoryRepository().getStories();
     return SizedBox(
       height: 97,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return InkWell(
-              onTap: () {
-                onProfileTap(me.userId);
+      child: FutureBuilder(
+        future: StoryRepository().getStories(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: snapshot.data!.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return HomeProfile(
+                    imageUrl: me.avatar,
+                    label: "Your Story",
+                  );
+                } else {
+                  return homeStory(snapshot.data![index - 1]);
+                }
               },
-              child: HomeProfile(imageUrl: me.avatar, label: "Your Story"),
             );
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
           } else {
-            return homeStory(stories[index - 1]);
+            return Center(child: CircularProgressIndicator());
           }
         },
-        separatorBuilder: (context, index) {
-          return SizedBox(height: 0, width: 0);
-        },
-        itemCount: stories.length,
       ),
     );
   }
 
-  Padding homeStory(Story story) {
+  Padding homeStory(StoryModel story) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(

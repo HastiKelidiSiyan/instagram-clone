@@ -1,23 +1,25 @@
 
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 
 import '../models/message_model.dart';
 
 class DirectsScreen extends StatelessWidget {
-  final me = UserRepository().getMe();
 
-  DirectsScreen({super.key});
+  DirectsScreen({required this.me, super.key});
+
+  final UserModel me;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xFFFFFFFF),
-        appBar: Head(me),
-        body: DirectsList(),
-        bottomNavigationBar: BottomBar(),
+        backgroundColor: const Color(0xFFFFFFFF),
+        appBar: Head(me: me,),
+        body: const DirectsList(),
+        bottomNavigationBar: const BottomBar(),
       ),
     );
   }
@@ -56,20 +58,25 @@ class DirectsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Message> messages = MessageRepository().getMessages();
-    return ListView.separated(
-      padding: EdgeInsets.zero,
-      itemBuilder: (context, index) {
-        return direct(messages[index]);
-      },
-      separatorBuilder: (context, index) {
-        return SizedBox(height: 0, width: 0);
-      },
-      itemCount: messages.length,
-    );
+    return FutureBuilder(future: MessageRepository().getMessages(), builder: (context, snapshot) {
+      return ListView.separated(
+        itemCount: snapshot.data?.length ?? 0,
+        separatorBuilder: (context, index) => Divider(height: 1, color: Color(0xffC7C7CC)),
+        itemBuilder: (context, index) {
+          if (snapshot.hasData) {
+            final message = snapshot.data![index];
+            return direct(message);
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      );
+    });
   }
 
-  SizedBox direct(Message message) {
+  SizedBox direct(MessageModel message) {
     return SizedBox(
       height: 72,
       child: Row(
@@ -113,9 +120,10 @@ class DirectsList extends StatelessWidget {
 }
 
 class Head extends StatelessWidget implements PreferredSizeWidget {
-  final dynamic me;
 
-  const Head(this.me, {super.key});
+  const Head({required this.me, super.key});
+
+  final UserModel me;
 
   @override
   Size get preferredSize => const Size.fromHeight(44);

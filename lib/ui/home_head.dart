@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/ui/directs_screen.dart';
 
 class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
-  const HomeHeader({super.key});
+  const HomeHeader({required this.me, super.key});
+
+  final UserModel me;
 
   @override
   Size get preferredSize => const Size.fromHeight(46);
@@ -42,7 +45,7 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => DirectsScreen()),
+                      MaterialPageRoute(builder: (context) => DirectsScreen(me: me, )),
                     );
                   },
                 ),
