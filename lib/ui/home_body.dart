@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/post_model.dart';
-import 'package:instagram_clone/models/story.dart';
+import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
 import '../models/post_model.dart';

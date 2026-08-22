@@ -1,8 +1,12 @@
+import 'package:instagram_clone/data_source/remote_data_source.dart';
+
 import '../data/data_constants.dart';
-import '../models/story.dart';
+import '../models/story_model.dart';
 
 class StoryRepository {
-  List<Story> getStories() {
-    return DataConstants.stories.map((e) => Story.fromJson(e)).toList();
+  RemoteDataSource remoteDataSource = RemoteDataSource();
+  
+  Future<List<StoryModel>> getStories() async {
+    return await remoteDataSource.getStories();
   }
 }
