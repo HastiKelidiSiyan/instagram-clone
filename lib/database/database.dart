@@ -13,11 +13,17 @@ class Users extends Table {
   IntColumn get totalFollowers => integer().withDefault(const Constant(0))();
   IntColumn get totalFollowings => integer().withDefault(const Constant(0))();
   TextColumn get bio => text()();
+
+    @override
+  Set<Column> get primaryKey => {id};
 }
 
 class Stories extends Table {
   BoolColumn get seen => boolean().withDefault(const Constant(false))();
   IntColumn get userId => integer()();
+
+    @override
+  Set<Column> get primaryKey => {userId};
 }
 
 class Posts extends Table {
@@ -28,6 +34,9 @@ class Posts extends Table {
   IntColumn get likedByUserId => integer()();
   IntColumn get totalLikes => integer().withDefault(const Constant(0))();
   IntColumn get totalComments => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {userId};
 }
 
 class Messages extends Table {

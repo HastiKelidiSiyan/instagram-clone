@@ -15,7 +15,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
@@ -116,8 +116,6 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -179,7 +177,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   User map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -389,7 +387,6 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<int> totalFollowers;
   final Value<int> totalFollowings;
   final Value<String> bio;
-  final Value<int> rowid;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -399,10 +396,9 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.totalFollowers = const Value.absent(),
     this.totalFollowings = const Value.absent(),
     this.bio = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   UsersCompanion.insert({
-    required int id,
+    this.id = const Value.absent(),
     required String name,
     required String username,
     required String avatar,
@@ -410,9 +406,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.totalFollowers = const Value.absent(),
     this.totalFollowings = const Value.absent(),
     required String bio,
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       name = Value(name),
+  }) : name = Value(name),
        username = Value(username),
        avatar = Value(avatar),
        bio = Value(bio);
@@ -425,7 +419,6 @@ class UsersCompanion extends UpdateCompanion<User> {
     Expression<int>? totalFollowers,
     Expression<int>? totalFollowings,
     Expression<String>? bio,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -436,7 +429,6 @@ class UsersCompanion extends UpdateCompanion<User> {
       if (totalFollowers != null) 'total_followers': totalFollowers,
       if (totalFollowings != null) 'total_followings': totalFollowings,
       if (bio != null) 'bio': bio,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -449,7 +441,6 @@ class UsersCompanion extends UpdateCompanion<User> {
     Value<int>? totalFollowers,
     Value<int>? totalFollowings,
     Value<String>? bio,
-    Value<int>? rowid,
   }) {
     return UsersCompanion(
       id: id ?? this.id,
@@ -460,7 +451,6 @@ class UsersCompanion extends UpdateCompanion<User> {
       totalFollowers: totalFollowers ?? this.totalFollowers,
       totalFollowings: totalFollowings ?? this.totalFollowings,
       bio: bio ?? this.bio,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -491,9 +481,6 @@ class UsersCompanion extends UpdateCompanion<User> {
     if (bio.present) {
       map['bio'] = Variable<String>(bio.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -507,8 +494,7 @@ class UsersCompanion extends UpdateCompanion<User> {
           ..write('totalPosts: $totalPosts, ')
           ..write('totalFollowers: $totalFollowers, ')
           ..write('totalFollowings: $totalFollowings, ')
-          ..write('bio: $bio, ')
-          ..write('rowid: $rowid')
+          ..write('bio: $bio')
           ..write(')'))
         .toString();
   }
@@ -539,7 +525,7 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   @override
   List<GeneratedColumn> get $columns => [seen, userId];
@@ -566,14 +552,12 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
         _userIdMeta,
         userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_userIdMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {userId};
   @override
   Story map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -661,38 +645,28 @@ class Story extends DataClass implements Insertable<Story> {
 class StoriesCompanion extends UpdateCompanion<Story> {
   final Value<bool> seen;
   final Value<int> userId;
-  final Value<int> rowid;
   const StoriesCompanion({
     this.seen = const Value.absent(),
     this.userId = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   StoriesCompanion.insert({
     this.seen = const Value.absent(),
-    required int userId,
-    this.rowid = const Value.absent(),
-  }) : userId = Value(userId);
+    this.userId = const Value.absent(),
+  });
   static Insertable<Story> custom({
     Expression<bool>? seen,
     Expression<int>? userId,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (seen != null) 'seen': seen,
       if (userId != null) 'user_id': userId,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
-  StoriesCompanion copyWith({
-    Value<bool>? seen,
-    Value<int>? userId,
-    Value<int>? rowid,
-  }) {
+  StoriesCompanion copyWith({Value<bool>? seen, Value<int>? userId}) {
     return StoriesCompanion(
       seen: seen ?? this.seen,
       userId: userId ?? this.userId,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -705,9 +679,6 @@ class StoriesCompanion extends UpdateCompanion<Story> {
     if (userId.present) {
       map['user_id'] = Variable<int>(userId.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -715,8 +686,7 @@ class StoriesCompanion extends UpdateCompanion<Story> {
   String toString() {
     return (StringBuffer('StoriesCompanion(')
           ..write('seen: $seen, ')
-          ..write('userId: $userId, ')
-          ..write('rowid: $rowid')
+          ..write('userId: $userId')
           ..write(')'))
         .toString();
   }
@@ -734,7 +704,7 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _subtitleMeta = const VerificationMeta(
     'subtitle',
@@ -831,8 +801,6 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
         _userIdMeta,
         userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_userIdMeta);
     }
     if (data.containsKey('subtitle')) {
       context.handle(
@@ -888,7 +856,7 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {userId};
   @override
   Post map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1081,7 +1049,6 @@ class PostsCompanion extends UpdateCompanion<Post> {
   final Value<int> likedByUserId;
   final Value<int> totalLikes;
   final Value<int> totalComments;
-  final Value<int> rowid;
   const PostsCompanion({
     this.userId = const Value.absent(),
     this.subtitle = const Value.absent(),
@@ -1090,19 +1057,16 @@ class PostsCompanion extends UpdateCompanion<Post> {
     this.likedByUserId = const Value.absent(),
     this.totalLikes = const Value.absent(),
     this.totalComments = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   PostsCompanion.insert({
-    required int userId,
+    this.userId = const Value.absent(),
     required String subtitle,
     required String postImage,
     required String caption,
     required int likedByUserId,
     this.totalLikes = const Value.absent(),
     this.totalComments = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : userId = Value(userId),
-       subtitle = Value(subtitle),
+  }) : subtitle = Value(subtitle),
        postImage = Value(postImage),
        caption = Value(caption),
        likedByUserId = Value(likedByUserId);
@@ -1114,7 +1078,6 @@ class PostsCompanion extends UpdateCompanion<Post> {
     Expression<int>? likedByUserId,
     Expression<int>? totalLikes,
     Expression<int>? totalComments,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (userId != null) 'user_id': userId,
@@ -1124,7 +1087,6 @@ class PostsCompanion extends UpdateCompanion<Post> {
       if (likedByUserId != null) 'liked_by_user_id': likedByUserId,
       if (totalLikes != null) 'total_likes': totalLikes,
       if (totalComments != null) 'total_comments': totalComments,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1136,7 +1098,6 @@ class PostsCompanion extends UpdateCompanion<Post> {
     Value<int>? likedByUserId,
     Value<int>? totalLikes,
     Value<int>? totalComments,
-    Value<int>? rowid,
   }) {
     return PostsCompanion(
       userId: userId ?? this.userId,
@@ -1146,7 +1107,6 @@ class PostsCompanion extends UpdateCompanion<Post> {
       likedByUserId: likedByUserId ?? this.likedByUserId,
       totalLikes: totalLikes ?? this.totalLikes,
       totalComments: totalComments ?? this.totalComments,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1174,9 +1134,6 @@ class PostsCompanion extends UpdateCompanion<Post> {
     if (totalComments.present) {
       map['total_comments'] = Variable<int>(totalComments.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -1189,8 +1146,7 @@ class PostsCompanion extends UpdateCompanion<Post> {
           ..write('caption: $caption, ')
           ..write('likedByUserId: $likedByUserId, ')
           ..write('totalLikes: $totalLikes, ')
-          ..write('totalComments: $totalComments, ')
-          ..write('rowid: $rowid')
+          ..write('totalComments: $totalComments')
           ..write(')'))
         .toString();
   }
@@ -1483,7 +1439,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$UsersTableCreateCompanionBuilder =
     UsersCompanion Function({
-      required int id,
+      Value<int> id,
       required String name,
       required String username,
       required String avatar,
@@ -1491,7 +1447,6 @@ typedef $$UsersTableCreateCompanionBuilder =
       Value<int> totalFollowers,
       Value<int> totalFollowings,
       required String bio,
-      Value<int> rowid,
     });
 typedef $$UsersTableUpdateCompanionBuilder =
     UsersCompanion Function({
@@ -1503,7 +1458,6 @@ typedef $$UsersTableUpdateCompanionBuilder =
       Value<int> totalFollowers,
       Value<int> totalFollowings,
       Value<String> bio,
-      Value<int> rowid,
     });
 
 class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
@@ -1681,7 +1635,6 @@ class $$UsersTableTableManager
                 Value<int> totalFollowers = const Value.absent(),
                 Value<int> totalFollowings = const Value.absent(),
                 Value<String> bio = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
               }) => UsersCompanion(
                 id: id,
                 name: name,
@@ -1691,11 +1644,10 @@ class $$UsersTableTableManager
                 totalFollowers: totalFollowers,
                 totalFollowings: totalFollowings,
                 bio: bio,
-                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required int id,
+                Value<int> id = const Value.absent(),
                 required String name,
                 required String username,
                 required String avatar,
@@ -1703,7 +1655,6 @@ class $$UsersTableTableManager
                 Value<int> totalFollowers = const Value.absent(),
                 Value<int> totalFollowings = const Value.absent(),
                 required String bio,
-                Value<int> rowid = const Value.absent(),
               }) => UsersCompanion.insert(
                 id: id,
                 name: name,
@@ -1713,7 +1664,6 @@ class $$UsersTableTableManager
                 totalFollowers: totalFollowers,
                 totalFollowings: totalFollowings,
                 bio: bio,
-                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -1738,17 +1688,9 @@ typedef $$UsersTableProcessedTableManager =
       PrefetchHooks Function()
     >;
 typedef $$StoriesTableCreateCompanionBuilder =
-    StoriesCompanion Function({
-      Value<bool> seen,
-      required int userId,
-      Value<int> rowid,
-    });
+    StoriesCompanion Function({Value<bool> seen, Value<int> userId});
 typedef $$StoriesTableUpdateCompanionBuilder =
-    StoriesCompanion Function({
-      Value<bool> seen,
-      Value<int> userId,
-      Value<int> rowid,
-    });
+    StoriesCompanion Function({Value<bool> seen, Value<int> userId});
 
 class $$StoriesTableFilterComposer
     extends Composer<_$AppDatabase, $StoriesTable> {
@@ -1836,18 +1778,12 @@ class $$StoriesTableTableManager
               ({
                 Value<bool> seen = const Value.absent(),
                 Value<int> userId = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => StoriesCompanion(seen: seen, userId: userId, rowid: rowid),
+              }) => StoriesCompanion(seen: seen, userId: userId),
           createCompanionCallback:
               ({
                 Value<bool> seen = const Value.absent(),
-                required int userId,
-                Value<int> rowid = const Value.absent(),
-              }) => StoriesCompanion.insert(
-                seen: seen,
-                userId: userId,
-                rowid: rowid,
-              ),
+                Value<int> userId = const Value.absent(),
+              }) => StoriesCompanion.insert(seen: seen, userId: userId),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
@@ -1872,14 +1808,13 @@ typedef $$StoriesTableProcessedTableManager =
     >;
 typedef $$PostsTableCreateCompanionBuilder =
     PostsCompanion Function({
-      required int userId,
+      Value<int> userId,
       required String subtitle,
       required String postImage,
       required String caption,
       required int likedByUserId,
       Value<int> totalLikes,
       Value<int> totalComments,
-      Value<int> rowid,
     });
 typedef $$PostsTableUpdateCompanionBuilder =
     PostsCompanion Function({
@@ -1890,7 +1825,6 @@ typedef $$PostsTableUpdateCompanionBuilder =
       Value<int> likedByUserId,
       Value<int> totalLikes,
       Value<int> totalComments,
-      Value<int> rowid,
     });
 
 class $$PostsTableFilterComposer extends Composer<_$AppDatabase, $PostsTable> {
@@ -2054,7 +1988,6 @@ class $$PostsTableTableManager
                 Value<int> likedByUserId = const Value.absent(),
                 Value<int> totalLikes = const Value.absent(),
                 Value<int> totalComments = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
               }) => PostsCompanion(
                 userId: userId,
                 subtitle: subtitle,
@@ -2063,18 +1996,16 @@ class $$PostsTableTableManager
                 likedByUserId: likedByUserId,
                 totalLikes: totalLikes,
                 totalComments: totalComments,
-                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required int userId,
+                Value<int> userId = const Value.absent(),
                 required String subtitle,
                 required String postImage,
                 required String caption,
                 required int likedByUserId,
                 Value<int> totalLikes = const Value.absent(),
                 Value<int> totalComments = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
               }) => PostsCompanion.insert(
                 userId: userId,
                 subtitle: subtitle,
@@ -2083,7 +2014,6 @@ class $$PostsTableTableManager
                 likedByUserId: likedByUserId,
                 totalLikes: totalLikes,
                 totalComments: totalComments,
-                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

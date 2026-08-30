@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:instagram_clone/data_source/remote_data_source.dart';
 import 'package:instagram_clone/database/database.dart';
 import 'package:instagram_clone/models/message_model.dart';
 import 'package:instagram_clone/models/story_model.dart';
@@ -17,7 +18,7 @@ class LocalDataSource {
         final likedBy = await getUserById(post.likedByUserId);
         postModels = posts.map((post) {
           return PostModel(
-            user: user,
+            user: user!,
             subtitle: post.subtitle,
             postImage: post.postImage,
             caption: post.caption,
@@ -38,13 +39,13 @@ class LocalDataSource {
       for (var post in posts) {
         final user = await getUserById(post.user.userId);
         final likedByuser = await getUserById(post.likedBy!.userId);
-        await database.into(database.posts).insert(
+        await database.into(database.posts).insertOnConflictUpdate(
           PostsCompanion.insert(
-            userId: user.userId,
+            userId: Value(user!.userId),
             subtitle: post.subtitle,
             postImage: post.postImage,
             caption: post.caption,
-            likedByUserId: likedByuser.userId,
+            likedByUserId: likedByuser!.userId,
             totalLikes: Value(post.totalLikes),
             totalComments: Value(post.totalComments),
           ),
@@ -63,7 +64,7 @@ class LocalDataSource {
         final user = await getUserById(story.userId);
         storyModels = stories.map((story) {
           return StoryModel(
-            user: user,
+            user: user!,
             seen: story.seen,
           );
         }).toList();
@@ -78,9 +79,9 @@ class LocalDataSource {
     try {
       for (var story in stories) {
         final user = await getUserById(story.user.userId);
-        await database.into(database.stories).insert(
+        await database.into(database.stories).insertOnConflictUpdate(
           StoriesCompanion.insert(
-            userId: user.userId,
+            userId: Value(user!.userId),
             seen: Value(story.seen),
           ),
         );
@@ -98,7 +99,7 @@ class LocalDataSource {
         final user = await getUserById(message.userId);
         messageModels = messages.map((message) {
           return MessageModel(
-            user: user,
+            user: user!,
             lastMessage: message.lastMessage,
             date: message.date,
           );
@@ -114,9 +115,9 @@ class LocalDataSource {
     try {
       for (var message in messages) {
         final user = await getUserById(message.user.userId);
-        await database.into(database.messages).insert(
+        await database.into(database.messages).insertOnConflictUpdate(
           MessagesCompanion.insert(
-            userId: user.userId,
+            userId: user!.userId,
             lastMessage: message.lastMessage,
             date: message.date,
           ),
@@ -152,9 +153,9 @@ class LocalDataSource {
   Future<void> cacheUsers(List<UserModel> users) async {
     try {
       for (var user in users) {
-        await database.into(database.users).insert(
+        await database.into(database.users).insertOnConflictUpdate(
           UsersCompanion.insert(
-            id: user.userId,
+            id: Value(user!.userId),
             name: user.name,
             username: user.username,
             avatar: user.avatar,
@@ -170,28 +171,12 @@ class LocalDataSource {
     }
   }
 
-  Future<UserModel> getUserById(int id) async {
-    try {
-      final user = await (database.select(
-        database.users,
-      )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
-      if (user == null) {
-        throw Exception('User not found');
-      }
-      return UserModel(
-        userId: user.id,
-        name: user.name,
-        username: user.username,
-        avatar: user.avatar,
-        totalPosts: user.totalPosts,
-        totalFollowers: user.totalFollowers,
-        totalFollowings: user.totalFollowings,
-        bio: user.bio,
-      );
-    } catch (e) {
-      throw Exception('Failed to get user by id: $e');
-    }
+  Future<UserModel?> getUserById(int id) async {
+    RemoteDataSource remoteDataSource = RemoteDataSource();
+      final user = await remoteDataSource.getUserById(id);
+      return user;
   }
+
   Future<UserModel> getUserByUsername(String username) async {
     try {
       final user = await (database.select(
