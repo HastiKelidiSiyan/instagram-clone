@@ -1,15 +1,30 @@
+import 'package:instagram_clone/data_source/local_data_source.dart';
 import 'package:instagram_clone/data_source/remote_data_source.dart';
+import 'package:instagram_clone/services/connection_availability%20.dart';
 import '../models/user_model.dart';
 
 class UserRepository {
   RemoteDataSource remoteDataSource = RemoteDataSource();
+  LocalDataSource localDataSource = LocalDataSource();
+  ConnectionAvailibility connectivityResult = ConnectionAvailibility();
 
   Future<List<UserModel>> getUsers() async {
-    return await remoteDataSource.getUsers();
+    if (await connectivityResult.isConnected()) {
+      final users = await remoteDataSource.getUsers();
+      await localDataSource.cacheUsers(users);
+      return users;
+    } else {
+      return await localDataSource.getUsers();
+    }
   }
 
   Future<UserModel?> getUserById(int id) async {
-    return await remoteDataSource.getUserById(id);
+    if (await connectivityResult.isConnected()) {
+      final user = await remoteDataSource.getUserById(id);
+      return user;
+    } else {
+      return await localDataSource.getUserById(id);
+    }
   }
 
   Future<UserModel?> addUser(UserModel user) async {
@@ -17,11 +32,20 @@ class UserRepository {
   }
 
   Future<UserModel?> getUserByUsername(String username) async {
-    return await remoteDataSource.getUserByUsername(username);
+    if (await connectivityResult.isConnected()) {
+      final user = await remoteDataSource.getUserByUsername(username);
+      return user;
+    } else {
+      return await localDataSource.getUserByUsername(username);
+    }
   }
 
   Future<UserModel?> getMe() async {
-    return await getUserById(1);
-  
+    if (await connectivityResult.isConnected()) {
+      final user = await remoteDataSource.getUserById(1);
+      return user;
+    } else {
+      return await localDataSource.getUserById(1);
+    }
   }
 }
