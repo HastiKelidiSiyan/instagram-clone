@@ -192,4 +192,26 @@ class LocalDataSource {
       throw Exception('Failed to get user by id: $e');
     }
   }
+  Future<UserModel> getUserByUsername(String username) async {
+    try {
+      final user = await (database.select(
+        database.users,
+      )..where((tbl) => tbl.username.equals(username))).getSingleOrNull();
+      if (user == null) {
+        throw Exception('User not found');
+      }
+      return UserModel(
+        userId: user.id,
+        name: user.name,
+        username: user.username,
+        avatar: user.avatar,
+        totalPosts: user.totalPosts,
+        totalFollowers: user.totalFollowers,
+        totalFollowings: user.totalFollowings,
+        bio: user.bio,
+      );
+    } catch (e) {
+      throw Exception('Failed to get user by id: $e');
+    }
+  }
 }
