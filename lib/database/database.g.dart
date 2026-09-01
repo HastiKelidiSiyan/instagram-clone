@@ -1164,7 +1164,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _lastMessageMeta = const VerificationMeta(
     'lastMessage',
@@ -1205,8 +1205,6 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         _userIdMeta,
         userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_userIdMeta);
     }
     if (data.containsKey('last_message')) {
       context.handle(
@@ -1231,7 +1229,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {userId};
   @override
   Message map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1345,32 +1343,26 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   final Value<int> userId;
   final Value<String> lastMessage;
   final Value<DateTime> date;
-  final Value<int> rowid;
   const MessagesCompanion({
     this.userId = const Value.absent(),
     this.lastMessage = const Value.absent(),
     this.date = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   MessagesCompanion.insert({
-    required int userId,
+    this.userId = const Value.absent(),
     required String lastMessage,
     required DateTime date,
-    this.rowid = const Value.absent(),
-  }) : userId = Value(userId),
-       lastMessage = Value(lastMessage),
+  }) : lastMessage = Value(lastMessage),
        date = Value(date);
   static Insertable<Message> custom({
     Expression<int>? userId,
     Expression<String>? lastMessage,
     Expression<DateTime>? date,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (userId != null) 'user_id': userId,
       if (lastMessage != null) 'last_message': lastMessage,
       if (date != null) 'date': date,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1378,13 +1370,11 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Value<int>? userId,
     Value<String>? lastMessage,
     Value<DateTime>? date,
-    Value<int>? rowid,
   }) {
     return MessagesCompanion(
       userId: userId ?? this.userId,
       lastMessage: lastMessage ?? this.lastMessage,
       date: date ?? this.date,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1400,9 +1390,6 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -1411,8 +1398,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     return (StringBuffer('MessagesCompanion(')
           ..write('userId: $userId, ')
           ..write('lastMessage: $lastMessage, ')
-          ..write('date: $date, ')
-          ..write('rowid: $rowid')
+          ..write('date: $date')
           ..write(')'))
         .toString();
   }
@@ -2039,17 +2025,15 @@ typedef $$PostsTableProcessedTableManager =
     >;
 typedef $$MessagesTableCreateCompanionBuilder =
     MessagesCompanion Function({
-      required int userId,
+      Value<int> userId,
       required String lastMessage,
       required DateTime date,
-      Value<int> rowid,
     });
 typedef $$MessagesTableUpdateCompanionBuilder =
     MessagesCompanion Function({
       Value<int> userId,
       Value<String> lastMessage,
       Value<DateTime> date,
-      Value<int> rowid,
     });
 
 class $$MessagesTableFilterComposer
@@ -2154,24 +2138,20 @@ class $$MessagesTableTableManager
                 Value<int> userId = const Value.absent(),
                 Value<String> lastMessage = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
               }) => MessagesCompanion(
                 userId: userId,
                 lastMessage: lastMessage,
                 date: date,
-                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required int userId,
+                Value<int> userId = const Value.absent(),
                 required String lastMessage,
                 required DateTime date,
-                Value<int> rowid = const Value.absent(),
               }) => MessagesCompanion.insert(
                 userId: userId,
                 lastMessage: lastMessage,
                 date: date,
-                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -43,10 +43,15 @@ class Messages extends Table {
   IntColumn get userId => integer()();
   TextColumn get lastMessage => text()();
   DateTimeColumn get date => dateTime()();
+
+    @override
+  Set<Column> get primaryKey => {userId};
 }
 
 @DriftDatabase(tables: [Users, Stories, Posts, Messages])
 class AppDatabase extends _$AppDatabase {
+  static final AppDatabase instance = AppDatabase();
+
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
