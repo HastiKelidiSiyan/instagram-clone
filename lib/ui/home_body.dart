@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/story_model.dart';
@@ -120,7 +121,11 @@ class NavigationBar extends StatelessWidget {
                 SizedBox(width: 58),
                 CircleAvatar(
                   radius: 9,
-                  backgroundImage: NetworkImage(me.avatar),
+                  child: CachedNetworkImage(
+                    imageUrl: me.avatar,
+                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  ),
                 ),
               ],
             ),
@@ -223,7 +228,11 @@ class PostExtraInfo extends StatelessWidget {
           InkWell(
             child: CircleAvatar(
               radius: 8.5,
-              backgroundImage: NetworkImage(post.likedBy!.avatar),
+              child: CachedNetworkImage(
+                imageUrl: post.likedBy!.avatar,
+                placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+              ),
             ),
             onTap: () {
               onProfileTap(post.likedBy!.userId);
@@ -287,7 +296,12 @@ class PostContents extends StatelessWidget {
     return Container(
       color: Colors.black,
       width: double.infinity,
-      child: Image.network(post.postImage, height: 320),
+      child: CachedNetworkImage(
+        height: 320,
+        imageUrl: post.postImage,
+        placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+      ),
     );
   }
 }
@@ -307,7 +321,11 @@ class PostInfo extends StatelessWidget {
           InkWell(
             child: CircleAvatar(
               radius: 16,
-              backgroundImage: NetworkImage(post.user.avatar),
+              child: CachedNetworkImage(
+                imageUrl: post.user.avatar,
+                placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+              ),
             ),
             onTap: () {
               onProfileTap(post.user.userId);
@@ -358,10 +376,7 @@ class HomeStories extends StatelessWidget {
               itemCount: snapshot.data!.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return HomeProfile(
-                    imageUrl: me.avatar,
-                    label: "Your Story",
-                  );
+                  return HomeProfile(imageUrl: me.avatar, label: "Your Story");
                 } else {
                   return homeStory(snapshot.data![index - 1]);
                 }
@@ -417,7 +432,11 @@ class HomeStories extends StatelessWidget {
                 padding: const EdgeInsets.all(3.0),
                 child: CircleAvatar(
                   radius: 25,
-                  backgroundImage: NetworkImage(story.user.avatar),
+                  child: CachedNetworkImage(
+                    imageUrl: story.user.avatar,
+                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  ),
                 ),
               ),
             ],

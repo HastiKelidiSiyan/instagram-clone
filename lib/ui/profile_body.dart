@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 
@@ -243,7 +244,11 @@ class ProfileProfile extends StatelessWidget {
             alignment: Alignment.center,
             child: CircleAvatar(
               radius: 43,
-              backgroundImage: NetworkImage(imageUrl),
+              child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+          ),
             ),
           ),
         ),

@@ -1,4 +1,4 @@
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
@@ -7,8 +7,7 @@ import 'package:instagram_clone/repositories/user_repository.dart';
 import '../models/message_model.dart';
 
 class DirectsScreen extends StatelessWidget {
-
-  DirectsScreen({required this.me, super.key});
+  const DirectsScreen({required this.me, super.key});
 
   final UserModel me;
 
@@ -17,7 +16,7 @@ class DirectsScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFF),
-        appBar: Head(me: me,),
+        appBar: Head(me: me),
         body: const DirectsList(),
         bottomNavigationBar: const BottomBar(),
       ),
@@ -58,22 +57,26 @@ class DirectsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: MessageRepository().getMessages(), builder: (context, snapshot) {
-      return ListView.separated(
-        itemCount: snapshot.data?.length ?? 0,
-        separatorBuilder: (context, index) => Divider(height: 1, color: Color(0xffC7C7CC)),
-        itemBuilder: (context, index) {
-          if (snapshot.hasData) {
-            final message = snapshot.data![index];
-            return direct(message);
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      );
-    });
+    return FutureBuilder(
+      future: MessageRepository().getMessages(),
+      builder: (context, snapshot) {
+        return ListView.separated(
+          itemCount: snapshot.data?.length ?? 0,
+          separatorBuilder: (context, index) =>
+              Divider(height: 1, color: Color(0xffC7C7CC)),
+          itemBuilder: (context, index) {
+            if (snapshot.hasData) {
+              final message = snapshot.data![index];
+              return direct(message);
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        );
+      },
+    );
   }
 
   SizedBox direct(MessageModel message) {
@@ -120,7 +123,6 @@ class DirectsList extends StatelessWidget {
 }
 
 class Head extends StatelessWidget implements PreferredSizeWidget {
-
   const Head({required this.me, super.key});
 
   final UserModel me;
@@ -189,7 +191,11 @@ class HighlightProfiles extends StatelessWidget {
         decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
         child: CircleAvatar(
           radius: 28,
-          backgroundImage: NetworkImage(imageUrl),
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+          ),
         ),
       ),
     );
