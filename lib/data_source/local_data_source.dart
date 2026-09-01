@@ -7,7 +7,10 @@ import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/models/post_model.dart';
 
 class LocalDataSource {
-  final database = AppDatabase();
+  final AppDatabase database;
+
+  LocalDataSource([AppDatabase? database])
+    : database = database ?? AppDatabase.instance;
 
   Future<List<PostModel>> getPosts() async {
     try {
@@ -117,7 +120,7 @@ class LocalDataSource {
         final user = await getUserById(message.user.userId);
         await database.into(database.messages).insertOnConflictUpdate(
           MessagesCompanion.insert(
-            userId: user!.userId,
+            userId: Value(user!.userId),
             lastMessage: message.lastMessage,
             date: message.date,
           ),
