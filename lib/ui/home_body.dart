@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
+import 'package:instagram_clone/ui/app_feedback.dart';
 
 class HomeBody extends StatelessWidget {
   final Function(int) onProfileTap;
@@ -24,35 +26,63 @@ class HomeBody extends StatelessWidget {
   }
 }
 
-class PostBody extends StatelessWidget {
+class PostBody extends StatefulWidget {
   final Function(int) onProfileTap;
 
   const PostBody({super.key, required this.onProfileTap});
 
   @override
+  State<PostBody> createState() => _PostBodyState();
+}
+
+class _PostBodyState extends State<PostBody> {
+  Future<List<PostModel>>? _postsFuture = PostRepository().getPosts();
+
+  Future<void> _refresh() async {
+    setState(() {
+      _postsFuture = PostRepository().getPosts();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: PostRepository().getPosts(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.separated(
-            itemBuilder: (context, index) {
-              return HomePost(
-                post: snapshot.data![index],
-                onProfileTap: onProfileTap,
-              );
-            },
-            separatorBuilder: (context, index) {
-              return SizedBox(height: 0, width: 0);
-            },
-            itemCount: snapshot.data!.length,
-          );
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: FutureBuilder(
+        future: _postsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.separated(
+              itemBuilder: (context, index) {
+                return HomePost(
+                  post: snapshot.data![index],
+                  onProfileTap: widget.onProfileTap,
+                );
+              },
+              separatorBuilder: (context, index) {
+                return SizedBox(height: 0, width: 0);
+              },
+              itemCount: snapshot.data!.length,
+            );
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (snapshot.error is AppFailure) {
+                AppFeedback.showFailure(context, snapshot.error as AppFailure);
+              } else {
+                AppFeedback.showException(context, snapshot.error.toString());
+              }
+            });
+            return Center(
+              child: IconButton(
+                onPressed: _refresh,
+                icon: Icon(Icons.refresh),
+              ),
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }
@@ -123,8 +153,10 @@ class NavigationBar extends StatelessWidget {
                   radius: 9,
                   child: CachedNetworkImage(
                     imageUrl: me.avatar,
-                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                    placeholder: (context, url) =>
+                        Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        Center(child: Icon(Icons.error)),
                   ),
                 ),
               ],
@@ -231,8 +263,10 @@ class PostExtraInfo extends StatelessWidget {
               child: ClipOval(
                 child: CachedNetworkImage(
                   imageUrl: post.likedBy!.avatar,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) =>
+                      Center(child: Icon(Icons.error)),
                 ),
               ),
             ),
@@ -302,7 +336,8 @@ class PostContents extends StatelessWidget {
         height: 320,
         fit: BoxFit.fitHeight,
         imageUrl: post.postImage,
-        placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+        placeholder: (context, url) =>
+            Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
       ),
     );
@@ -327,8 +362,10 @@ class PostInfo extends StatelessWidget {
               child: ClipOval(
                 child: CachedNetworkImage(
                   imageUrl: post.user.avatar,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) =>
+                      Center(child: Icon(Icons.error)),
                 ),
               ),
             ),
@@ -362,37 +399,71 @@ class PostInfo extends StatelessWidget {
   }
 }
 
-class HomeStories extends StatelessWidget {
+class HomeStories extends StatefulWidget {
   final dynamic me;
   final Function(int) onProfileTap;
 
   const HomeStories({super.key, required this.me, required this.onProfileTap});
 
   @override
+  State<HomeStories> createState() => _HomeStoriesState();
+}
+
+class _HomeStoriesState extends State<HomeStories> {
+  Future<List<StoryModel>>? _storiesFuture = StoryRepository().getStories();
+
+  Future<void> _refresh() async {
+    setState(() {
+      _storiesFuture = StoryRepository().getStories();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 97,
-      child: FutureBuilder(
-        future: StoryRepository().getStories(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: snapshot.data!.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return HomeProfile(imageUrl: me.avatar, label: "Your Story");
+      child: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder(
+          future: _storiesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: snapshot.data!.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return HomeProfile(
+                      imageUrl: widget.me.avatar,
+                      label: "Your Story",
+                    );
+                  } else {
+                    return homeStory(snapshot.data![index - 1]);
+                  }
+                },
+              );
+            } else if (snapshot.hasError) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (snapshot.error is AppFailure) {
+                  AppFeedback.showFailure(
+                    context,
+                    snapshot.error as AppFailure,
+                  );
                 } else {
-                  return homeStory(snapshot.data![index - 1]);
+                  AppFeedback.showException(context, snapshot.error.toString());
                 }
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
+              });
+              return Center(
+                child: IconButton(
+                  onPressed: _refresh,
+                  icon: Icon(Icons.refresh),
+                ),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
       ),
     );
   }
@@ -440,8 +511,10 @@ class HomeStories extends StatelessWidget {
                   child: ClipOval(
                     child: CachedNetworkImage(
                       imageUrl: story.user.avatar,
-                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                      placeholder: (context, url) =>
+                          Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          Center(child: Icon(Icons.error)),
                     ),
                   ),
                 ),

@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
+import 'package:instagram_clone/ui/app_feedback.dart';
 
 import '../models/message_model.dart';
 
@@ -52,30 +54,55 @@ class BottomBar extends StatelessWidget {
   }
 }
 
-class DirectsList extends StatelessWidget {
+class DirectsList extends StatefulWidget {
   const DirectsList({super.key});
 
   @override
+  State<DirectsList> createState() => _DirectsListState();
+}
+
+class _DirectsListState extends State<DirectsList> {
+  Future<List<MessageModel>> _messagesFuture = MessageRepository()
+      .getMessages();
+
+        Future<void> _refresh() async {
+    setState(() {
+      _messagesFuture = MessageRepository().getMessages();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: MessageRepository().getMessages(),
-      builder: (context, snapshot) {
-        return ListView.separated(
-          itemCount: snapshot.data?.length ?? 0,
-          separatorBuilder: (context, index) =>
-              Divider(height: 1, color: Color(0xffC7C7CC)),
-          itemBuilder: (context, index) {
-            if (snapshot.hasData) {
-              final message = snapshot.data![index];
-              return direct(message);
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          },
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: FutureBuilder(
+        future: _messagesFuture,
+        builder: (context, snapshot) {
+          return ListView.separated(
+            itemCount: snapshot.data?.length ?? 0,
+            separatorBuilder: (context, index) =>
+                Divider(height: 1, color: Color(0xffC7C7CC)),
+            itemBuilder: (context, index) {
+              if (snapshot.hasData) {
+                final message = snapshot.data![index];
+                return direct(message);
+              } else if (snapshot.hasError) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  AppFeedback.showFailure(context, snapshot.error as AppFailure);
+                });
+                return Center(
+                  child: IconButton(
+                    onPressed: _refresh,
+                    icon: Icon(Icons.refresh),
+                  ),
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -194,8 +221,10 @@ class HighlightProfiles extends StatelessWidget {
           child: ClipOval(
             child: CachedNetworkImage(
               imageUrl: imageUrl,
-              placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+              placeholder: (context, url) =>
+                  Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) =>
+                  Center(child: Icon(Icons.error)),
             ),
           ),
         ),

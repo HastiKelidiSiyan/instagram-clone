@@ -11,7 +11,6 @@ class UserRepository {
   Future<List<UserModel>> getUsers() async {
     if (await connectivityResult.isConnected()) {
       final users = await remoteDataSource.getUsers();
-      await localDataSource.cacheUsers(users);
       return users;
     } else {
       return await localDataSource.getUsers();
