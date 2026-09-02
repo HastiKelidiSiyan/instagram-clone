@@ -1,5 +1,6 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
-import 'package:instagram_clone/data_source/remote_data_source.dart';
 import 'package:instagram_clone/database/database.dart';
 import 'package:instagram_clone/models/message_model.dart';
 import 'package:instagram_clone/models/story_model.dart';
@@ -15,23 +16,21 @@ class LocalDataSource {
   Future<List<PostModel>> getPosts() async {
     try {
       final posts = await database.select(database.posts).get();
-      List<PostModel> postModels = [];
-      for (var post in posts) {
-        final user = await getUserById(post.userId);
-        final likedBy = await getUserById(post.likedByUserId);
-        postModels = posts.map((post) {
-          return PostModel(
-            user: user!,
-            subtitle: post.subtitle,
-            postImage: post.postImage,
-            caption: post.caption,
-            likedBy: likedBy,
-            totalLikes: post.totalLikes,
-            totalComments: post.totalComments,
-          );
-        }).toList();
-      }
-      return postModels;
+      return posts
+          .map(
+            (post) => PostModel(
+              user: _userFromJson(post.userJson),
+              subtitle: post.subtitle,
+              postImage: post.postImage,
+              caption: post.caption,
+              likedBy: post.likedByJson == null
+                  ? null
+                  : _userFromJson(post.likedByJson!),
+              totalLikes: post.totalLikes,
+              totalComments: post.totalComments,
+            ),
+          )
+          .toList();
     } catch (e) {
       throw Exception('Failed to get posts: $e');
     }
@@ -40,19 +39,24 @@ class LocalDataSource {
   Future<void> cachePosts(List<PostModel> posts) async {
     try {
       for (var post in posts) {
-        final user = await getUserById(post.user.userId);
-        final likedByuser = await getUserById(post.likedBy!.userId);
-        await database.into(database.posts).insertOnConflictUpdate(
-          PostsCompanion.insert(
-            userId: Value(user!.userId),
-            subtitle: post.subtitle,
-            postImage: post.postImage,
-            caption: post.caption,
-            likedByUserId: likedByuser!.userId,
-            totalLikes: Value(post.totalLikes),
-            totalComments: Value(post.totalComments),
-          ),
-        );
+        await database
+            .into(database.posts)
+            .insertOnConflictUpdate(
+              PostsCompanion.insert(
+                userId: Value(post.user.userId),
+                userJson: jsonEncode(post.user.toJson()),
+                subtitle: post.subtitle,
+                postImage: post.postImage,
+                caption: post.caption,
+                likedByJson: Value(
+                  post.likedBy == null
+                      ? null
+                      : jsonEncode(post.likedBy!.toJson()),
+                ),
+                totalLikes: Value(post.totalLikes),
+                totalComments: Value(post.totalComments),
+              ),
+            );
       }
     } catch (e) {
       throw Exception('Failed to cache posts: $e');
@@ -62,17 +66,14 @@ class LocalDataSource {
   Future<List<StoryModel>> getStories() async {
     try {
       final stories = await database.select(database.stories).get();
-      List<StoryModel> storyModels = [];
-      for (var story in stories) {
-        final user = await getUserById(story.userId);
-        storyModels = stories.map((story) {
-          return StoryModel(
-            user: user!,
-            seen: story.seen,
-          );
-        }).toList();
-      }
-      return storyModels;
+      return stories
+          .map(
+            (story) => StoryModel(
+              user: _userFromJson(story.userJson),
+              seen: story.seen,
+            ),
+          )
+          .toList();
     } catch (e) {
       throw Exception('Failed to get stories: $e');
     }
@@ -81,13 +82,15 @@ class LocalDataSource {
   Future<void> cacheStories(List<StoryModel> stories) async {
     try {
       for (var story in stories) {
-        final user = await getUserById(story.user.userId);
-        await database.into(database.stories).insertOnConflictUpdate(
-          StoriesCompanion.insert(
-            userId: Value(user!.userId),
-            seen: Value(story.seen),
-          ),
-        );
+        await database
+            .into(database.stories)
+            .insertOnConflictUpdate(
+              StoriesCompanion.insert(
+                userId: Value(story.user.userId),
+                userJson: jsonEncode(story.user.toJson()),
+                seen: Value(story.seen),
+              ),
+            );
       }
     } catch (e) {
       throw Exception('Failed to cache stories: $e');
@@ -97,18 +100,15 @@ class LocalDataSource {
   Future<List<MessageModel>> getMessages() async {
     try {
       final messages = await database.select(database.messages).get();
-      List<MessageModel> messageModels = [];
-      for (var message in messages) {
-        final user = await getUserById(message.userId);
-        messageModels = messages.map((message) {
-          return MessageModel(
-            user: user!,
-            lastMessage: message.lastMessage,
-            date: message.date,
-          );
-        }).toList();
-      }
-      return messageModels;
+      return messages
+          .map(
+            (message) => MessageModel(
+              user: _userFromJson(message.userJson),
+              lastMessage: message.lastMessage,
+              date: message.date,
+            ),
+          )
+          .toList();
     } catch (e) {
       throw Exception('Failed to get messages: $e');
     }
@@ -117,89 +117,69 @@ class LocalDataSource {
   Future<void> cacheMessages(List<MessageModel> messages) async {
     try {
       for (var message in messages) {
-        final user = await getUserById(message.user.userId);
-        await database.into(database.messages).insertOnConflictUpdate(
-          MessagesCompanion.insert(
-            userId: Value(user!.userId),
-            lastMessage: message.lastMessage,
-            date: message.date,
-          ),
-        );
+        await database
+            .into(database.messages)
+            .insertOnConflictUpdate(
+              MessagesCompanion.insert(
+                userId: Value(message.user.userId),
+                userJson: jsonEncode(message.user.toJson()),
+                lastMessage: message.lastMessage,
+                date: message.date,
+              ),
+            );
       }
     } catch (e) {
       throw Exception('Failed to cache messages: $e');
     }
   }
 
-  Future<List<UserModel>> getUsers() async {
-    try {
-      final users = await database.select(database.users).get();
-      return users
-          .map(
-            (user) => UserModel(
-              userId: user.id,
-              name: user.name,
-              username: user.username,
-              avatar: user.avatar,
-              totalPosts: user.totalPosts,
-              totalFollowers: user.totalFollowers,
-              totalFollowings: user.totalFollowings,
-              bio: user.bio,
-            ),
-          )
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to get users: $e');
-    }
+  UserModel _userFromJson(String userJson) {
+    return UserModel.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
   }
 
-  Future<void> cacheUsers(List<UserModel> users) async {
+  Future<List<UserModel>> getUsers() async {
     try {
-      for (var user in users) {
-        await database.into(database.users).insertOnConflictUpdate(
-          UsersCompanion.insert(
-            id: Value(user!.userId),
-            name: user.name,
-            username: user.username,
-            avatar: user.avatar,
-            totalPosts: Value(user.totalPosts),
-            totalFollowers: Value(user.totalFollowers),
-            totalFollowings: Value(user.totalFollowings),
-            bio: user.bio,
-          ),
-        );
+      final posts = await getPosts();
+      final stories = await getStories();
+      final messages = await getMessages();
+      final users = <int, UserModel>{};
+
+      for (final post in posts) {
+        users[post.user.userId] = post.user;
+        if (post.likedBy != null) {
+          users[post.likedBy!.userId] = post.likedBy!;
+        }
       }
+      for (final story in stories) {
+        users[story.user.userId] = story.user;
+      }
+      for (final message in messages) {
+        users[message.user.userId] = message.user;
+      }
+
+      return users.values.toList();
     } catch (e) {
-      throw Exception('Failed to cache users: $e');
+      throw Exception('Failed to get cached users: $e');
     }
   }
 
   Future<UserModel?> getUserById(int id) async {
-    RemoteDataSource remoteDataSource = RemoteDataSource();
-      final user = await remoteDataSource.getUserById(id);
-      return user;
+    final users = await getUsers();
+    for (final user in users) {
+      if (user.userId == id) {
+        return user;
+      }
+    }
+    return null;
   }
 
-  Future<UserModel> getUserByUsername(String username) async {
-    try {
-      final user = await (database.select(
-        database.users,
-      )..where((tbl) => tbl.username.equals(username))).getSingleOrNull();
-      if (user == null) {
-        throw Exception('User not found');
+  Future<UserModel?> getUserByUsername(String username) async {
+    final users = await getUsers();
+    for (final user in users) {
+      if (user.username == username) {
+        return user;
       }
-      return UserModel(
-        userId: user.id,
-        name: user.name,
-        username: user.username,
-        avatar: user.avatar,
-        totalPosts: user.totalPosts,
-        totalFollowers: user.totalFollowers,
-        totalFollowings: user.totalFollowings,
-        bio: user.bio,
-      );
-    } catch (e) {
-      throw Exception('Failed to get user by id: $e');
     }
+    return null;
   }
 }

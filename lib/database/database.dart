@@ -4,23 +4,10 @@ import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';
 
-class Users extends Table {
-  IntColumn get id => integer()();
-  TextColumn get name => text()();
-  TextColumn get username => text()();
-  TextColumn get avatar => text()();
-  IntColumn get totalPosts => integer().withDefault(const Constant(0))();
-  IntColumn get totalFollowers => integer().withDefault(const Constant(0))();
-  IntColumn get totalFollowings => integer().withDefault(const Constant(0))();
-  TextColumn get bio => text()();
-
-    @override
-  Set<Column> get primaryKey => {id};
-}
-
 class Stories extends Table {
   BoolColumn get seen => boolean().withDefault(const Constant(false))();
   IntColumn get userId => integer()();
+  TextColumn get userJson => text()();
 
     @override
   Set<Column> get primaryKey => {userId};
@@ -28,10 +15,11 @@ class Stories extends Table {
 
 class Posts extends Table {
   IntColumn get userId => integer()();
+  TextColumn get userJson => text()();
   TextColumn get subtitle => text()();
   TextColumn get postImage => text()();
   TextColumn get caption => text()();
-  IntColumn get likedByUserId => integer()();
+  TextColumn get likedByJson => text().nullable()();
   IntColumn get totalLikes => integer().withDefault(const Constant(0))();
   IntColumn get totalComments => integer().withDefault(const Constant(0))();
 
@@ -41,6 +29,7 @@ class Posts extends Table {
 
 class Messages extends Table {
   IntColumn get userId => integer()();
+  TextColumn get userJson => text()();
   TextColumn get lastMessage => text()();
   DateTimeColumn get date => dateTime()();
 
@@ -48,14 +37,25 @@ class Messages extends Table {
   Set<Column> get primaryKey => {userId};
 }
 
-@DriftDatabase(tables: [Users, Stories, Posts, Messages])
+@DriftDatabase(tables: [Stories, Posts, Messages])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase();
 
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (migrator, from, to) async {
+      await migrator.deleteTable('users');
+      await migrator.deleteTable('stories');
+      await migrator.deleteTable('posts');
+      await migrator.deleteTable('messages');
+      await migrator.createAll();
+    },
+  );
 
   static QueryExecutor _openConnection() {
     return driftDatabase(
