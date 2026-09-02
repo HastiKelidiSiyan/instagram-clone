@@ -228,10 +228,12 @@ class PostExtraInfo extends StatelessWidget {
           InkWell(
             child: CircleAvatar(
               radius: 8.5,
-              child: CachedNetworkImage(
-                imageUrl: post.likedBy!.avatar,
-                placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: post.likedBy!.avatar,
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                ),
               ),
             ),
             onTap: () {
@@ -298,6 +300,7 @@ class PostContents extends StatelessWidget {
       width: double.infinity,
       child: CachedNetworkImage(
         height: 320,
+        fit: BoxFit.fitHeight,
         imageUrl: post.postImage,
         placeholder: (context, url) => Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
@@ -321,10 +324,12 @@ class PostInfo extends StatelessWidget {
           InkWell(
             child: CircleAvatar(
               radius: 16,
-              child: CachedNetworkImage(
-                imageUrl: post.user.avatar,
-                placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: post.user.avatar,
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                ),
               ),
             ),
             onTap: () {
@@ -432,10 +437,12 @@ class HomeStories extends StatelessWidget {
                 padding: const EdgeInsets.all(3.0),
                 child: CircleAvatar(
                   radius: 25,
-                  child: CachedNetworkImage(
-                    imageUrl: story.user.avatar,
-                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: story.user.avatar,
+                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                    ),
                   ),
                 ),
               ),

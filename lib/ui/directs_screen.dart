@@ -191,10 +191,12 @@ class HighlightProfiles extends StatelessWidget {
         decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
         child: CircleAvatar(
           radius: 28,
-          child: CachedNetworkImage(
-            imageUrl: imageUrl,
-            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+          child: ClipOval(
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+            ),
           ),
         ),
       ),
