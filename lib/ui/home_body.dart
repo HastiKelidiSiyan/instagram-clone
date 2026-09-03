@@ -559,7 +559,13 @@ class HomeProfile extends StatelessWidget {
                 padding: const EdgeInsets.all(3.0),
                 child: CircleAvatar(
                   radius: 25,
-                  backgroundImage: NetworkImage(imageUrl),
+                  child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                ),
+              ),
                 ),
               ),
             ],

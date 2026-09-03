@@ -283,7 +283,13 @@ class NavigationBar extends StatelessWidget {
           SizedBox(width: 58),
           Image.asset("assets/images/ShopIcon.png", height: 20, width: 20),
           SizedBox(width: 58),
-          CircleAvatar(radius: 9, backgroundImage: NetworkImage(me.avatar)),
+          CircleAvatar(radius: 9, child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: me.avatar,
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                ),
+              ),),
         ],
       ),
     );

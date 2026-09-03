@@ -135,7 +135,11 @@ class _InstagramState extends State<Instagram> {
           BottomNavigationBarItem(
             icon: CircleAvatar(
               radius: 9,
-              backgroundImage: NetworkImage(currentUser.avatar),
+              backgroundImage: NetworkImage(currentUser.avatar,
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                ),
+              ),
             ),
             label: '',
           ),
