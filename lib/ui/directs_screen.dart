@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
-import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 
 import '../models/message_model.dart';

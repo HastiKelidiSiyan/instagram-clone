@@ -1,10 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
-import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
-import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/ui/home_body.dart';
 import 'package:instagram_clone/ui/home_head.dart';
 import 'package:instagram_clone/ui/profile_body.dart';

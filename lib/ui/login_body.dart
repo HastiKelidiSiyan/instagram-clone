@@ -4,8 +4,6 @@ import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/signup_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'instagram.dart';
-
 class LoginBody extends StatefulWidget {
   const LoginBody({super.key});
 
