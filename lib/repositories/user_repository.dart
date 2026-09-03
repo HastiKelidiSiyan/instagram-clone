@@ -42,9 +42,10 @@ class UserRepository {
   Future<UserModel?> getMe() async {
     if (await connectivityResult.isConnected()) {
       final user = await remoteDataSource.getUserById(1);
+      await localDataSource.cacheMe(user!);
       return user;
     } else {
-      return await localDataSource.getUserById(1);
+      return await localDataSource.getMe();
     }
   }
 }

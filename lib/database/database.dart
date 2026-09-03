@@ -4,6 +4,20 @@ import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';
 
+class Users extends Table {
+  IntColumn get userId => integer()();
+  TextColumn get name => text()();
+  TextColumn get username => text()();
+  TextColumn get avatar => text()();
+  IntColumn get totalPosts => integer()();
+  IntColumn get totalFollowers => integer()();
+  IntColumn get totalFollowings => integer()();
+  TextColumn get bio => text()();
+
+    @override
+  Set<Column> get primaryKey => {userId};
+}
+
 class Stories extends Table {
   BoolColumn get seen => boolean().withDefault(const Constant(false))();
   IntColumn get userId => integer()();
@@ -37,7 +51,7 @@ class Messages extends Table {
   Set<Column> get primaryKey => {userId};
 }
 
-@DriftDatabase(tables: [Stories, Posts, Messages])
+@DriftDatabase(tables: [Stories, Posts, Messages, Users])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase();
 

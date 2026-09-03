@@ -1060,12 +1060,519 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   }
 }
 
+class $UsersTable extends Users with TableInfo<$UsersTable, User> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UsersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _usernameMeta = const VerificationMeta(
+    'username',
+  );
+  @override
+  late final GeneratedColumn<String> username = GeneratedColumn<String>(
+    'username',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _avatarMeta = const VerificationMeta('avatar');
+  @override
+  late final GeneratedColumn<String> avatar = GeneratedColumn<String>(
+    'avatar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _totalPostsMeta = const VerificationMeta(
+    'totalPosts',
+  );
+  @override
+  late final GeneratedColumn<int> totalPosts = GeneratedColumn<int>(
+    'total_posts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _totalFollowersMeta = const VerificationMeta(
+    'totalFollowers',
+  );
+  @override
+  late final GeneratedColumn<int> totalFollowers = GeneratedColumn<int>(
+    'total_followers',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _totalFollowingsMeta = const VerificationMeta(
+    'totalFollowings',
+  );
+  @override
+  late final GeneratedColumn<int> totalFollowings = GeneratedColumn<int>(
+    'total_followings',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bioMeta = const VerificationMeta('bio');
+  @override
+  late final GeneratedColumn<String> bio = GeneratedColumn<String>(
+    'bio',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    userId,
+    name,
+    username,
+    avatar,
+    totalPosts,
+    totalFollowers,
+    totalFollowings,
+    bio,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'users';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<User> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('username')) {
+      context.handle(
+        _usernameMeta,
+        username.isAcceptableOrUnknown(data['username']!, _usernameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_usernameMeta);
+    }
+    if (data.containsKey('avatar')) {
+      context.handle(
+        _avatarMeta,
+        avatar.isAcceptableOrUnknown(data['avatar']!, _avatarMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_avatarMeta);
+    }
+    if (data.containsKey('total_posts')) {
+      context.handle(
+        _totalPostsMeta,
+        totalPosts.isAcceptableOrUnknown(data['total_posts']!, _totalPostsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_totalPostsMeta);
+    }
+    if (data.containsKey('total_followers')) {
+      context.handle(
+        _totalFollowersMeta,
+        totalFollowers.isAcceptableOrUnknown(
+          data['total_followers']!,
+          _totalFollowersMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_totalFollowersMeta);
+    }
+    if (data.containsKey('total_followings')) {
+      context.handle(
+        _totalFollowingsMeta,
+        totalFollowings.isAcceptableOrUnknown(
+          data['total_followings']!,
+          _totalFollowingsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_totalFollowingsMeta);
+    }
+    if (data.containsKey('bio')) {
+      context.handle(
+        _bioMeta,
+        bio.isAcceptableOrUnknown(data['bio']!, _bioMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bioMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {userId};
+  @override
+  User map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return User(
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      username: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}username'],
+      )!,
+      avatar: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}avatar'],
+      )!,
+      totalPosts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_posts'],
+      )!,
+      totalFollowers: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_followers'],
+      )!,
+      totalFollowings: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_followings'],
+      )!,
+      bio: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bio'],
+      )!,
+    );
+  }
+
+  @override
+  $UsersTable createAlias(String alias) {
+    return $UsersTable(attachedDatabase, alias);
+  }
+}
+
+class User extends DataClass implements Insertable<User> {
+  final int userId;
+  final String name;
+  final String username;
+  final String avatar;
+  final int totalPosts;
+  final int totalFollowers;
+  final int totalFollowings;
+  final String bio;
+  const User({
+    required this.userId,
+    required this.name,
+    required this.username,
+    required this.avatar,
+    required this.totalPosts,
+    required this.totalFollowers,
+    required this.totalFollowings,
+    required this.bio,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['user_id'] = Variable<int>(userId);
+    map['name'] = Variable<String>(name);
+    map['username'] = Variable<String>(username);
+    map['avatar'] = Variable<String>(avatar);
+    map['total_posts'] = Variable<int>(totalPosts);
+    map['total_followers'] = Variable<int>(totalFollowers);
+    map['total_followings'] = Variable<int>(totalFollowings);
+    map['bio'] = Variable<String>(bio);
+    return map;
+  }
+
+  UsersCompanion toCompanion(bool nullToAbsent) {
+    return UsersCompanion(
+      userId: Value(userId),
+      name: Value(name),
+      username: Value(username),
+      avatar: Value(avatar),
+      totalPosts: Value(totalPosts),
+      totalFollowers: Value(totalFollowers),
+      totalFollowings: Value(totalFollowings),
+      bio: Value(bio),
+    );
+  }
+
+  factory User.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return User(
+      userId: serializer.fromJson<int>(json['userId']),
+      name: serializer.fromJson<String>(json['name']),
+      username: serializer.fromJson<String>(json['username']),
+      avatar: serializer.fromJson<String>(json['avatar']),
+      totalPosts: serializer.fromJson<int>(json['totalPosts']),
+      totalFollowers: serializer.fromJson<int>(json['totalFollowers']),
+      totalFollowings: serializer.fromJson<int>(json['totalFollowings']),
+      bio: serializer.fromJson<String>(json['bio']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'userId': serializer.toJson<int>(userId),
+      'name': serializer.toJson<String>(name),
+      'username': serializer.toJson<String>(username),
+      'avatar': serializer.toJson<String>(avatar),
+      'totalPosts': serializer.toJson<int>(totalPosts),
+      'totalFollowers': serializer.toJson<int>(totalFollowers),
+      'totalFollowings': serializer.toJson<int>(totalFollowings),
+      'bio': serializer.toJson<String>(bio),
+    };
+  }
+
+  User copyWith({
+    int? userId,
+    String? name,
+    String? username,
+    String? avatar,
+    int? totalPosts,
+    int? totalFollowers,
+    int? totalFollowings,
+    String? bio,
+  }) => User(
+    userId: userId ?? this.userId,
+    name: name ?? this.name,
+    username: username ?? this.username,
+    avatar: avatar ?? this.avatar,
+    totalPosts: totalPosts ?? this.totalPosts,
+    totalFollowers: totalFollowers ?? this.totalFollowers,
+    totalFollowings: totalFollowings ?? this.totalFollowings,
+    bio: bio ?? this.bio,
+  );
+  User copyWithCompanion(UsersCompanion data) {
+    return User(
+      userId: data.userId.present ? data.userId.value : this.userId,
+      name: data.name.present ? data.name.value : this.name,
+      username: data.username.present ? data.username.value : this.username,
+      avatar: data.avatar.present ? data.avatar.value : this.avatar,
+      totalPosts: data.totalPosts.present
+          ? data.totalPosts.value
+          : this.totalPosts,
+      totalFollowers: data.totalFollowers.present
+          ? data.totalFollowers.value
+          : this.totalFollowers,
+      totalFollowings: data.totalFollowings.present
+          ? data.totalFollowings.value
+          : this.totalFollowings,
+      bio: data.bio.present ? data.bio.value : this.bio,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('User(')
+          ..write('userId: $userId, ')
+          ..write('name: $name, ')
+          ..write('username: $username, ')
+          ..write('avatar: $avatar, ')
+          ..write('totalPosts: $totalPosts, ')
+          ..write('totalFollowers: $totalFollowers, ')
+          ..write('totalFollowings: $totalFollowings, ')
+          ..write('bio: $bio')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    userId,
+    name,
+    username,
+    avatar,
+    totalPosts,
+    totalFollowers,
+    totalFollowings,
+    bio,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is User &&
+          other.userId == this.userId &&
+          other.name == this.name &&
+          other.username == this.username &&
+          other.avatar == this.avatar &&
+          other.totalPosts == this.totalPosts &&
+          other.totalFollowers == this.totalFollowers &&
+          other.totalFollowings == this.totalFollowings &&
+          other.bio == this.bio);
+}
+
+class UsersCompanion extends UpdateCompanion<User> {
+  final Value<int> userId;
+  final Value<String> name;
+  final Value<String> username;
+  final Value<String> avatar;
+  final Value<int> totalPosts;
+  final Value<int> totalFollowers;
+  final Value<int> totalFollowings;
+  final Value<String> bio;
+  const UsersCompanion({
+    this.userId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.username = const Value.absent(),
+    this.avatar = const Value.absent(),
+    this.totalPosts = const Value.absent(),
+    this.totalFollowers = const Value.absent(),
+    this.totalFollowings = const Value.absent(),
+    this.bio = const Value.absent(),
+  });
+  UsersCompanion.insert({
+    this.userId = const Value.absent(),
+    required String name,
+    required String username,
+    required String avatar,
+    required int totalPosts,
+    required int totalFollowers,
+    required int totalFollowings,
+    required String bio,
+  }) : name = Value(name),
+       username = Value(username),
+       avatar = Value(avatar),
+       totalPosts = Value(totalPosts),
+       totalFollowers = Value(totalFollowers),
+       totalFollowings = Value(totalFollowings),
+       bio = Value(bio);
+  static Insertable<User> custom({
+    Expression<int>? userId,
+    Expression<String>? name,
+    Expression<String>? username,
+    Expression<String>? avatar,
+    Expression<int>? totalPosts,
+    Expression<int>? totalFollowers,
+    Expression<int>? totalFollowings,
+    Expression<String>? bio,
+  }) {
+    return RawValuesInsertable({
+      if (userId != null) 'user_id': userId,
+      if (name != null) 'name': name,
+      if (username != null) 'username': username,
+      if (avatar != null) 'avatar': avatar,
+      if (totalPosts != null) 'total_posts': totalPosts,
+      if (totalFollowers != null) 'total_followers': totalFollowers,
+      if (totalFollowings != null) 'total_followings': totalFollowings,
+      if (bio != null) 'bio': bio,
+    });
+  }
+
+  UsersCompanion copyWith({
+    Value<int>? userId,
+    Value<String>? name,
+    Value<String>? username,
+    Value<String>? avatar,
+    Value<int>? totalPosts,
+    Value<int>? totalFollowers,
+    Value<int>? totalFollowings,
+    Value<String>? bio,
+  }) {
+    return UsersCompanion(
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      username: username ?? this.username,
+      avatar: avatar ?? this.avatar,
+      totalPosts: totalPosts ?? this.totalPosts,
+      totalFollowers: totalFollowers ?? this.totalFollowers,
+      totalFollowings: totalFollowings ?? this.totalFollowings,
+      bio: bio ?? this.bio,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (username.present) {
+      map['username'] = Variable<String>(username.value);
+    }
+    if (avatar.present) {
+      map['avatar'] = Variable<String>(avatar.value);
+    }
+    if (totalPosts.present) {
+      map['total_posts'] = Variable<int>(totalPosts.value);
+    }
+    if (totalFollowers.present) {
+      map['total_followers'] = Variable<int>(totalFollowers.value);
+    }
+    if (totalFollowings.present) {
+      map['total_followings'] = Variable<int>(totalFollowings.value);
+    }
+    if (bio.present) {
+      map['bio'] = Variable<String>(bio.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UsersCompanion(')
+          ..write('userId: $userId, ')
+          ..write('name: $name, ')
+          ..write('username: $username, ')
+          ..write('avatar: $avatar, ')
+          ..write('totalPosts: $totalPosts, ')
+          ..write('totalFollowers: $totalFollowers, ')
+          ..write('totalFollowings: $totalFollowings, ')
+          ..write('bio: $bio')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $StoriesTable stories = $StoriesTable(this);
   late final $PostsTable posts = $PostsTable(this);
   late final $MessagesTable messages = $MessagesTable(this);
+  late final $UsersTable users = $UsersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1074,6 +1581,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     stories,
     posts,
     messages,
+    users,
   ];
 }
 
@@ -1648,6 +2156,256 @@ typedef $$MessagesTableProcessedTableManager =
       Message,
       PrefetchHooks Function()
     >;
+typedef $$UsersTableCreateCompanionBuilder =
+    UsersCompanion Function({
+      Value<int> userId,
+      required String name,
+      required String username,
+      required String avatar,
+      required int totalPosts,
+      required int totalFollowers,
+      required int totalFollowings,
+      required String bio,
+    });
+typedef $$UsersTableUpdateCompanionBuilder =
+    UsersCompanion Function({
+      Value<int> userId,
+      Value<String> name,
+      Value<String> username,
+      Value<String> avatar,
+      Value<int> totalPosts,
+      Value<int> totalFollowers,
+      Value<int> totalFollowings,
+      Value<String> bio,
+    });
+
+class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
+  $$UsersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get username => $composableBuilder(
+    column: $table.username,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get avatar => $composableBuilder(
+    column: $table.avatar,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalPosts => $composableBuilder(
+    column: $table.totalPosts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalFollowers => $composableBuilder(
+    column: $table.totalFollowers,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalFollowings => $composableBuilder(
+    column: $table.totalFollowings,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bio => $composableBuilder(
+    column: $table.bio,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$UsersTableOrderingComposer
+    extends Composer<_$AppDatabase, $UsersTable> {
+  $$UsersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get username => $composableBuilder(
+    column: $table.username,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get avatar => $composableBuilder(
+    column: $table.avatar,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalPosts => $composableBuilder(
+    column: $table.totalPosts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalFollowers => $composableBuilder(
+    column: $table.totalFollowers,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalFollowings => $composableBuilder(
+    column: $table.totalFollowings,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bio => $composableBuilder(
+    column: $table.bio,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$UsersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UsersTable> {
+  $$UsersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get username =>
+      $composableBuilder(column: $table.username, builder: (column) => column);
+
+  GeneratedColumn<String> get avatar =>
+      $composableBuilder(column: $table.avatar, builder: (column) => column);
+
+  GeneratedColumn<int> get totalPosts => $composableBuilder(
+    column: $table.totalPosts,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get totalFollowers => $composableBuilder(
+    column: $table.totalFollowers,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get totalFollowings => $composableBuilder(
+    column: $table.totalFollowings,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bio =>
+      $composableBuilder(column: $table.bio, builder: (column) => column);
+}
+
+class $$UsersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $UsersTable,
+          User,
+          $$UsersTableFilterComposer,
+          $$UsersTableOrderingComposer,
+          $$UsersTableAnnotationComposer,
+          $$UsersTableCreateCompanionBuilder,
+          $$UsersTableUpdateCompanionBuilder,
+          (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
+          User,
+          PrefetchHooks Function()
+        > {
+  $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UsersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UsersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UsersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> userId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> username = const Value.absent(),
+                Value<String> avatar = const Value.absent(),
+                Value<int> totalPosts = const Value.absent(),
+                Value<int> totalFollowers = const Value.absent(),
+                Value<int> totalFollowings = const Value.absent(),
+                Value<String> bio = const Value.absent(),
+              }) => UsersCompanion(
+                userId: userId,
+                name: name,
+                username: username,
+                avatar: avatar,
+                totalPosts: totalPosts,
+                totalFollowers: totalFollowers,
+                totalFollowings: totalFollowings,
+                bio: bio,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> userId = const Value.absent(),
+                required String name,
+                required String username,
+                required String avatar,
+                required int totalPosts,
+                required int totalFollowers,
+                required int totalFollowings,
+                required String bio,
+              }) => UsersCompanion.insert(
+                userId: userId,
+                name: name,
+                username: username,
+                avatar: avatar,
+                totalPosts: totalPosts,
+                totalFollowers: totalFollowers,
+                totalFollowings: totalFollowings,
+                bio: bio,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$UsersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $UsersTable,
+      User,
+      $$UsersTableFilterComposer,
+      $$UsersTableOrderingComposer,
+      $$UsersTableAnnotationComposer,
+      $$UsersTableCreateCompanionBuilder,
+      $$UsersTableUpdateCompanionBuilder,
+      (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
+      User,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1658,4 +2416,6 @@ class $AppDatabaseManager {
       $$PostsTableTableManager(_db, _db.posts);
   $$MessagesTableTableManager get messages =>
       $$MessagesTableTableManager(_db, _db.messages);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db, _db.users);
 }

@@ -13,6 +13,41 @@ class LocalDataSource {
   LocalDataSource([AppDatabase? database])
     : database = database ?? AppDatabase.instance;
 
+  Future<void> cacheMe(UserModel user) async {
+    try {
+      await database
+          .into(database.users)
+          .insertOnConflictUpdate(
+            UsersCompanion.insert(
+              name: user.name,
+              username: user.username,
+              avatar: user.avatar,
+              totalPosts: user.totalPosts,
+              totalFollowers: user.totalFollowers,
+              totalFollowings: user.totalFollowings,
+              bio: user.bio,
+            ),
+          );
+    } catch (e) {
+      throw Exception('Failed to cache user: $e');
+    }
+  }
+
+  Future<UserModel> getMe() async {
+    try {
+      final users = await database.select(database.users).get();
+      return UserModel(
+        userId: users.first.userId,
+        name: users.first.name,
+        username: users.first.username,
+        avatar: users.first.avatar,
+        bio: users.first.bio,
+      );
+    } catch (e) {
+      throw Exception('Failed to find the user: $e');
+    }
+  }
+
   Future<List<PostModel>> getPosts() async {
     try {
       final posts = await database.select(database.posts).get();
