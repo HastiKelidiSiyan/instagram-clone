@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
@@ -11,32 +12,15 @@ import 'package:instagram_clone/ui/profile_head.dart';
 import 'package:instagram_clone/ui/profile_screen.dart' hide ProfileBody;
 
 class Instagram extends StatefulWidget {
-  const Instagram({super.key});
+  const Instagram({required this.me ,super.key});
+
+  final UserModel me;
 
   @override
   State<Instagram> createState() => _InstagramState();
 }
 
 class _InstagramState extends State<Instagram> {
-  UserModel? me;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUser();
-  }
-
-  Future<void> _loadUser() async {
-    try {
-    me = await UserRepository().getMe();
-    } on AppFailure catch (e) {
-      AppFeedback.showFailure(context, e);
-    }
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   int index = 0;
 
   void handleProfileTap(int userId) async {
@@ -47,24 +31,14 @@ class _InstagramState extends State<Instagram> {
     } else {
       UserModel? user = await UserRepository().getUserById(userId);
       Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => ProfileScreen(
-            user: user,
-          ),
-        ),
+        MaterialPageRoute(builder: (context) => ProfileScreen(user: user)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = me;
-
-    if (currentUser == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    final currentUser = widget.me;
 
     final heads = [
       HomeHeader(me: currentUser),
@@ -135,7 +109,9 @@ class _InstagramState extends State<Instagram> {
           BottomNavigationBarItem(
             icon: CircleAvatar(
               radius: 9,
-              backgroundImage: NetworkImage(currentUser.avatar,
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: currentUser.avatar,
                   placeholder: (context, url) => Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                 ),
@@ -148,5 +124,3 @@ class _InstagramState extends State<Instagram> {
     );
   }
 }
-
-

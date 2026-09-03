@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/signup_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,7 +73,7 @@ class _LoginBodyState extends State<LoginBody> {
       bool isUservalid = await _isUserValid(username, password);
       if (isUservalid) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const Instagram()),
+          MaterialPageRoute(builder: (context) => const LoadingScreen()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

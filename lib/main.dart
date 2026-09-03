@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/ui/instagram.dart';
+import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if(isloggedIn){
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const Instagram()),
+          MaterialPageRoute(builder: (context) => const LoadingScreen()),
         );
       } else {
         Navigator.of(context).pushReplacement(
