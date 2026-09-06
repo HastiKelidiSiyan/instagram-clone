@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/home_body.dart';
@@ -27,9 +28,7 @@ class _InstagramState extends State<Instagram> {
       });
     } else {
       UserModel? user = await UserRepository().getUserById(userId);
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => ProfileScreen(user: user)),
-      );
+      Get.to(() => ProfileScreen(user: user));
     }
   }
 

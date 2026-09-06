@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
@@ -36,9 +37,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
       if (user != null) {
         final UserModel me = user!;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => Instagram(me: me)),
-        );
+        Get.off(() => Instagram(me: me));
       } else {
         content = IconButton(onPressed: _loadUser, icon: Icon(Icons.refresh));
       }

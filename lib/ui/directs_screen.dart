@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
@@ -170,7 +171,7 @@ class Head extends StatelessWidget implements PreferredSizeWidget {
           SizedBox(width: 15),
           InkWell(
             onTap: () {
-              Navigator.pop(context);
+              Get.back();
             },
             child: Image.asset(
               "assets/images/backIcon.png",

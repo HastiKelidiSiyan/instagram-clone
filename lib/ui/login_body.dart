@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/signup_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,9 +71,7 @@ class _LoginBodyState extends State<LoginBody> {
     if (_isFormValid) {
       bool isUservalid = await _isUserValid(username, password);
       if (isUservalid) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoadingScreen()),
-        );
+        Get.off(() => const LoadingScreen());
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -346,9 +345,7 @@ class _LoginBodyState extends State<LoginBody> {
                   SizedBox(width: 8),
                   InkWell(
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => SignupScreen()),
-                      );
+                      Get.to(() => SignupScreen());
                     },
                     child: Text(
                       "Register",

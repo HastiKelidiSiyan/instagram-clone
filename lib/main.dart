@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 void main() {
   runApp(
@@ -18,10 +18,9 @@ class SplashScreen extends StatefulWidget {
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
-} 
+}
 
-class _SplashScreenState extends State<SplashScreen> {  
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -46,14 +45,10 @@ class _SplashScreenState extends State<SplashScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       bool isloggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-      if(isloggedIn){
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoadingScreen()),
-        );
+      if (isloggedIn) {
+        Get.off(() => const LoadingScreen());
       } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
+        Get.off(() => const LoginScreen());
       }
     });
   }

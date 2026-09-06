@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/ui/directs_screen.dart';
 
@@ -44,9 +45,7 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
                     width: 17,
                   ),
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => DirectsScreen(me: me, )),
-                    );
+                    Get.to(() => DirectsScreen(me: me));
                   },
                 ),
               ],

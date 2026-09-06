@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../models/user_model.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -59,7 +60,7 @@ class Head extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  Get.back();
                 },
                 child: Image.asset(
                   "assets/images/backIcon.png",
@@ -283,13 +284,18 @@ class NavigationBar extends StatelessWidget {
           SizedBox(width: 58),
           Image.asset("assets/images/ShopIcon.png", height: 20, width: 20),
           SizedBox(width: 58),
-          CircleAvatar(radius: 9, child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: me.avatar,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
-                ),
-              ),),
+          CircleAvatar(
+            radius: 9,
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: me.avatar,
+                placeholder: (context, url) =>
+                    Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) =>
+                    Center(child: Icon(Icons.error)),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -326,8 +332,10 @@ class ProfileProfile extends StatelessWidget {
               child: ClipOval(
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) =>
+                      Center(child: Icon(Icons.error)),
                 ),
               ),
             ),
@@ -368,8 +376,10 @@ class HighlightProfiles extends StatelessWidget {
               child: ClipOval(
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) =>
+                      Center(child: Icon(Icons.error)),
                 ),
               ),
             ),

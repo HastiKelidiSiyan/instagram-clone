@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +33,7 @@ class SignupHead extends StatelessWidget implements PreferredSizeWidget {
                 SizedBox(width: 20),
                 InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    Get.back();
                   },
                   child: Image.asset(
                     "assets/images/backButton.png",
@@ -259,7 +260,7 @@ class _SignupFormWithButtonsState extends State<SignupFormWithButtons> {
       await prefs.setString('username', _usernameController.text.trim());
       await prefs.setString('password', _passwordController.text.trim());
       UserRepository().addUser(user);
-      Navigator.pop(context);
+      Get.back();
     }
   }
 
@@ -753,7 +754,7 @@ class _SignupFormWithButtonsState extends State<SignupFormWithButtons> {
                 SizedBox(width: 8),
                 InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    Get.back();
                   },
                   child: Text(
                     "Login",
