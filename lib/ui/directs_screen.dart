@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
+import 'package:instagram_clone/ui/AppIcon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 
 import '../models/message_model.dart';
@@ -17,7 +18,6 @@ class DirectsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFFFFF),
         appBar: Head(me: me),
         body: const DirectsList(),
         bottomNavigationBar: const BottomBar(),
@@ -32,7 +32,6 @@ class BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color(0xFAFAFAFA),
       height: 45,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +64,7 @@ class _DirectsListState extends State<DirectsList> {
   Future<List<MessageModel>> _messagesFuture = MessageRepository()
       .getMessages();
 
-        Future<void> _refresh() async {
+  Future<void> _refresh() async {
     setState(() {
       _messagesFuture = MessageRepository().getMessages();
     });
@@ -88,7 +87,10 @@ class _DirectsListState extends State<DirectsList> {
                 return direct(message);
               } else if (snapshot.hasError) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  AppFeedback.showFailure(context, snapshot.error as AppFailure);
+                  AppFeedback.showFailure(
+                    context,
+                    snapshot.error as AppFailure,
+                  );
                 });
                 return Center(
                   child: IconButton(
@@ -160,7 +162,6 @@ class Head extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Color(0xFAFAFAFA),
       toolbarHeight: 44,
       titleSpacing: 0,
       leadingWidth: 0,
@@ -173,8 +174,7 @@ class Head extends StatelessWidget implements PreferredSizeWidget {
             onTap: () {
               Get.back();
             },
-            child: Image.asset(
-              "assets/images/backIcon.png",
+            child: AppIcon(asset:  "assets/images/backIcon.png",
               height: 17,
               width: 9,
             ),
@@ -188,7 +188,7 @@ class Head extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           Spacer(),
-          Image.asset("assets/images/AddIcon.png", height: 19, width: 19),
+          AppIcon(asset:  "assets/images/AddIcon.png", height: 19, width: 19),
           SizedBox(width: 18),
         ],
       ),
@@ -215,7 +215,10 @@ class HighlightProfiles extends StatelessWidget {
         width: 60,
         height: 60,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          shape: BoxShape.circle,
+        ),
         child: CircleAvatar(
           radius: 28,
           child: ClipOval(

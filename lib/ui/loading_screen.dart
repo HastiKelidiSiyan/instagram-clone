@@ -48,7 +48,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(child: content),
-      backgroundColor: Colors.white,
     );
   }
 }

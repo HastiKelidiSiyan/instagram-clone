@@ -9,6 +9,24 @@ void main() {
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(child: const SplashScreen()),
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(backgroundColor: Colors.white),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+        ),
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        scaffoldBackgroundColor: Colors.black,
+        brightness: Brightness.dark,
+        appBarTheme: AppBarTheme(backgroundColor: Colors.black),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.black,
+        ),
+      ),
+
+      themeMode: ThemeMode.system,
     ),
   );
 }

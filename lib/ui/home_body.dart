@@ -5,6 +5,7 @@ import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
+import 'package:instagram_clone/ui/AppIcon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 
 class HomeBody extends StatelessWidget {
@@ -73,10 +74,7 @@ class _PostBodyState extends State<PostBody> {
               }
             });
             return Center(
-              child: IconButton(
-                onPressed: _refresh,
-                icon: Icon(Icons.refresh),
-              ),
+              child: IconButton(onPressed: _refresh, icon: Icon(Icons.refresh)),
             );
           } else {
             return Center(child: CircularProgressIndicator());
@@ -310,13 +308,13 @@ class PostButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Image.asset("assets/images/HeartIcon.png", height: 24, width: 24),
+        AppIcon(asset:  "assets/images/HeartIcon.png", height: 24, width: 24),
         SizedBox(width: 12),
-        Image.asset("assets/images/CommentIcon.png", height: 24, width: 24),
+        AppIcon(asset:  "assets/images/CommentIcon.png", height: 24, width: 24),
         SizedBox(width: 12),
-        Image.asset("assets/images/DirectIcon.png", height: 24, width: 24),
+        AppIcon(asset:  "assets/images/DirectIcon.png", height: 24, width: 24),
         Spacer(),
-        Image.asset("assets/images/BookmarkIcon.png", height: 24, width: 24),
+        AppIcon(asset:  "assets/images/BookmarkIcon.png", height: 24, width: 24),
       ],
     );
   }
@@ -392,7 +390,7 @@ class PostInfo extends StatelessWidget {
             ),
           ),
           Spacer(),
-          Image.asset("assets/images/ThreeDotsIcon.png", height: 3, width: 13),
+          AppIcon(asset:"assets/images/ThreeDotsIcon.png", height: 3, width: 13),
         ],
       ),
     );
@@ -501,7 +499,7 @@ class _HomeStoriesState extends State<HomeStories> {
                 width: 54,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
               ),
               Padding(
@@ -552,7 +550,7 @@ class HomeProfile extends StatelessWidget {
                 width: 54,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
               ),
               Padding(
@@ -560,12 +558,14 @@ class HomeProfile extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 25,
                   child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
-                ),
-              ),
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      placeholder: (context, url) =>
+                          Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          Center(child: Icon(Icons.error)),
+                    ),
+                  ),
                 ),
               ),
             ],

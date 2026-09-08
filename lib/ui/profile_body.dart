@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/ui/AppIcon.dart';
 import '../models/user_model.dart';
 
 class ProfileBody extends StatelessWidget {
@@ -39,19 +40,18 @@ class Highlights extends StatelessWidget {
                 height: 64,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color(0xffC7C7CC),
+                  color: Theme.of(context).colorScheme.surface,
                 ),
                 alignment: Alignment.center,
                 child: Container(
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: Image.asset(
-                    "assets/images/AddIcon.png",
+                  child: AppIcon(asset:  "assets/images/AddIcon.png",
                     height: 18,
                     width: 18,
                   ),
@@ -100,7 +100,6 @@ class EditProfileButton extends StatelessWidget {
       height: 29,
       width: 343,
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(5),
         border: Border.all(color: Color(0xffcecece)),
       ),
@@ -108,7 +107,6 @@ class EditProfileButton extends StatelessWidget {
         child: Text(
           "Edit Profile",
           style: TextStyle(
-            color: Colors.black,
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
@@ -189,8 +187,6 @@ class ProfileInfo extends StatelessWidget {
   }
 }
 
-
-
 class NavigationBar extends StatelessWidget {
   final dynamic me;
 
@@ -210,13 +206,18 @@ class NavigationBar extends StatelessWidget {
           SizedBox(width: 58),
           Image.asset("assets/images/ShopIcon.png", height: 20, width: 20),
           SizedBox(width: 58),
-          CircleAvatar(radius: 9, child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: me.avatar,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
-                ),
-              ),),
+          CircleAvatar(
+            radius: 9,
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: me.avatar,
+                placeholder: (context, url) =>
+                    Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) =>
+                    Center(child: Icon(Icons.error)),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -244,17 +245,21 @@ class ProfileProfile extends StatelessWidget {
             width: 91,
             height: 91,
             decoration: BoxDecoration(
-              color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
             child: CircleAvatar(
               radius: 43,
-              child: CachedNetworkImage(
-            imageUrl: imageUrl,
-            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
-          ),
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) =>
+                      Center(child: Icon(Icons.error)),
+                ),
+              ),
             ),
           ),
         ),
@@ -284,7 +289,8 @@ class HighlightProfiles extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
+
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,

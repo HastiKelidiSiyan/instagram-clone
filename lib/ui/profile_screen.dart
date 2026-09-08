@@ -12,7 +12,6 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xFFFFFFFF),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(44),
           child: Head(user!),

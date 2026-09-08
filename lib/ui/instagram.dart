@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
+import 'package:instagram_clone/ui/AppIcon.dart';
 import 'package:instagram_clone/ui/home_body.dart';
 import 'package:instagram_clone/ui/home_head.dart';
 import 'package:instagram_clone/ui/profile_body.dart';
@@ -10,7 +11,7 @@ import 'package:instagram_clone/ui/profile_head.dart';
 import 'package:instagram_clone/ui/profile_screen.dart' hide ProfileBody;
 
 class Instagram extends StatefulWidget {
-  const Instagram({required this.me ,super.key});
+  const Instagram({required this.me, super.key});
 
   final UserModel me;
 
@@ -52,7 +53,6 @@ class _InstagramState extends State<Instagram> {
     ];
 
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFFF),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(44),
         child: heads[index],
@@ -66,37 +66,37 @@ class _InstagramState extends State<Instagram> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/images/HomeIcon.png",
+            icon: AppIcon(
+              asset: "assets/images/HomeIcon.png",
               height: 20,
               width: 20,
             ),
+
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/images/SearchIcon.png",
+            icon: AppIcon(
+              asset: "assets/images/SearchIcon.png",
               height: 20,
               width: 20,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/images/ReelsIcon.png",
+            icon: AppIcon(
+              asset: "assets/images/ReelsIcon.png",
               height: 20,
               width: 20,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/images/ShopIcon.png",
+            icon: AppIcon(
+              asset: "assets/images/ShopIcon.png",
               height: 20,
               width: 20,
             ),
@@ -108,8 +108,10 @@ class _InstagramState extends State<Instagram> {
               child: ClipOval(
                 child: CachedNetworkImage(
                   imageUrl: currentUser.avatar,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) =>
+                      Center(child: Icon(Icons.error)),
                 ),
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/ui/AppIcon.dart';
 
 class ProfileHeader extends StatelessWidget {
   final dynamic me;
@@ -16,8 +17,7 @@ class ProfileHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/images/PrivateIcon.png",
+              AppIcon(asset:   "assets/images/PrivateIcon.png",
                 height: 12,
                 width: 9,
               ),
@@ -27,14 +27,13 @@ class ProfileHeader extends StatelessWidget {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(width: 5),
-              Image.asset(
-                "assets/images/AccountsListIcon.png",
+              AppIcon(asset:  "assets/images/AccountsListIcon.png",
                 height: 6,
                 width: 11,
               ),
             ],
           ),
-          Image.asset("assets/images/MenuIcon.png", height: 17, width: 20),
+          AppIcon(asset:  "assets/images/MenuIcon.png", height: 17, width: 20),
         ],
       ),
     );

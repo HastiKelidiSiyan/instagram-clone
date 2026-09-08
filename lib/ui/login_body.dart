@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/ui/AppIcon.dart';
 import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/signup_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -115,8 +116,7 @@ class _LoginBodyState extends State<LoginBody> {
                     width: 49,
                   ),
                   SizedBox(height: 6),
-                  Image.asset(
-                    "assets/images/InstagramLogo.png",
+                  AppIcon(asset: "assets/images/InstagramLogo.png",
                     height: 49,
                     width: 182,
                   ),
@@ -220,8 +220,7 @@ class _LoginBodyState extends State<LoginBody> {
                           icon: SizedBox(
                             height: 20,
                             width: 20,
-                            child: Image.asset(
-                              "assets/images/visibilityIcon.png",
+                            child: AppIcon(asset: "assets/images/visibilityIcon.png",
                             ),
                           ),
                         ),
@@ -252,7 +251,7 @@ class _LoginBodyState extends State<LoginBody> {
                             if (states.contains(WidgetState.selected)) {
                               return Color(0xFF3897F0);
                             }
-                            return Color(0xFFFFFFFF);
+                            return Theme.of(context).colorScheme.surface;
                           }),
                         ),
                       ),
