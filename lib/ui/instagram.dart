@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/AppIcon.dart';
-import 'package:instagram_clone/ui/home_body.dart';
-import 'package:instagram_clone/ui/home_head.dart';
+import 'package:instagram_clone/ui/home_screen.dart';
 import 'package:instagram_clone/ui/profile_body.dart';
 import 'package:instagram_clone/ui/profile_head.dart';
 import 'package:instagram_clone/ui/profile_screen.dart' hide ProfileBody;
@@ -37,15 +36,9 @@ class _InstagramState extends State<Instagram> {
   Widget build(BuildContext context) {
     final currentUser = widget.me;
 
-    final heads = [
-      HomeHeader(me: currentUser),
-      const Placeholder(child: Text("Explore Head")),
-      const Placeholder(child: Text("Reel Head")),
-      const Placeholder(child: Text("Shop Head")),
-      ProfileHeader(currentUser),
-    ];
-    final bodies = [
-      HomeBody(me: currentUser, onProfileTap: handleProfileTap),
+
+    final screens = [
+      HomeScreen(me: currentUser, onProfileTap: handleProfileTap),
       const Placeholder(child: Text("Explore Body")),
       const Placeholder(child: Text("Reel Body")),
       const Placeholder(child: Text("Shop Body")),
@@ -53,11 +46,7 @@ class _InstagramState extends State<Instagram> {
     ];
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(44),
-        child: heads[index],
-      ),
-      body: bodies[index],
+      body: screens[index],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: (int currentIndex) {
