@@ -10,15 +10,85 @@ class ProfileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ProfileContents(me),
-        SizedBox(height: 15),
-        EditProfileButton(),
-        SizedBox(height: 1),
-        Highlights(),
-        Container(height: 1, color: Color(0xdacecece)),
-        Spacer(),
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          ProfileContents(me),
+          SizedBox(height: 15),
+          EditProfileButton(),
+          SizedBox(height: 1),
+          Highlights(),
+          PostGrid(),
+          Container(height: 1, color: Color(0xdacecece)),
+          TabBarViews(user: me),
+        ],
+      ),
+    );
+  }
+}
+
+class TabBarViews extends StatelessWidget {
+  const TabBarViews({
+    super.key,
+    required this.user
+  });
+
+  final UserModel user;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget content = Text("No Posts");
+
+    return Expanded(
+      child: TabBarView(
+        children: [
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                SliverGrid(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return Container(
+                        alignment: Alignment.center,
+                        color: Colors.teal[100 * (index % 9)],
+                      );
+                    },
+                    childCount: 20,
+                  ),
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 140.0,
+                    mainAxisSpacing: 2.0,
+                    crossAxisSpacing: 2.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Center(
+            child: Text("f"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PostGrid extends StatelessWidget {
+  const PostGrid({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TabBar(
+      tabs: [
+        Tab(
+          icon: Icon(Icons.grid_4x4),
+        ),
+        Tab(
+          icon: Icon(Icons.person),
+        ),
       ],
     );
   }
@@ -47,11 +117,12 @@ class Highlights extends StatelessWidget {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).colorScheme.surface,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: AppIcon(asset:  "assets/images/AddIcon.png",
+                  child: AppIcon(
+                    asset: "assets/images/AddIcon.png",
                     height: 18,
                     width: 18,
                   ),
@@ -245,7 +316,7 @@ class ProfileProfile extends StatelessWidget {
             width: 91,
             height: 91,
             decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
+              color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
