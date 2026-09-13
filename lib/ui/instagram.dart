@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
-import 'package:instagram_clone/ui/AppIcon.dart';
+import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/home_screen.dart';
-import 'package:instagram_clone/ui/profile_body.dart';
-import 'package:instagram_clone/ui/profile_head.dart';
+
 import 'package:instagram_clone/ui/profile_screen.dart' hide ProfileBody;
 
 class Instagram extends StatefulWidget {
@@ -42,7 +41,7 @@ class _InstagramState extends State<Instagram> {
       const Placeholder(child: Text("Explore Body")),
       const Placeholder(child: Text("Reel Body")),
       const Placeholder(child: Text("Shop Body")),
-      ProfileBody(currentUser),
+      ProfileScreen(user: currentUser),
     ];
 
     return Scaffold(

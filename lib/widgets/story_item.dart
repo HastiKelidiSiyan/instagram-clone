@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/story_model.dart';
 
-class StoryListItem extends StatelessWidget {
-  const StoryListItem({super.key, required this.story, required this.onTap});
+class StoryItem extends StatelessWidget {
+  const StoryItem({super.key, required this.story, required this.onTap, required this.radius, required this.isDirect});
 
   final StoryModel story;
   final VoidCallback onTap;
+  final double radius;
+  final bool isDirect;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +22,8 @@ class StoryListItem extends StatelessWidget {
             alignment: AlignmentGeometry.center,
             children: [
               Container(
-                width: 58,
-                height: 58,
+                width: (radius * 2) + 4,
+                height: (radius * 2) + 4,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: story.seen
@@ -38,8 +40,8 @@ class StoryListItem extends StatelessWidget {
                 ),
               ),
               Container(
-                height: 54,
-                width: 54,
+                height: (radius * 2) + 4,
+                width: (radius * 2) + 4,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Theme.of(context).colorScheme.surface,
@@ -48,7 +50,7 @@ class StoryListItem extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(3.0),
                 child: CircleAvatar(
-                  radius: 25,
+                  radius: radius,
                   child: ClipOval(
                     child: CachedNetworkImage(
                       imageUrl: story.user.avatar,
@@ -63,7 +65,8 @@ class StoryListItem extends StatelessWidget {
             ],
           ),
           SizedBox(height: 8),
-          Text(story.user.username, style: TextStyle(fontSize: 11)),
+          if (!isDirect)
+            Text(story.user.username, style: TextStyle(fontSize: 11)),
         ],
       ),
     );

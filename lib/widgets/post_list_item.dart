@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/post_model.dart';
-import 'package:instagram_clone/ui/AppIcon.dart';
+import 'package:instagram_clone/ui/app_icon.dart';
 
 class PostListItem extends StatelessWidget {
   final PostModel post;

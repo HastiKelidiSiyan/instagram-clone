@@ -1,17 +1,17 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:instagram_clone/models/app_failure.dart';
-import 'package:instagram_clone/models/post_model.dart';
-import 'package:instagram_clone/models/story_model.dart';
+import 'package:flutter/material.dart';
+import 'package:instagram_clone/ui/app_icon.dart';
+import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/models/user_model.dart';
+import 'package:instagram_clone/ui/directs_screen.dart';
+import 'package:instagram_clone/models/post_model.dart';
+import 'package:instagram_clone/models/app_failure.dart';
+import 'package:instagram_clone/models/story_model.dart';
+import 'package:instagram_clone/widgets/story_item.dart';
+import 'package:instagram_clone/widgets/post_list_item.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
-import 'package:instagram_clone/ui/AppIcon.dart';
-import 'package:instagram_clone/ui/app_feedback.dart';
-import 'package:instagram_clone/ui/directs_screen.dart';
-import 'package:instagram_clone/widgets/post_list_item.dart';
-import 'package:instagram_clone/widgets/story_list_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.me, required this.onProfileTap});
@@ -53,165 +53,109 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
 
-PreferredSizeWidget _homeAppBar(UserModel me) {
-  return AppBar(
-    toolbarHeight: 44,
-    titleSpacing: 0,
-    leadingWidth: 0,
-    title: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-      child: Row(
-        children: [
-          AppIcon(
-            asset: "assets/images/InstagramLogo.png",
-            height: 36,
-            width: 100,
-          ),
-          Spacer(),
-          Row(
-            children: [
-              AppIcon(
-                asset: "assets/images/AddIcon.png",
-                height: 17,
-                width: 17,
-              ),
-              SizedBox(width: 16),
-              AppIcon(
-                asset: "assets/images/HeartIcon.png",
-                height: 17,
-                width: 17,
-              ),
-              SizedBox(width: 16),
-              InkWell(
-                child: AppIcon(
-                  asset: "assets/images/DirectIcon.png",
+  PreferredSizeWidget _homeAppBar(UserModel me) {
+    return AppBar(
+      toolbarHeight: 44,
+      titleSpacing: 0,
+      leadingWidth: 0,
+      title: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+        child: Row(
+          children: [
+            AppIcon(
+              asset: "assets/images/InstagramLogo.png",
+              height: 36,
+              width: 100,
+            ),
+            Spacer(),
+            Row(
+              children: [
+                AppIcon(
+                  asset: "assets/images/AddIcon.png",
                   height: 17,
                   width: 17,
                 ),
-                onTap: () {
-                  Get.to(() => DirectsScreen(me: me));
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _homeBody(
-  UserModel me,
-  Function(int) onProfileTap,
-  Future<List<PostModel>>? postsFuture,
-  Future<List<StoryModel>>? storiesFuture,
-  Future<void> Function() refreshPosts,
-  Future<void> Function() refreshStories,
-) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      _storiesSection(me, onProfileTap, storiesFuture, refreshStories),
-      Container(height: 1, color: Color(0xffcecece)),
-      Expanded(
-        child: _postsSection(me, onProfileTap, postsFuture, refreshPosts),
-      ),
-    ],
-  );
-}
-
-Widget _postsSection(
-  UserModel me,
-  Function(int) onProfileTap,
-  Future<List<PostModel>>? postsFuture,
-  Future<void> Function() refreshPosts,
-) {
-  return RefreshIndicator(
-    onRefresh: refreshPosts,
-    child: FutureBuilder(
-      future: postsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.separated(
-            itemBuilder: (context, index) {
-              return PostListItem(
-                post: snapshot.data![index],
-                onProfileTap: onProfileTap,
-              );
-            },
-            separatorBuilder: (context, index) {
-              return SizedBox(height: 0, width: 0);
-            },
-            itemCount: snapshot.data!.length,
-          );
-        } else if (snapshot.hasError) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (snapshot.error is AppFailure) {
-              AppFeedback.showFailure(context, snapshot.error as AppFailure);
-            } else {
-              AppFeedback.showException(context, snapshot.error.toString());
-            }
-          });
-          return Center(
-            child: IconButton(
-              onPressed: refreshPosts,
-              icon: Icon(Icons.refresh),
+                SizedBox(width: 16),
+                AppIcon(
+                  asset: "assets/images/HeartIcon.png",
+                  height: 17,
+                  width: 17,
+                ),
+                SizedBox(width: 16),
+                InkWell(
+                  child: AppIcon(
+                    asset: "assets/images/DirectIcon.png",
+                    height: 17,
+                    width: 17,
+                  ),
+                  onTap: () {
+                    Get.to(() => DirectsScreen(me: me));
+                  },
+                ),
+              ],
             ),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    ),
-  );
-}
-Widget _storiesSection(
-  UserModel me,
-  Function(int) onProfileTap,
-  Future<List<StoryModel>>? storiesFuture,
-  Future<void> Function() refreshStories,
-) {
-  return SizedBox(
-    height: 97,
-    child: RefreshIndicator(
-      onRefresh: refreshStories,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _homeBody(
+    UserModel me,
+    Function(int) onProfileTap,
+    Future<List<PostModel>>? postsFuture,
+    Future<List<StoryModel>>? storiesFuture,
+    Future<void> Function() refreshPosts,
+    Future<void> Function() refreshStories,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _storiesSection(me, onProfileTap, storiesFuture, refreshStories),
+        Container(height: 1, color: Color(0xffcecece)),
+        Expanded(
+          child: _postsSection(me, onProfileTap, postsFuture, refreshPosts),
+        ),
+      ],
+    );
+  }
+
+  Widget _postsSection(
+    UserModel me,
+    Function(int) onProfileTap,
+    Future<List<PostModel>>? postsFuture,
+    Future<void> Function() refreshPosts,
+  ) {
+    return RefreshIndicator(
+      onRefresh: refreshPosts,
       child: FutureBuilder(
-        future: storiesFuture,
+        future: postsFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: snapshot.data!.length + 1,
+            return ListView.separated(
               itemBuilder: (context, index) {
-                if (index == 0) {
-                  return HomeProfile(
-                    imageUrl: me.avatar,
-                    label: "Your Story",
-                  );
-                } else {
-                  return StoryListItem(
-                    story: snapshot.data![index - 1],
-                    onTap: () => onProfileTap(index - 1),
-                  );
-                }
+                return PostListItem(
+                  post: snapshot.data![index],
+                  onProfileTap: onProfileTap,
+                );
               },
+              separatorBuilder: (context, index) {
+                return SizedBox(height: 0, width: 0);
+              },
+              itemCount: snapshot.data!.length,
             );
           } else if (snapshot.hasError) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (snapshot.error is AppFailure) {
-                AppFeedback.showFailure(
-                  context,
-                  snapshot.error as AppFailure,
-                );
+                AppFeedback.showFailure(context, snapshot.error as AppFailure);
               } else {
                 AppFeedback.showException(context, snapshot.error.toString());
               }
             });
             return Center(
               child: IconButton(
-                onPressed: refreshStories,
+                onPressed: refreshPosts,
                 icon: Icon(Icons.refresh),
               ),
             );
@@ -220,8 +164,66 @@ Widget _storiesSection(
           }
         },
       ),
-    ),
-  );
+    );
+  }
+
+  Widget _storiesSection(
+    UserModel me,
+    Function(int) onProfileTap,
+    Future<List<StoryModel>>? storiesFuture,
+    Future<void> Function() refreshStories,
+  ) {
+    return SizedBox(
+      height: 97,
+      child: RefreshIndicator(
+        onRefresh: refreshStories,
+        child: FutureBuilder(
+          future: storiesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: snapshot.data!.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return HomeProfile(
+                      imageUrl: me.avatar,
+                      label: "Your Story",
+                    );
+                  } else {
+                    return StoryItem(
+                      story: snapshot.data![index - 1],
+                      onTap: () => onProfileTap(index - 1),
+                      radius: 25, isDirect: false,
+                    );
+                  }
+                },
+              );
+            } else if (snapshot.hasError) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (snapshot.error is AppFailure) {
+                  AppFeedback.showFailure(
+                    context,
+                    snapshot.error as AppFailure,
+                  );
+                } else {
+                  AppFeedback.showException(context, snapshot.error.toString());
+                }
+              });
+              return Center(
+                child: IconButton(
+                  onPressed: refreshStories,
+                  icon: Icon(Icons.refresh),
+                ),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
+      ),
+    );
+  }
 }
 
 class HomeProfile extends StatelessWidget {
@@ -275,63 +277,3 @@ class HomeProfile extends StatelessWidget {
   }
 }
 
-class NavigationBar extends StatelessWidget {
-  final dynamic me;
-
-  const NavigationBar(this.me, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 44,
-      child: Column(
-        children: [
-          Container(height: 1, color: Color(0xffcecece)),
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "assets/images/HomeIcon.png",
-                  height: 20,
-                  width: 20,
-                ),
-                SizedBox(width: 58),
-                Image.asset(
-                  "assets/images/SearchIcon.png",
-                  height: 20,
-                  width: 20,
-                ),
-                SizedBox(width: 58),
-                Image.asset(
-                  "assets/images/ReelsIcon.png",
-                  height: 20,
-                  width: 20,
-                ),
-                SizedBox(width: 58),
-                Image.asset(
-                  "assets/images/ShopIcon.png",
-                  height: 20,
-                  width: 20,
-                ),
-                SizedBox(width: 58),
-                CircleAvatar(
-                  radius: 9,
-                  child: CachedNetworkImage(
-                    imageUrl: me.avatar,
-                    placeholder: (context, url) =>
-                        Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        Center(child: Icon(Icons.error)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

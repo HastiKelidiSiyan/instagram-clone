@@ -1,37 +1,152 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/app_failure.dart';
+import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
-import 'package:instagram_clone/ui/AppIcon.dart';
+import 'package:instagram_clone/repositories/story_repository.dart';
+import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
+import 'package:instagram_clone/widgets/direct_list_item.dart';
 
 import '../models/message_model.dart';
 
-class DirectsScreen extends StatelessWidget {
-  const DirectsScreen({required this.me, super.key});
+class DirectsScreen extends StatefulWidget {
+  const DirectsScreen({
+    required this.me,
+    super.key,
+  });
 
   final UserModel me;
+  @override
+  State<DirectsScreen> createState() => _DirectsScreenState();
+}
+
+class _DirectsScreenState extends State<DirectsScreen> {
+  Future<List<MessageModel>> _messagesFuture = MessageRepository()
+      .getMessages();
+  Future<List<StoryModel>> _storiesFuture = StoryRepository().getStories();
+
+  Future<void> _refresh() async {
+    setState(() {
+      _messagesFuture = MessageRepository().getMessages();
+      _storiesFuture = StoryRepository().getStories();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: Head(me: me),
-        body: const DirectsList(),
-        bottomNavigationBar: const BottomBar(),
+        appBar: _directsAppBar(widget.me),
+        body: _directsList(),
+        bottomNavigationBar: _footer(),
       ),
     );
   }
-}
 
-class BottomBar extends StatelessWidget {
-  const BottomBar({super.key});
+  PreferredSizeWidget _directsAppBar(UserModel me) {
+    return AppBar(
+      toolbarHeight: 44,
+      titleSpacing: 0,
+      leadingWidth: 0,
+      automaticallyImplyLeading: false,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(width: 15),
+          InkWell(
+            onTap: () {
+              Get.back();
+            },
+            child: AppIcon(
+              asset: "assets/images/backIcon.png",
+              height: 17,
+              width: 9,
+            ),
+          ),
+          Spacer(),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              me.username,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Spacer(),
+          AppIcon(asset: "assets/images/AddIcon.png", height: 19, width: 19),
+          SizedBox(width: 18),
+        ],
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget _directsList() {
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: FutureBuilder(
+        future: _messagesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return FutureBuilder<List<StoryModel>>(
+              future: _storiesFuture,
+              builder: (context, storiesSnapshot) {
+                if (storiesSnapshot.hasData) {
+                  return ListView.separated(
+                    itemCount: snapshot.data!.length,
+                    separatorBuilder: (context, index) =>
+                        Divider(height: 1, color: Color(0xffC7C7CC)),
+                    itemBuilder: (context, index) {
+                      final message = snapshot.data![index];
+                      final story = storiesSnapshot.data!.firstWhere(
+                        (story) => story.user.userId == message.user.userId,
+                        orElse: () =>
+                            StoryModel(seen: true, user: message.user),
+                      );
+
+                      return DirectListItem(
+                        message: message,
+                        onTap: () {},
+                        radius: 28,
+                        story: story,
+                      );
+                    },
+                  );
+                } else if (storiesSnapshot.hasError) {
+                  return Center(
+                    child: IconButton(
+                      onPressed: _refresh,
+                      icon: Icon(Icons.refresh),
+                    ),
+                  );
+                }
+
+                return Center(child: CircularProgressIndicator());
+              },
+            );
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              AppFeedback.showFailure(
+                context,
+                snapshot.error as AppFailure,
+              );
+            });
+            return Center(
+              child: IconButton(
+                onPressed: _refresh,
+                icon: Icon(Icons.refresh),
+              ),
+            );
+          }
+
+          return Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
+
+  Widget _footer() {
+    return SizedBox(
       height: 45,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -50,212 +165,5 @@ class BottomBar extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class DirectsList extends StatefulWidget {
-  const DirectsList({super.key});
-
-  @override
-  State<DirectsList> createState() => _DirectsListState();
-}
-
-class _DirectsListState extends State<DirectsList> {
-  Future<List<MessageModel>> _messagesFuture = MessageRepository()
-      .getMessages();
-
-  Future<void> _refresh() async {
-    setState(() {
-      _messagesFuture = MessageRepository().getMessages();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      child: FutureBuilder(
-        future: _messagesFuture,
-        builder: (context, snapshot) {
-          return ListView.separated(
-            itemCount: snapshot.data?.length ?? 0,
-            separatorBuilder: (context, index) =>
-                Divider(height: 1, color: Color(0xffC7C7CC)),
-            itemBuilder: (context, index) {
-              if (snapshot.hasData) {
-                final message = snapshot.data![index];
-                return direct(message);
-              } else if (snapshot.hasError) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  AppFeedback.showFailure(
-                    context,
-                    snapshot.error as AppFailure,
-                  );
-                });
-                return Center(
-                  child: IconButton(
-                    onPressed: _refresh,
-                    icon: Icon(Icons.refresh),
-                  ),
-                );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  SizedBox direct(MessageModel message) {
-    return SizedBox(
-      height: 72,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(width: 12),
-          HighlightProfiles(imageUrl: message.user.avatar),
-          SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(message.user.username, style: TextStyle(fontSize: 13)),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 190,
-                    child: Text(
-                      message.lastMessage,
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  SizedBox(width: 6),
-                  Text(
-                    "· ${getTimeDistance(message.date)}",
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Spacer(),
-          Image.asset("assets/images/CameraIcon.png", height: 22, width: 23),
-          SizedBox(width: 15),
-        ],
-      ),
-    );
-  }
-}
-
-class Head extends StatelessWidget implements PreferredSizeWidget {
-  const Head({required this.me, super.key});
-
-  final UserModel me;
-
-  @override
-  Size get preferredSize => const Size.fromHeight(44);
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      toolbarHeight: 44,
-      titleSpacing: 0,
-      leadingWidth: 0,
-      automaticallyImplyLeading: false,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(width: 15),
-          InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: AppIcon(asset:  "assets/images/backIcon.png",
-              height: 17,
-              width: 9,
-            ),
-          ),
-          Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Text(
-              me.username,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Spacer(),
-          AppIcon(asset:  "assets/images/AddIcon.png", height: 19, width: 19),
-          SizedBox(width: 18),
-        ],
-      ),
-    );
-  }
-}
-
-class HighlightProfiles extends StatelessWidget {
-  const HighlightProfiles({super.key, required this.imageUrl});
-
-  final String imageUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 64,
-      height: 64,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Color(0xffC7C7CC),
-      ),
-      child: Container(
-        width: 60,
-        height: 60,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          shape: BoxShape.circle,
-        ),
-        child: CircleAvatar(
-          radius: 28,
-          child: ClipOval(
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              placeholder: (context, url) =>
-                  Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) =>
-                  Center(child: Icon(Icons.error)),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-String getTimeDistance(DateTime pastTime) {
-  final now = DateTime.now();
-  final difference = now.difference(pastTime);
-
-  if (difference.inSeconds < 60) {
-    return 'now';
-  } else if (difference.inMinutes < 60) {
-    return '${difference.inMinutes}m';
-  } else if (difference.inHours < 24) {
-    return '${difference.inHours}h';
-  } else if (difference.inDays < 7) {
-    return '${difference.inDays}d';
-  } else if (difference.inDays < 30) {
-    final weeks = (difference.inDays / 7).floor();
-    return '${weeks}w';
-  } else if (difference.inDays < 365) {
-    final months = (difference.inDays / 30).floor();
-    return '${months}mo';
-  } else {
-    final years = (difference.inDays / 365).floor();
-    return '${years}y';
   }
 }
