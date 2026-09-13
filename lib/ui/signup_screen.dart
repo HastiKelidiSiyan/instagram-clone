@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
+import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: SignupHead(), body: SignupBody());
-  }
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class SignupHead extends StatelessWidget implements PreferredSizeWidget {
-  const SignupHead({super.key});
-
+class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(appBar: _signupHead(), body: _signupBody());
+  }
+
+  PreferredSizeWidget _signupHead() {
     return AppBar(
       toolbarHeight: 102,
       titleSpacing: 0,
@@ -35,8 +36,8 @@ class SignupHead extends StatelessWidget implements PreferredSizeWidget {
                   onTap: () {
                     Get.back();
                   },
-                  child: Image.asset(
-                    "assets/images/backButton.png",
+                  child: AppIcon(
+                    asset: "assets/images/backButton.png",
                     height: 32,
                     width: 32,
                   ),
@@ -55,30 +56,12 @@ class SignupHead extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  @override
-  Size get preferredSize => Size.fromHeight(102);
-}
-
-class SignupBody extends StatelessWidget {
-  const SignupBody({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _signupBody() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 30),
-      child: SignupFormWithButtons(),
+      child: _signupForm(),
     );
   }
-}
-
-class SignupFormWithButtons extends StatefulWidget {
-  const SignupFormWithButtons({super.key});
-
-  @override
-  State<SignupFormWithButtons> createState() => _SignupFormWithButtonsState();
-}
-
-class _SignupFormWithButtonsState extends State<SignupFormWithButtons> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -273,8 +256,7 @@ class _SignupFormWithButtonsState extends State<SignupFormWithButtons> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _signupForm() {
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -450,7 +432,7 @@ class _SignupFormWithButtonsState extends State<SignupFormWithButtons> {
                   icon: SizedBox(
                     height: 20,
                     width: 20,
-                    child: Image.asset("assets/images/visibilityIcon.png"),
+                    child: AppIcon(asset: "assets/images/visibilityIcon.png"),
                   ),
                 ),
               ),
@@ -503,10 +485,12 @@ class _SignupFormWithButtonsState extends State<SignupFormWithButtons> {
               icon: SizedBox(
                 height: 20,
                 width: 20,
-                child: Image.asset(
-                  "assets/images/dropDownButton.png",
-                  height: 16,
-                  width: 16,
+                child: Center(
+                  child: AppIcon(
+                    asset: "assets/images/dropDownButton.png",
+                    height: 20,
+                    width: 20,
+                  ),
                 ),
               ),
               items: countries.map((String country) {
