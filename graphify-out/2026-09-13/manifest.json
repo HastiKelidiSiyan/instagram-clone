@@ -84,9 +84,9 @@
     "semantic_hash": "af73cf9eb87dcc221e632cfdb0465a0c"
   },
   "lib/main.dart": {
-    "mtime": 1789310538.3530273,
-    "seen": 1789310549.183294,
-    "ast_hash": "5a62799db4f5afabb808530fa376c149",
+    "mtime": 1789308010.8586545,
+    "seen": 1789308823.77723,
+    "ast_hash": "e270fe203a900a77dd3bb19bd4058313",
     "semantic_hash": ""
   },
   "lib/models/app_failure.dart": {
@@ -156,9 +156,9 @@
     "semantic_hash": "6bffa7f70ca0d334c44393ad3c00ed9b"
   },
   "lib/ui/directs_screen.dart": {
-    "mtime": 1789310225.6983726,
-    "seen": 1789310549.183294,
-    "ast_hash": "6231ccf26bc7c42bef13171ae1571303",
+    "mtime": 1789306324.4474764,
+    "seen": 1789308823.77723,
+    "ast_hash": "d1be84f58aca2690a1b94624ea39b9df",
     "semantic_hash": ""
   },
   "lib/ui/instagram.dart": {
@@ -180,16 +180,16 @@
     "semantic_hash": ""
   },
   "lib/ui/profile_screen.dart": {
-    "mtime": 1789310393.1369455,
-    "seen": 1789310549.183294,
-    "ast_hash": "dbe5941b1c4009f7c4b7be00a02cd0db",
+    "mtime": 1789308813.6526644,
+    "seen": 1789308823.77723,
+    "ast_hash": "85583203c15be5f92d6c47228f5c36c4",
     "semantic_hash": ""
   },
   "lib/ui/signup_screen.dart": {
-    "mtime": 1789310500.0054357,
-    "seen": 1789310549.183294,
-    "ast_hash": "6facc9629a284f3509509c51f2bec3f4",
-    "semantic_hash": ""
+    "mtime": 1788793417.0603821,
+    "seen": 1788793438.5573967,
+    "ast_hash": "beb7674d69507323d078cef63404b7bc",
+    "semantic_hash": "beb7674d69507323d078cef63404b7bc"
   },
   "linux/flutter/generated_plugin_registrant.cc": {
     "mtime": 1787143705.47385,
@@ -330,15 +330,15 @@
     "semantic_hash": ""
   },
   "lib/ui/home_screen.dart": {
-    "mtime": 1789310283.4693763,
-    "seen": 1789310549.183294,
-    "ast_hash": "dc4dce6d9fb84133b49eb962c7fac17f",
+    "mtime": 1789306780.299422,
+    "seen": 1789308823.77723,
+    "ast_hash": "7d8fb81a8a46c9ab0ae7b81da54adb4d",
     "semantic_hash": ""
   },
   "lib/widgets/direct_list_item.dart": {
-    "mtime": 1789310271.461279,
-    "seen": 1789310549.183294,
-    "ast_hash": "701271cd532a7d968cfb9b044e7f85da",
+    "mtime": 1789307798.9444005,
+    "seen": 1789308823.77723,
+    "ast_hash": "139a5b023f5fe660f7f2ab03d43bb698",
     "semantic_hash": ""
   },
   "lib/widgets/post_list_item.dart": {
@@ -348,9 +348,9 @@
     "semantic_hash": ""
   },
   "lib/widgets/story_item.dart": {
-    "mtime": 1789310302.7054315,
-    "seen": 1789310549.183294,
-    "ast_hash": "3886943196cf3a4aae1438ea1da6102f",
+    "mtime": 1789307791.4395404,
+    "seen": 1789308823.77723,
+    "ast_hash": "4afceb95233c772ff3517716b9090bb8",
     "semantic_hash": ""
   },
   ".codex/skills/graphify/SKILL.md": {

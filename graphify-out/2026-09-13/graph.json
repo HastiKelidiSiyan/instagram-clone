@@ -2289,6 +2289,17 @@
       "source_location": null
     },
     {
+      "id": "lib_widgets_direct_list_item_directlistitem",
+      "label": "DirectListItem",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "remote_data_source.dart",
+      "file_type": "code",
+      "norm_label": "directlistitem",
+      "source_file": "lib/widgets/direct_list_item.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_widgets_direct_list_item_gettimedistance",
       "label": "getTimeDistance",
       "_origin": "ast",
@@ -2377,17 +2388,6 @@
       "source_location": null
     },
     {
-      "id": "lib_widgets_story_item_isdirect",
-      "label": "isDirect",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "remote_data_source.dart",
-      "file_type": "code",
-      "norm_label": "isdirect",
-      "source_file": "lib/widgets/story_item.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_widgets_story_item_ontap",
       "label": "onTap",
       "_origin": "ast",
@@ -2417,6 +2417,17 @@
       "community_name": "remote_data_source.dart",
       "file_type": "code",
       "norm_label": "story",
+      "source_file": "lib/widgets/story_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_story_item_storyitem",
+      "label": "StoryItem",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "remote_data_source.dart",
+      "file_type": "code",
+      "norm_label": "storyitem",
       "source_file": "lib/widgets/story_item.dart",
       "source_location": null
     },
@@ -2498,28 +2509,6 @@
       "source_location": null
     },
     {
-      "id": "lib_ui_home_screen_homeprofile",
-      "label": "HomeProfile",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "homeprofile",
-      "source_file": "lib/ui/home_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_home_screen_navigationbar",
-      "label": "NavigationBar",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "navigationbar",
-      "source_file": "lib/ui/home_screen.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_ui_profile_screen",
       "label": "profile_screen.dart",
       "_origin": "ast",
@@ -2560,17 +2549,6 @@
       "community_name": "profile_screen.dart",
       "file_type": "code",
       "norm_label": "_editprofilebutton",
-      "source_file": "lib/ui/profile_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_profile_screen_false",
-      "label": "false",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "false",
       "source_file": "lib/ui/profile_screen.dart",
       "source_location": null
     },
@@ -2641,17 +2619,6 @@
       "source_location": null
     },
     {
-      "id": "lib_ui_profile_screen_profileappbar",
-      "label": "_profileAppBar",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_profileappbar",
-      "source_file": "lib/ui/profile_screen.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_ui_profile_screen_profilebody",
       "label": "_profileBody",
       "_origin": "ast",
@@ -2670,6 +2637,17 @@
       "community_name": "profile_screen.dart",
       "file_type": "code",
       "norm_label": "_profilecontents",
+      "source_file": "lib/ui/profile_screen.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_ui_profile_screen_profileheader",
+      "label": "_profileHeader",
+      "_origin": "ast",
+      "community": 11,
+      "community_name": "profile_screen.dart",
+      "file_type": "code",
+      "norm_label": "_profileheader",
       "source_file": "lib/ui/profile_screen.dart",
       "source_location": null
     },
@@ -2740,157 +2718,36 @@
       "source_location": null
     },
     {
-      "id": "lib_widgets_direct_list_item_directlistitem",
-      "label": "DirectListItem",
+      "id": "lib_ui_signup_screen_signupbody",
+      "label": "SignupBody",
       "_origin": "ast",
       "community": 11,
       "community_name": "profile_screen.dart",
       "file_type": "code",
-      "norm_label": "directlistitem",
-      "source_file": "lib/widgets/direct_list_item.dart",
+      "norm_label": "signupbody",
+      "source_file": "lib/ui/signup_screen.dart",
       "source_location": null
     },
     {
-      "id": "lib_widgets_post_list_item",
-      "label": "post_list_item.dart",
+      "id": "lib_ui_signup_screen_signuphead",
+      "label": "SignupHead",
       "_origin": "ast",
       "community": 11,
       "community_name": "profile_screen.dart",
       "file_type": "code",
-      "norm_label": "post_list_item.dart",
-      "source_file": "lib/widgets/post_list_item.dart",
+      "norm_label": "signuphead",
+      "source_file": "lib/ui/signup_screen.dart",
       "source_location": null
     },
     {
-      "id": "lib_widgets_post_list_item_build",
-      "label": "build",
+      "id": "lib_ui_signup_screen_signupscreen",
+      "label": "SignupScreen",
       "_origin": "ast",
       "community": 11,
       "community_name": "profile_screen.dart",
       "file_type": "code",
-      "norm_label": "build",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_post",
-      "label": "post",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "post",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_postactions",
-      "label": "_postActions",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_postactions",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_postcaption",
-      "label": "_postCaption",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_postcaption",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_postfooter",
-      "label": "_postFooter",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_postfooter",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_postheader",
-      "label": "_postHeader",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_postheader",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_postimage",
-      "label": "_postImage",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_postimage",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_postlikes",
-      "label": "_postLikes",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_postlikes",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_postlistitem",
-      "label": "PostListItem",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "postlistitem",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_posttopcomment",
-      "label": "_postTopComment",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "_posttopcomment",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_post_list_item_url",
-      "label": "url",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "url",
-      "source_file": "lib/widgets/post_list_item.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_widgets_story_item_storyitem",
-      "label": "StoryItem",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "profile_screen.dart",
-      "file_type": "code",
-      "norm_label": "storyitem",
-      "source_file": "lib/widgets/story_item.dart",
+      "norm_label": "signupscreen",
+      "source_file": "lib/ui/signup_screen.dart",
       "source_location": null
     },
     {
@@ -2905,13 +2762,13 @@
       "source_location": null
     },
     {
-      "id": "package_instagram_clone_ui_app_icon_dart",
-      "label": "package:instagram_clone/ui/app_icon.dart",
+      "id": "preferredsizewidget",
+      "label": "PreferredSizeWidget",
       "_origin": "ast",
       "community": 11,
       "community_name": "profile_screen.dart",
       "file_type": "code",
-      "norm_label": "package:instagram_clone/ui/app_icon.dart",
+      "norm_label": "preferredsizewidget",
       "source_file": null,
       "source_location": null
     },
@@ -2971,13 +2828,13 @@
       "source_location": null
     },
     {
-      "id": "lib_ui_directs_screen_directsappbar",
-      "label": "_directsAppBar",
+      "id": "lib_ui_directs_screen_dierctsappbar",
+      "label": "_dierctsAppBar",
       "_origin": "ast",
       "community": 12,
       "community_name": "directs_screen.dart",
       "file_type": "code",
-      "norm_label": "_directsappbar",
+      "norm_label": "_dierctsappbar",
       "source_file": "lib/ui/directs_screen.dart",
       "source_location": null
     },
@@ -2989,6 +2846,28 @@
       "community_name": "directs_screen.dart",
       "file_type": "code",
       "norm_label": "_directslist",
+      "source_file": "lib/ui/directs_screen.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_ui_directs_screen_directsscreen",
+      "label": "DirectsScreen",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "directs_screen.dart",
+      "file_type": "code",
+      "norm_label": "directsscreen",
+      "source_file": "lib/ui/directs_screen.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_ui_directs_screen_directsscreenstate",
+      "label": "_DirectsScreenState",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "directs_screen.dart",
+      "file_type": "code",
+      "norm_label": "_directsscreenstate",
       "source_file": "lib/ui/directs_screen.dart",
       "source_location": null
     },
@@ -3045,17 +2924,6 @@
       "file_type": "code",
       "norm_label": "_storiesfuture",
       "source_file": "lib/ui/directs_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "models_message_model_dart",
-      "label": "../models/message_model.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "directs_screen.dart",
-      "file_type": "code",
-      "norm_label": "../models/message_model.dart",
-      "source_file": null,
       "source_location": null
     },
     {
@@ -3191,13 +3059,13 @@
       "source_location": null
     },
     {
-      "id": "package_instagram_clone_repositories_user_repository_dart",
-      "label": "package:instagram_clone/repositories/user_repository.dart",
+      "id": "package_instagram_clone_models_user_model_dart",
+      "label": "package:instagram_clone/models/user_model.dart",
       "_origin": "ast",
       "community": 14,
       "community_name": "loading_screen.dart",
       "file_type": "code",
-      "norm_label": "package:instagram_clone/repositories/user_repository.dart",
+      "norm_label": "package:instagram_clone/models/user_model.dart",
       "source_file": null,
       "source_location": null
     },
@@ -4692,13 +4560,156 @@
       "source_location": null
     },
     {
-      "id": "package_instagram_clone_models_user_model_dart",
-      "label": "package:instagram_clone/models/user_model.dart",
+      "id": "lib_widgets_post_list_item",
+      "label": "post_list_item.dart",
       "_origin": "ast",
       "community": 22,
       "community_name": "instagram.dart",
       "file_type": "code",
-      "norm_label": "package:instagram_clone/models/user_model.dart",
+      "norm_label": "post_list_item.dart",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_build",
+      "label": "build",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "build",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_post",
+      "label": "post",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "post",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_postactions",
+      "label": "_postActions",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "_postactions",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_postcaption",
+      "label": "_postCaption",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "_postcaption",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_postfooter",
+      "label": "_postFooter",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "_postfooter",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_postheader",
+      "label": "_postHeader",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "_postheader",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_postimage",
+      "label": "_postImage",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "_postimage",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_postlikes",
+      "label": "_postLikes",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "_postlikes",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_postlistitem",
+      "label": "PostListItem",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "postlistitem",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_posttopcomment",
+      "label": "_postTopComment",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "_posttopcomment",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_widgets_post_list_item_url",
+      "label": "url",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "url",
+      "source_file": "lib/widgets/post_list_item.dart",
+      "source_location": null
+    },
+    {
+      "id": "package_instagram_clone_repositories_user_repository_dart",
+      "label": "package:instagram_clone/repositories/user_repository.dart",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "package:instagram_clone/repositories/user_repository.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "package_instagram_clone_ui_app_icon_dart",
+      "label": "package:instagram_clone/ui/app_icon.dart",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "instagram.dart",
+      "file_type": "code",
+      "norm_label": "package:instagram_clone/ui/app_icon.dart",
       "source_file": null,
       "source_location": null
     },
@@ -5261,6 +5272,17 @@
       "file_type": "code",
       "norm_label": "isconnected",
       "source_file": "lib/services/connection_availability .dart",
+      "source_location": null
+    },
+    {
+      "id": "models_message_model_dart",
+      "label": "../models/message_model.dart",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "user_repository.dart",
+      "file_type": "code",
+      "norm_label": "../models/message_model.dart",
+      "source_file": null,
       "source_location": null
     },
     {
@@ -5990,28 +6012,6 @@
       "source_location": null
     },
     {
-      "id": "lib_ui_directs_screen_directsscreen",
-      "label": "DirectsScreen",
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "State",
-      "file_type": "code",
-      "norm_label": "directsscreen",
-      "source_file": "lib/ui/directs_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_directs_screen_directsscreenstate",
-      "label": "_DirectsScreenState",
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "State",
-      "file_type": "code",
-      "norm_label": "_directsscreenstate",
-      "source_file": "lib/ui/directs_screen.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_ui_login_screen_loginscreen",
       "label": "LoginScreen",
       "_origin": "ast",
@@ -6031,6 +6031,28 @@
       "file_type": "code",
       "norm_label": "_loginscreenstate",
       "source_file": "lib/ui/login_screen.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_ui_signup_screen_signupformwithbuttons",
+      "label": "SignupFormWithButtons",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "State",
+      "file_type": "code",
+      "norm_label": "signupformwithbuttons",
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_ui_signup_screen_signupformwithbuttonsstate",
+      "label": "_SignupFormWithButtonsState",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "State",
+      "file_type": "code",
+      "norm_label": "_signupformwithbuttonsstate",
+      "source_file": "lib/ui/signup_screen.dart",
       "source_location": null
     },
     {
@@ -7154,6 +7176,17 @@
       "source_location": null
     },
     {
+      "id": "lib_ui_signup_screen_preferredsize",
+      "label": "preferredSize",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "signup_screen.dart",
+      "file_type": "code",
+      "norm_label": "preferredsize",
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_ui_signup_screen_radiogroupvalue",
       "label": "_radioGroupValue",
       "_origin": "ast",
@@ -7172,61 +7205,6 @@
       "community_name": "signup_screen.dart",
       "file_type": "code",
       "norm_label": "selectedcountry",
-      "source_file": "lib/ui/signup_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_signup_screen_signupbody",
-      "label": "_signupBody",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "signup_screen.dart",
-      "file_type": "code",
-      "norm_label": "_signupbody",
-      "source_file": "lib/ui/signup_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_signup_screen_signupform",
-      "label": "_signupForm",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "signup_screen.dart",
-      "file_type": "code",
-      "norm_label": "_signupform",
-      "source_file": "lib/ui/signup_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_signup_screen_signuphead",
-      "label": "_signupHead",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "signup_screen.dart",
-      "file_type": "code",
-      "norm_label": "_signuphead",
-      "source_file": "lib/ui/signup_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_signup_screen_signupscreen",
-      "label": "SignupScreen",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "signup_screen.dart",
-      "file_type": "code",
-      "norm_label": "signupscreen",
-      "source_file": "lib/ui/signup_screen.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_ui_signup_screen_signupscreenstate",
-      "label": "_SignupScreenState",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "signup_screen.dart",
-      "file_type": "code",
-      "norm_label": "_signupscreenstate",
       "source_file": "lib/ui/signup_screen.dart",
       "source_location": null
     },
@@ -7338,6 +7316,17 @@
       "file_type": "code",
       "norm_label": "_validateusername",
       "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null
+    },
+    {
+      "id": "size_get",
+      "label": "Size get",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "signup_screen.dart",
+      "file_type": "code",
+      "norm_label": "size get",
+      "source_file": null,
       "source_location": null
     },
     {
@@ -7561,6 +7550,17 @@
       "source_location": null
     },
     {
+      "id": "lib_ui_home_screen_homeprofile",
+      "label": "HomeProfile",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "home_screen.dart",
+      "file_type": "code",
+      "norm_label": "homeprofile",
+      "source_file": "lib/ui/home_screen.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_ui_home_screen_homescreen",
       "label": "HomeScreen",
       "_origin": "ast",
@@ -7612,6 +7612,17 @@
       "community_name": "home_screen.dart",
       "file_type": "code",
       "norm_label": "me",
+      "source_file": "lib/ui/home_screen.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_ui_home_screen_navigationbar",
+      "label": "NavigationBar",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "home_screen.dart",
+      "file_type": "code",
+      "norm_label": "navigationbar",
       "source_file": "lib/ui/home_screen.dart",
       "source_location": null
     },
@@ -9987,6 +9998,18 @@
     {
       "source": "lib_ui_signup_screen",
       "target": "list",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "variable_type",
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_signup_screen",
+      "target": "size_get",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -13393,7 +13416,7 @@
     },
     {
       "source": "lib_ui_directs_screen",
-      "target": "lib_ui_directs_screen_directsappbar",
+      "target": "lib_ui_directs_screen_dierctsappbar",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -14097,17 +14120,6 @@
     },
     {
       "source": "lib_ui_profile_screen",
-      "target": "lib_ui_profile_screen_false",
-      "relation": "defines",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/ui/profile_screen.dart",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "lib_ui_profile_screen",
       "target": "lib_ui_profile_screen_highlightimages",
       "relation": "defines",
       "_origin": "ast",
@@ -14174,17 +14186,6 @@
     },
     {
       "source": "lib_ui_profile_screen",
-      "target": "lib_ui_profile_screen_profileappbar",
-      "relation": "defines",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/ui/profile_screen.dart",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "lib_ui_profile_screen",
       "target": "lib_ui_profile_screen_profilebody",
       "relation": "defines",
       "_origin": "ast",
@@ -14197,6 +14198,17 @@
     {
       "source": "lib_ui_profile_screen",
       "target": "lib_ui_profile_screen_profilecontents",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/ui/profile_screen.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_profile_screen",
+      "target": "lib_ui_profile_screen_profileheader",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -14438,6 +14450,17 @@
     },
     {
       "source": "lib_ui_signup_screen",
+      "target": "lib_ui_signup_screen_preferredsize",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_signup_screen",
       "target": "lib_ui_signup_screen_radiogroupvalue",
       "relation": "defines",
       "_origin": "ast",
@@ -14471,7 +14494,18 @@
     },
     {
       "source": "lib_ui_signup_screen",
-      "target": "lib_ui_signup_screen_signupform",
+      "target": "lib_ui_signup_screen_signupformwithbuttons",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_signup_screen",
+      "target": "lib_ui_signup_screen_signupformwithbuttonsstate",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -14494,17 +14528,6 @@
     {
       "source": "lib_ui_signup_screen",
       "target": "lib_ui_signup_screen_signupscreen",
-      "relation": "defines",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/ui/signup_screen.dart",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "lib_ui_signup_screen",
-      "target": "lib_ui_signup_screen_signupscreenstate",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -14856,17 +14879,6 @@
     },
     {
       "source": "lib_widgets_story_item",
-      "target": "lib_widgets_story_item_isdirect",
-      "relation": "defines",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/widgets/story_item.dart",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "lib_widgets_story_item",
       "target": "lib_widgets_story_item_ontap",
       "relation": "defines",
       "_origin": "ast",
@@ -14983,6 +14995,17 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/models/app_failure.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_signup_screen_signuphead",
+      "target": "preferredsizewidget",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/ui/signup_screen.dart",
       "source_location": null,
       "weight": 1.0
     },
@@ -16021,17 +16044,6 @@
       "weight": 1.0
     },
     {
-      "source": "lib_ui_profile_screen",
-      "target": "package_instagram_clone_ui_app_icon_dart",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/ui/profile_screen.dart",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
       "source": "lib_ui_signup_screen",
       "target": "package_flutter_material_dart",
       "relation": "imports",
@@ -16692,7 +16704,18 @@
       "weight": 1.0
     },
     {
-      "source": "lib_ui_signup_screen_signupscreen",
+      "source": "lib_ui_signup_screen_signupbody",
+      "target": "statelesswidget",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_signup_screen_signupformwithbuttons",
       "target": "statefulwidget",
       "relation": "inherits",
       "_origin": "ast",
@@ -16703,8 +16726,30 @@
       "weight": 1.0
     },
     {
-      "source": "lib_ui_signup_screen_signupscreenstate",
+      "source": "lib_ui_signup_screen_signupformwithbuttonsstate",
       "target": "state",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_signup_screen_signuphead",
+      "target": "statelesswidget",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/ui/signup_screen.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_ui_signup_screen_signupscreen",
+      "target": "statelesswidget",
       "relation": "inherits",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -17022,8 +17067,8 @@
       "weight": 1.0
     },
     {
-      "source": "lib_ui_signup_screen_signupscreenstate",
-      "target": "lib_ui_signup_screen_signupscreen",
+      "source": "lib_ui_signup_screen_signupformwithbuttonsstate",
+      "target": "lib_ui_signup_screen_signupformwithbuttons",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
