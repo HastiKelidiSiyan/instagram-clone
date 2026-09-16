@@ -1,43 +1,35 @@
 class UserModel {
-  final int userId;
-  final String name;
+  final int id;
   final String username;
-  final String avatar;
-  final int totalPosts;
-  final int totalFollowers;
-  final int totalFollowings;
-  final String bio;
+  final String name;
+  final String? avatar;
+  final String? bio;
+  final DateTime createdAt;
 
   UserModel({
-    required this.userId,
+    required this.id,
     required this.name,
     required this.username,
     required this.avatar,
-    this.totalPosts = 0,
-    this.totalFollowers = 0,
-    this.totalFollowings = 0,
     required this.bio,
+    required this.createdAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    userId: json['userId'],
+    id: json['id'],
     name: json['name'],
     username: json['username'],
     avatar: json['avatar'],
-    totalPosts: json['totalPosts'],
-    totalFollowers: json['totalFollowers'],
-    totalFollowings: json['totalFollowings'],
+    createdAt: DateTime.parse(json['createdAt']),
     bio: json['bio'],
   );
 
   Map<String, dynamic> toJson() => {
-    'userId': userId,
+    'id': id,
     'name': name,
     'username': username,
     'avatar': avatar,
-    'totalPosts': totalPosts,
-    'totalFollowers': totalFollowers,
-    'totalFollowings': totalFollowings,
+    'createdAt': createdAt.toIso8601String(),
     'bio': bio,
   };
 }
