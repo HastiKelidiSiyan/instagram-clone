@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
+import 'package:instagram_clone/ui/login_screen.dart';
 import '../models/user_model.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -13,14 +15,41 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: _profileAppBar(user!),
+        appBar: _profileAppBar(user!, context),
         body: _profileBody(user!, context),
       ),
     );
   }
 }
 
-PreferredSizeWidget _profileAppBar(UserModel user) {
+void _showLogoutBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text("Logout"),
+                onTap: () async {
+                  Get.off(() => const LoginScreen());
+                  await AuthRepository().logout();
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+PreferredSizeWidget _profileAppBar(UserModel user, BuildContext context) {
   Widget content = Row(
     children: [
       SizedBox(width: 15),
@@ -76,10 +105,13 @@ PreferredSizeWidget _profileAppBar(UserModel user) {
           Row(
             children: [
               Spacer(),
-              AppIcon(
-                asset: "assets/images/MenuIcon.png",
-                height: 17,
-                width: 20,
+              InkWell(
+                onTap: () => _showLogoutBottomSheet(context),
+                child: AppIcon(
+                  asset: "assets/images/MenuIcon.png",
+                  height: 17,
+                  width: 20,
+                ),
               ),
             ],
           ),
@@ -120,22 +152,22 @@ Widget _tabBarView(UserModel user) {
     children: [
       CustomScrollView(
         slivers: [
-          SliverGrid(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.teal[100 * (index % 9)],
-                );
-              },
-              childCount: 20,
-            ),
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 140.0,
-              mainAxisSpacing: 2.0,
-              crossAxisSpacing: 2.0,
-            ),
-          ),
+          // SliverGrid(
+          //   delegate: SliverChildBuilderDelegate(
+          //     (BuildContext context, int index) {
+          //       return Container(
+          //         alignment: Alignment.center,
+          //         color: Colors.teal[100 * (index % 9)],
+          //       );
+          //     },
+          //     childCount: 20,
+          //   ),
+          //   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          //     maxCrossAxisExtent: 140.0,
+          //     mainAxisSpacing: 2.0,
+          //     crossAxisSpacing: 2.0,
+          //   ),
+          // ),
         ],
       ),
       Center(
@@ -270,8 +302,10 @@ class ProfileInfo extends StatelessWidget {
   }
 }
 
-Widget _profileProfile(String imageUrl,
-BuildContext context, ) {
+Widget _profileProfile(
+  String imageUrl,
+  BuildContext context,
+) {
   return Column(
     children: [
       Container(
