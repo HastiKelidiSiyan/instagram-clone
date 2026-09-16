@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:instagram_clone/core/storage/secure_token_storage.dart';
 
 class DioClient {
   static final Dio dio = Dio(
@@ -9,6 +10,20 @@ class DioClient {
         'Content-Type': 'application/json',
       },
     ),
-  );
+  )..interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final storage = SecureTokenStorage();
+          final accessToken = await storage.getAccessToken();
+
+          if (accessToken != null) {
+            options.headers['Authorization'] =
+                'Bearer $accessToken';
+          }
+
+          handler.next(options);
+        },
+      ),
+    );
 }
 
