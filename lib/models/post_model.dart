@@ -1,41 +1,30 @@
 import 'user_model.dart';
 
 class PostModel {
-  final UserModel user;
-  final String subtitle;
-  final String postImage;
+  final int id;
+  final int userId;
   final String caption;
-  final UserModel? likedBy;
-  final int totalLikes;
-  final int totalComments;
+  final DateTime createdAt;
 
   PostModel({
-    required this.user,
-    required this.subtitle,
-    required this.postImage,
+    required this.id,
+    required this.userId,
     required this.caption,
-    required this.likedBy,
-    this.totalLikes = 0,
-    this.totalComments = 0,
+    required this.createdAt,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
-    user: UserModel.fromJson(json['user']),
-    subtitle: json['subtitle'],
-    postImage: json['postImage'],
+    id: json['id'],
+    userId: json['userId'],
     caption: json['caption'],
-    likedBy: json['likedBy'] != null ? UserModel.fromJson(json['likedBy']) : null,
-    totalLikes: json['totalLikes'] ?? 0,
-    totalComments: json['totalComments'] ?? 0,
+    createdAt: DateTime.parse(json['createdAt']),
   );
 
+
   Map<String, dynamic> toJson() => {
-    'user': user.toJson(),
-    'subtitle': subtitle,
-    'postImage': postImage,
+    'id': id,
+    'userId': userId,
     'caption': caption,
-    'likedBy': likedBy?.toJson(),
-    'totalLikes': totalLikes,
-    'totalComments': totalComments,
+    'createdAt': createdAt.toIso8601String(),
   };
 }
