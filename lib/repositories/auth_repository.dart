@@ -24,8 +24,9 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
-    await tokenStorage.clearTokens();
-  }
+  await remoteDataSource.logout();
+  await tokenStorage.clearTokens();
+}
 
   Future<bool> isLoggedIn() async {
     final accessToken = await tokenStorage.getAccessToken();

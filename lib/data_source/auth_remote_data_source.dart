@@ -20,4 +20,8 @@ class AuthRemoteDataSource {
 
     return AuthModel.fromJson(response.data);
   }
+
+  Future<void> logout() async {
+  await dio.post('/auth/v1/logout');
+}
 }
