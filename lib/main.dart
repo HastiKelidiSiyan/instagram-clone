@@ -4,27 +4,27 @@
 // import 'package:instagram_clone/ui/login_screen.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(
-    GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SafeArea(child: const SplashScreen()),
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.white),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-        ),
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
-        brightness: Brightness.dark,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.black),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.black,
-        ),
-      ),
+// void main() {
+//   runApp(
+//     GetMaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: SafeArea(child: const SplashScreen()),
+//       theme: ThemeData(
+//         scaffoldBackgroundColor: Colors.white,
+//         appBarTheme: AppBarTheme(backgroundColor: Colors.white),
+//         bottomNavigationBarTheme: BottomNavigationBarThemeData(
+//           backgroundColor: Colors.white,
+//         ),
+//         brightness: Brightness.light,
+//       ),
+//       darkTheme: ThemeData(
+//         scaffoldBackgroundColor: Colors.black,
+//         brightness: Brightness.dark,
+//         appBarTheme: AppBarTheme(backgroundColor: Colors.black),
+//         bottomNavigationBarTheme: BottomNavigationBarThemeData(
+//         backgroundColor: Colors.black,
+//         ),
+//       ),
 
 //       themeMode: ThemeMode.system,
 //     ),
@@ -58,16 +58,16 @@ void main() {
 //     );
 //   }
 
-  void checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 2), () async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      bool isloggedIn = prefs.getBool('isLoggedIn') ?? false;
+//   void checkLoginStatus() async {
+//     await Future.delayed(const Duration(seconds: 2), () async {
+//       SharedPreferences prefs = await SharedPreferences.getInstance();
+//       bool isloggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-      if (isloggedIn) {
-        Get.off(() => const LoadingScreen());
-      } else {
-        Get.off(() => const LoginScreen());
-      }
-    });
-  }
-}
+//       if (isloggedIn) {
+//         Get.off(() => const LoadingScreen());
+//       } else {
+//         Get.off(() => const LoginScreen());
+//       }
+//     });
+//   }
+// }
