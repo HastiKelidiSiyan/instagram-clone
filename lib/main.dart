@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,10 +61,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void checkLoginStatus() async {
     await Future.delayed(const Duration(seconds: 2), () async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      bool isloggedIn = prefs.getBool('isLoggedIn') ?? false;
+      bool isLoggedIn = await AuthRepository().isLoggedIn();
 
-      if (isloggedIn) {
+      if (isLoggedIn) {
         Get.off(() => const LoadingScreen());
       } else {
         Get.off(() => const LoginScreen());
