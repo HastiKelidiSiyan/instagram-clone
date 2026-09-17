@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 part 'database.g.dart';
 
 class Users extends Table {
-  IntColumn get id => integer()();
+  TextColumn get id => text()();
   TextColumn get username => text()();
   TextColumn get name => text()();
   TextColumn get avatarUrl => text().nullable()();
@@ -17,8 +17,8 @@ class Users extends Table {
 }
 
 class Stories extends Table {
-  IntColumn get id => integer()();
-  IntColumn get userId => integer().references(Users, #id)();
+  TextColumn get id => text()();
+  TextColumn get userId => text().references(Users, #id)();
   TextColumn get mediaUrl => text()();
   TextColumn get mediaType => text()();
   DateTimeColumn get createdAt => dateTime()();
@@ -29,8 +29,8 @@ class Stories extends Table {
 }
 
 class Posts extends Table {
-  IntColumn get id => integer()();
-  IntColumn get userId => integer().references(Users, #id)();
+  TextColumn get id => text()();
+  TextColumn get userId => text().references(Users, #id)();
   TextColumn get caption => text()();
   DateTimeColumn get createdAt => dateTime()();
 
@@ -39,9 +39,9 @@ class Posts extends Table {
 }
 
 class Messages extends Table {
-  IntColumn get id => integer()();
-  IntColumn get conversationId => integer().references(Conversations, #id)();
-  IntColumn get senderId => integer().references(Users, #id)();
+  TextColumn get id => text()();
+  TextColumn get conversationId => text().references(Conversations, #id)();
+  TextColumn get senderId => text().references(Users, #id)();
   TextColumn get textContent => text()();
   DateTimeColumn get createdAt => dateTime()();
 
@@ -50,9 +50,9 @@ class Messages extends Table {
 }
 
 class Comments extends Table {
-  IntColumn get id => integer()();
-  IntColumn get postId => integer().references(Posts, #id)();
-  IntColumn get userId => integer().references(Users, #id)();
+  TextColumn get id => text()();
+  TextColumn get postId => text().references(Posts, #id)();
+  TextColumn get userId => text().references(Users, #id)();
   TextColumn get textContent => text()();
   DateTimeColumn get createdAt => dateTime()();
 
@@ -61,8 +61,8 @@ class Comments extends Table {
 }
 
 class PostMedia extends Table {
-  IntColumn get id => integer()();
-  IntColumn get postId => integer().references(Posts, #id)();
+  TextColumn get id => text()();
+  TextColumn get postId => text().references(Posts, #id)();
   TextColumn get mediaUrl => text()();
   TextColumn get mediaType => text()();
   IntColumn get position => integer()();
@@ -72,9 +72,9 @@ class PostMedia extends Table {
 }
 
 class Likes extends Table {
-  IntColumn get id => integer()();
-  IntColumn get userId => integer().references(Users, #id)();
-  IntColumn get postId => integer().references(Posts, #id)();
+  TextColumn get id => text()();
+  TextColumn get userId => text().references(Users, #id)();
+  TextColumn get postId => text().references(Posts, #id)();
   DateTimeColumn get createdAt => dateTime()();
 
   @override
@@ -82,8 +82,8 @@ class Likes extends Table {
 }
 
 class Follows extends Table {
-  IntColumn get followerId => integer().references(Users, #id)();
-  IntColumn get followingId => integer().references(Users, #id)();
+  TextColumn get followerId => text().references(Users, #id)();
+  TextColumn get followingId => text().references(Users, #id)();
   DateTimeColumn get createdAt => dateTime()();
 
   @override
@@ -91,24 +91,24 @@ class Follows extends Table {
 }
 
 class StoryViews extends Table {
-  IntColumn get userId => integer().references(Users, #id)();
-  IntColumn get storyId => integer().references(Stories, #id)();
-  DateTimeColumn get viewdAt => dateTime()();
+  TextColumn get userId => text().references(Users, #id)();
+  TextColumn get storyId => text().references(Stories, #id)();
+  DateTimeColumn get viewedAt => dateTime()();
 
   @override
   Set<Column> get primaryKey => {userId, storyId};
 }
 
 class ConversationMembers extends Table {
-  IntColumn get userId => integer().references(Users, #id)();
-  IntColumn get conversationId => integer().references(Conversations, #id)();
+  TextColumn get userId => text().references(Users, #id)();
+  TextColumn get conversationId => text().references(Conversations, #id)();
 
   @override
   Set<Column> get primaryKey => {userId, conversationId};
 }
 
 class Conversations extends Table {
-  IntColumn get id => integer()();
+  TextColumn get id => text()();
   DateTimeColumn get createdAt => dateTime()();
 
   @override

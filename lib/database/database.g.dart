@@ -10,12 +10,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   $UsersTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _usernameMeta = const VerificationMeta(
     'username',
@@ -91,6 +91,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('username')) {
       context.handle(
@@ -138,7 +140,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return User(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       username: attachedDatabase.typeMapping.read(
@@ -171,7 +173,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
 }
 
 class User extends DataClass implements Insertable<User> {
-  final int id;
+  final String id;
   final String username;
   final String name;
   final String? avatarUrl;
@@ -188,7 +190,7 @@ class User extends DataClass implements Insertable<User> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['username'] = Variable<String>(username);
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || avatarUrl != null) {
@@ -220,7 +222,7 @@ class User extends DataClass implements Insertable<User> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return User(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       username: serializer.fromJson<String>(json['username']),
       name: serializer.fromJson<String>(json['name']),
       avatarUrl: serializer.fromJson<String?>(json['avatarUrl']),
@@ -232,7 +234,7 @@ class User extends DataClass implements Insertable<User> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'username': serializer.toJson<String>(username),
       'name': serializer.toJson<String>(name),
       'avatarUrl': serializer.toJson<String?>(avatarUrl),
@@ -242,7 +244,7 @@ class User extends DataClass implements Insertable<User> {
   }
 
   User copyWith({
-    int? id,
+    String? id,
     String? username,
     String? name,
     Value<String?> avatarUrl = const Value.absent(),
@@ -296,12 +298,13 @@ class User extends DataClass implements Insertable<User> {
 }
 
 class UsersCompanion extends UpdateCompanion<User> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> username;
   final Value<String> name;
   final Value<String?> avatarUrl;
   final Value<String?> bio;
   final Value<DateTime> createdAt;
+  final Value<int> rowid;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.username = const Value.absent(),
@@ -309,24 +312,28 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.avatarUrl = const Value.absent(),
     this.bio = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   UsersCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String username,
     required String name,
     this.avatarUrl = const Value.absent(),
     this.bio = const Value.absent(),
     required DateTime createdAt,
-  }) : username = Value(username),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       username = Value(username),
        name = Value(name),
        createdAt = Value(createdAt);
   static Insertable<User> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? username,
     Expression<String>? name,
     Expression<String>? avatarUrl,
     Expression<String>? bio,
     Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -335,16 +342,18 @@ class UsersCompanion extends UpdateCompanion<User> {
       if (avatarUrl != null) 'avatar_url': avatarUrl,
       if (bio != null) 'bio': bio,
       if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   UsersCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? username,
     Value<String>? name,
     Value<String?>? avatarUrl,
     Value<String?>? bio,
     Value<DateTime>? createdAt,
+    Value<int>? rowid,
   }) {
     return UsersCompanion(
       id: id ?? this.id,
@@ -353,6 +362,7 @@ class UsersCompanion extends UpdateCompanion<User> {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       bio: bio ?? this.bio,
       createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -360,7 +370,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (username.present) {
       map['username'] = Variable<String>(username.value);
@@ -377,6 +387,9 @@ class UsersCompanion extends UpdateCompanion<User> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -388,7 +401,8 @@ class UsersCompanion extends UpdateCompanion<User> {
           ..write('name: $name, ')
           ..write('avatarUrl: $avatarUrl, ')
           ..write('bio: $bio, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -401,20 +415,20 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
   $StoriesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
     'user_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -487,6 +501,8 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('user_id')) {
       context.handle(
@@ -538,11 +554,11 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Story(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}user_id'],
       )!,
       mediaUrl: attachedDatabase.typeMapping.read(
@@ -571,8 +587,8 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
 }
 
 class Story extends DataClass implements Insertable<Story> {
-  final int id;
-  final int userId;
+  final String id;
+  final String userId;
   final String mediaUrl;
   final String mediaType;
   final DateTime createdAt;
@@ -588,8 +604,8 @@ class Story extends DataClass implements Insertable<Story> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['user_id'] = Variable<int>(userId);
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
     map['media_url'] = Variable<String>(mediaUrl);
     map['media_type'] = Variable<String>(mediaType);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -614,8 +630,8 @@ class Story extends DataClass implements Insertable<Story> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Story(
-      id: serializer.fromJson<int>(json['id']),
-      userId: serializer.fromJson<int>(json['userId']),
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
       mediaUrl: serializer.fromJson<String>(json['mediaUrl']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -626,8 +642,8 @@ class Story extends DataClass implements Insertable<Story> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'userId': serializer.toJson<int>(userId),
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
       'mediaUrl': serializer.toJson<String>(mediaUrl),
       'mediaType': serializer.toJson<String>(mediaType),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -636,8 +652,8 @@ class Story extends DataClass implements Insertable<Story> {
   }
 
   Story copyWith({
-    int? id,
-    int? userId,
+    String? id,
+    String? userId,
     String? mediaUrl,
     String? mediaType,
     DateTime? createdAt,
@@ -690,12 +706,13 @@ class Story extends DataClass implements Insertable<Story> {
 }
 
 class StoriesCompanion extends UpdateCompanion<Story> {
-  final Value<int> id;
-  final Value<int> userId;
+  final Value<String> id;
+  final Value<String> userId;
   final Value<String> mediaUrl;
   final Value<String> mediaType;
   final Value<DateTime> createdAt;
   final Value<DateTime> expiresAt;
+  final Value<int> rowid;
   const StoriesCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
@@ -703,26 +720,30 @@ class StoriesCompanion extends UpdateCompanion<Story> {
     this.mediaType = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.expiresAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   StoriesCompanion.insert({
-    this.id = const Value.absent(),
-    required int userId,
+    required String id,
+    required String userId,
     required String mediaUrl,
     required String mediaType,
     required DateTime createdAt,
     required DateTime expiresAt,
-  }) : userId = Value(userId),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       userId = Value(userId),
        mediaUrl = Value(mediaUrl),
        mediaType = Value(mediaType),
        createdAt = Value(createdAt),
        expiresAt = Value(expiresAt);
   static Insertable<Story> custom({
-    Expression<int>? id,
-    Expression<int>? userId,
+    Expression<String>? id,
+    Expression<String>? userId,
     Expression<String>? mediaUrl,
     Expression<String>? mediaType,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? expiresAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -731,16 +752,18 @@ class StoriesCompanion extends UpdateCompanion<Story> {
       if (mediaType != null) 'media_type': mediaType,
       if (createdAt != null) 'created_at': createdAt,
       if (expiresAt != null) 'expires_at': expiresAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   StoriesCompanion copyWith({
-    Value<int>? id,
-    Value<int>? userId,
+    Value<String>? id,
+    Value<String>? userId,
     Value<String>? mediaUrl,
     Value<String>? mediaType,
     Value<DateTime>? createdAt,
     Value<DateTime>? expiresAt,
+    Value<int>? rowid,
   }) {
     return StoriesCompanion(
       id: id ?? this.id,
@@ -749,6 +772,7 @@ class StoriesCompanion extends UpdateCompanion<Story> {
       mediaType: mediaType ?? this.mediaType,
       createdAt: createdAt ?? this.createdAt,
       expiresAt: expiresAt ?? this.expiresAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -756,10 +780,10 @@ class StoriesCompanion extends UpdateCompanion<Story> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (mediaUrl.present) {
       map['media_url'] = Variable<String>(mediaUrl.value);
@@ -773,6 +797,9 @@ class StoriesCompanion extends UpdateCompanion<Story> {
     if (expiresAt.present) {
       map['expires_at'] = Variable<DateTime>(expiresAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -784,7 +811,8 @@ class StoriesCompanion extends UpdateCompanion<Story> {
           ..write('mediaUrl: $mediaUrl, ')
           ..write('mediaType: $mediaType, ')
           ..write('createdAt: $createdAt, ')
-          ..write('expiresAt: $expiresAt')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -798,11 +826,11 @@ class $StoryViewsTable extends StoryViews
   $StoryViewsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
     'user_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -812,29 +840,29 @@ class $StoryViewsTable extends StoryViews
     'storyId',
   );
   @override
-  late final GeneratedColumn<int> storyId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> storyId = GeneratedColumn<String>(
     'story_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES stories (id)',
     ),
   );
-  static const VerificationMeta _viewdAtMeta = const VerificationMeta(
-    'viewdAt',
+  static const VerificationMeta _viewedAtMeta = const VerificationMeta(
+    'viewedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> viewdAt = GeneratedColumn<DateTime>(
-    'viewd_at',
+  late final GeneratedColumn<DateTime> viewedAt = GeneratedColumn<DateTime>(
+    'viewed_at',
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [userId, storyId, viewdAt];
+  List<GeneratedColumn> get $columns => [userId, storyId, viewedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -863,13 +891,13 @@ class $StoryViewsTable extends StoryViews
     } else if (isInserting) {
       context.missing(_storyIdMeta);
     }
-    if (data.containsKey('viewd_at')) {
+    if (data.containsKey('viewed_at')) {
       context.handle(
-        _viewdAtMeta,
-        viewdAt.isAcceptableOrUnknown(data['viewd_at']!, _viewdAtMeta),
+        _viewedAtMeta,
+        viewedAt.isAcceptableOrUnknown(data['viewed_at']!, _viewedAtMeta),
       );
     } else if (isInserting) {
-      context.missing(_viewdAtMeta);
+      context.missing(_viewedAtMeta);
     }
     return context;
   }
@@ -881,16 +909,16 @@ class $StoryViewsTable extends StoryViews
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return StoryView(
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}user_id'],
       )!,
       storyId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}story_id'],
       )!,
-      viewdAt: attachedDatabase.typeMapping.read(
+      viewedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}viewd_at'],
+        data['${effectivePrefix}viewed_at'],
       )!,
     );
   }
@@ -902,20 +930,20 @@ class $StoryViewsTable extends StoryViews
 }
 
 class StoryView extends DataClass implements Insertable<StoryView> {
-  final int userId;
-  final int storyId;
-  final DateTime viewdAt;
+  final String userId;
+  final String storyId;
+  final DateTime viewedAt;
   const StoryView({
     required this.userId,
     required this.storyId,
-    required this.viewdAt,
+    required this.viewedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['user_id'] = Variable<int>(userId);
-    map['story_id'] = Variable<int>(storyId);
-    map['viewd_at'] = Variable<DateTime>(viewdAt);
+    map['user_id'] = Variable<String>(userId);
+    map['story_id'] = Variable<String>(storyId);
+    map['viewed_at'] = Variable<DateTime>(viewedAt);
     return map;
   }
 
@@ -923,7 +951,7 @@ class StoryView extends DataClass implements Insertable<StoryView> {
     return StoryViewsCompanion(
       userId: Value(userId),
       storyId: Value(storyId),
-      viewdAt: Value(viewdAt),
+      viewedAt: Value(viewedAt),
     );
   }
 
@@ -933,32 +961,32 @@ class StoryView extends DataClass implements Insertable<StoryView> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return StoryView(
-      userId: serializer.fromJson<int>(json['userId']),
-      storyId: serializer.fromJson<int>(json['storyId']),
-      viewdAt: serializer.fromJson<DateTime>(json['viewdAt']),
+      userId: serializer.fromJson<String>(json['userId']),
+      storyId: serializer.fromJson<String>(json['storyId']),
+      viewedAt: serializer.fromJson<DateTime>(json['viewedAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'userId': serializer.toJson<int>(userId),
-      'storyId': serializer.toJson<int>(storyId),
-      'viewdAt': serializer.toJson<DateTime>(viewdAt),
+      'userId': serializer.toJson<String>(userId),
+      'storyId': serializer.toJson<String>(storyId),
+      'viewedAt': serializer.toJson<DateTime>(viewedAt),
     };
   }
 
-  StoryView copyWith({int? userId, int? storyId, DateTime? viewdAt}) =>
+  StoryView copyWith({String? userId, String? storyId, DateTime? viewedAt}) =>
       StoryView(
         userId: userId ?? this.userId,
         storyId: storyId ?? this.storyId,
-        viewdAt: viewdAt ?? this.viewdAt,
+        viewedAt: viewedAt ?? this.viewedAt,
       );
   StoryView copyWithCompanion(StoryViewsCompanion data) {
     return StoryView(
       userId: data.userId.present ? data.userId.value : this.userId,
       storyId: data.storyId.present ? data.storyId.value : this.storyId,
-      viewdAt: data.viewdAt.present ? data.viewdAt.value : this.viewdAt,
+      viewedAt: data.viewedAt.present ? data.viewedAt.value : this.viewedAt,
     );
   }
 
@@ -967,65 +995,65 @@ class StoryView extends DataClass implements Insertable<StoryView> {
     return (StringBuffer('StoryView(')
           ..write('userId: $userId, ')
           ..write('storyId: $storyId, ')
-          ..write('viewdAt: $viewdAt')
+          ..write('viewedAt: $viewedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(userId, storyId, viewdAt);
+  int get hashCode => Object.hash(userId, storyId, viewedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is StoryView &&
           other.userId == this.userId &&
           other.storyId == this.storyId &&
-          other.viewdAt == this.viewdAt);
+          other.viewedAt == this.viewedAt);
 }
 
 class StoryViewsCompanion extends UpdateCompanion<StoryView> {
-  final Value<int> userId;
-  final Value<int> storyId;
-  final Value<DateTime> viewdAt;
+  final Value<String> userId;
+  final Value<String> storyId;
+  final Value<DateTime> viewedAt;
   final Value<int> rowid;
   const StoryViewsCompanion({
     this.userId = const Value.absent(),
     this.storyId = const Value.absent(),
-    this.viewdAt = const Value.absent(),
+    this.viewedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   StoryViewsCompanion.insert({
-    required int userId,
-    required int storyId,
-    required DateTime viewdAt,
+    required String userId,
+    required String storyId,
+    required DateTime viewedAt,
     this.rowid = const Value.absent(),
   }) : userId = Value(userId),
        storyId = Value(storyId),
-       viewdAt = Value(viewdAt);
+       viewedAt = Value(viewedAt);
   static Insertable<StoryView> custom({
-    Expression<int>? userId,
-    Expression<int>? storyId,
-    Expression<DateTime>? viewdAt,
+    Expression<String>? userId,
+    Expression<String>? storyId,
+    Expression<DateTime>? viewedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (userId != null) 'user_id': userId,
       if (storyId != null) 'story_id': storyId,
-      if (viewdAt != null) 'viewd_at': viewdAt,
+      if (viewedAt != null) 'viewed_at': viewedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   StoryViewsCompanion copyWith({
-    Value<int>? userId,
-    Value<int>? storyId,
-    Value<DateTime>? viewdAt,
+    Value<String>? userId,
+    Value<String>? storyId,
+    Value<DateTime>? viewedAt,
     Value<int>? rowid,
   }) {
     return StoryViewsCompanion(
       userId: userId ?? this.userId,
       storyId: storyId ?? this.storyId,
-      viewdAt: viewdAt ?? this.viewdAt,
+      viewedAt: viewedAt ?? this.viewedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1034,13 +1062,13 @@ class StoryViewsCompanion extends UpdateCompanion<StoryView> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (storyId.present) {
-      map['story_id'] = Variable<int>(storyId.value);
+      map['story_id'] = Variable<String>(storyId.value);
     }
-    if (viewdAt.present) {
-      map['viewd_at'] = Variable<DateTime>(viewdAt.value);
+    if (viewedAt.present) {
+      map['viewed_at'] = Variable<DateTime>(viewedAt.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1053,7 +1081,7 @@ class StoryViewsCompanion extends UpdateCompanion<StoryView> {
     return (StringBuffer('StoryViewsCompanion(')
           ..write('userId: $userId, ')
           ..write('storyId: $storyId, ')
-          ..write('viewdAt: $viewdAt, ')
+          ..write('viewedAt: $viewedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1067,20 +1095,20 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
   $PostsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
     'user_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -1124,6 +1152,8 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('user_id')) {
       context.handle(
@@ -1159,11 +1189,11 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Post(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}user_id'],
       )!,
       caption: attachedDatabase.typeMapping.read(
@@ -1184,8 +1214,8 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
 }
 
 class Post extends DataClass implements Insertable<Post> {
-  final int id;
-  final int userId;
+  final String id;
+  final String userId;
   final String caption;
   final DateTime createdAt;
   const Post({
@@ -1197,8 +1227,8 @@ class Post extends DataClass implements Insertable<Post> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['user_id'] = Variable<int>(userId);
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
     map['caption'] = Variable<String>(caption);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -1219,8 +1249,8 @@ class Post extends DataClass implements Insertable<Post> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Post(
-      id: serializer.fromJson<int>(json['id']),
-      userId: serializer.fromJson<int>(json['userId']),
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
       caption: serializer.fromJson<String>(json['caption']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -1229,20 +1259,24 @@ class Post extends DataClass implements Insertable<Post> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'userId': serializer.toJson<int>(userId),
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
       'caption': serializer.toJson<String>(caption),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
-  Post copyWith({int? id, int? userId, String? caption, DateTime? createdAt}) =>
-      Post(
-        id: id ?? this.id,
-        userId: userId ?? this.userId,
-        caption: caption ?? this.caption,
-        createdAt: createdAt ?? this.createdAt,
-      );
+  Post copyWith({
+    String? id,
+    String? userId,
+    String? caption,
+    DateTime? createdAt,
+  }) => Post(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    caption: caption ?? this.caption,
+    createdAt: createdAt ?? this.createdAt,
+  );
   Post copyWithCompanion(PostsCompanion data) {
     return Post(
       id: data.id.present ? data.id.value : this.id,
@@ -1276,49 +1310,57 @@ class Post extends DataClass implements Insertable<Post> {
 }
 
 class PostsCompanion extends UpdateCompanion<Post> {
-  final Value<int> id;
-  final Value<int> userId;
+  final Value<String> id;
+  final Value<String> userId;
   final Value<String> caption;
   final Value<DateTime> createdAt;
+  final Value<int> rowid;
   const PostsCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
     this.caption = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   PostsCompanion.insert({
-    this.id = const Value.absent(),
-    required int userId,
+    required String id,
+    required String userId,
     required String caption,
     required DateTime createdAt,
-  }) : userId = Value(userId),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       userId = Value(userId),
        caption = Value(caption),
        createdAt = Value(createdAt);
   static Insertable<Post> custom({
-    Expression<int>? id,
-    Expression<int>? userId,
+    Expression<String>? id,
+    Expression<String>? userId,
     Expression<String>? caption,
     Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (userId != null) 'user_id': userId,
       if (caption != null) 'caption': caption,
       if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   PostsCompanion copyWith({
-    Value<int>? id,
-    Value<int>? userId,
+    Value<String>? id,
+    Value<String>? userId,
     Value<String>? caption,
     Value<DateTime>? createdAt,
+    Value<int>? rowid,
   }) {
     return PostsCompanion(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       caption: caption ?? this.caption,
       createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1326,16 +1368,19 @@ class PostsCompanion extends UpdateCompanion<Post> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (caption.present) {
       map['caption'] = Variable<String>(caption.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -1346,7 +1391,8 @@ class PostsCompanion extends UpdateCompanion<Post> {
           ..write('id: $id, ')
           ..write('userId: $userId, ')
           ..write('caption: $caption, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1360,20 +1406,20 @@ class $PostMediaTable extends PostMedia
   $PostMediaTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
   @override
-  late final GeneratedColumn<int> postId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> postId = GeneratedColumn<String>(
     'post_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES posts (id)',
@@ -1434,6 +1480,8 @@ class $PostMediaTable extends PostMedia
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('post_id')) {
       context.handle(
@@ -1477,11 +1525,11 @@ class $PostMediaTable extends PostMedia
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PostMediaData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       postId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}post_id'],
       )!,
       mediaUrl: attachedDatabase.typeMapping.read(
@@ -1506,8 +1554,8 @@ class $PostMediaTable extends PostMedia
 }
 
 class PostMediaData extends DataClass implements Insertable<PostMediaData> {
-  final int id;
-  final int postId;
+  final String id;
+  final String postId;
   final String mediaUrl;
   final String mediaType;
   final int position;
@@ -1521,8 +1569,8 @@ class PostMediaData extends DataClass implements Insertable<PostMediaData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['post_id'] = Variable<int>(postId);
+    map['id'] = Variable<String>(id);
+    map['post_id'] = Variable<String>(postId);
     map['media_url'] = Variable<String>(mediaUrl);
     map['media_type'] = Variable<String>(mediaType);
     map['position'] = Variable<int>(position);
@@ -1545,8 +1593,8 @@ class PostMediaData extends DataClass implements Insertable<PostMediaData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PostMediaData(
-      id: serializer.fromJson<int>(json['id']),
-      postId: serializer.fromJson<int>(json['postId']),
+      id: serializer.fromJson<String>(json['id']),
+      postId: serializer.fromJson<String>(json['postId']),
       mediaUrl: serializer.fromJson<String>(json['mediaUrl']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
       position: serializer.fromJson<int>(json['position']),
@@ -1556,8 +1604,8 @@ class PostMediaData extends DataClass implements Insertable<PostMediaData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'postId': serializer.toJson<int>(postId),
+      'id': serializer.toJson<String>(id),
+      'postId': serializer.toJson<String>(postId),
       'mediaUrl': serializer.toJson<String>(mediaUrl),
       'mediaType': serializer.toJson<String>(mediaType),
       'position': serializer.toJson<int>(position),
@@ -1565,8 +1613,8 @@ class PostMediaData extends DataClass implements Insertable<PostMediaData> {
   }
 
   PostMediaData copyWith({
-    int? id,
-    int? postId,
+    String? id,
+    String? postId,
     String? mediaUrl,
     String? mediaType,
     int? position,
@@ -1613,34 +1661,39 @@ class PostMediaData extends DataClass implements Insertable<PostMediaData> {
 }
 
 class PostMediaCompanion extends UpdateCompanion<PostMediaData> {
-  final Value<int> id;
-  final Value<int> postId;
+  final Value<String> id;
+  final Value<String> postId;
   final Value<String> mediaUrl;
   final Value<String> mediaType;
   final Value<int> position;
+  final Value<int> rowid;
   const PostMediaCompanion({
     this.id = const Value.absent(),
     this.postId = const Value.absent(),
     this.mediaUrl = const Value.absent(),
     this.mediaType = const Value.absent(),
     this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   PostMediaCompanion.insert({
-    this.id = const Value.absent(),
-    required int postId,
+    required String id,
+    required String postId,
     required String mediaUrl,
     required String mediaType,
     required int position,
-  }) : postId = Value(postId),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       postId = Value(postId),
        mediaUrl = Value(mediaUrl),
        mediaType = Value(mediaType),
        position = Value(position);
   static Insertable<PostMediaData> custom({
-    Expression<int>? id,
-    Expression<int>? postId,
+    Expression<String>? id,
+    Expression<String>? postId,
     Expression<String>? mediaUrl,
     Expression<String>? mediaType,
     Expression<int>? position,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1648,15 +1701,17 @@ class PostMediaCompanion extends UpdateCompanion<PostMediaData> {
       if (mediaUrl != null) 'media_url': mediaUrl,
       if (mediaType != null) 'media_type': mediaType,
       if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   PostMediaCompanion copyWith({
-    Value<int>? id,
-    Value<int>? postId,
+    Value<String>? id,
+    Value<String>? postId,
     Value<String>? mediaUrl,
     Value<String>? mediaType,
     Value<int>? position,
+    Value<int>? rowid,
   }) {
     return PostMediaCompanion(
       id: id ?? this.id,
@@ -1664,6 +1719,7 @@ class PostMediaCompanion extends UpdateCompanion<PostMediaData> {
       mediaUrl: mediaUrl ?? this.mediaUrl,
       mediaType: mediaType ?? this.mediaType,
       position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1671,10 +1727,10 @@ class PostMediaCompanion extends UpdateCompanion<PostMediaData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (postId.present) {
-      map['post_id'] = Variable<int>(postId.value);
+      map['post_id'] = Variable<String>(postId.value);
     }
     if (mediaUrl.present) {
       map['media_url'] = Variable<String>(mediaUrl.value);
@@ -1684,6 +1740,9 @@ class PostMediaCompanion extends UpdateCompanion<PostMediaData> {
     }
     if (position.present) {
       map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -1695,7 +1754,8 @@ class PostMediaCompanion extends UpdateCompanion<PostMediaData> {
           ..write('postId: $postId, ')
           ..write('mediaUrl: $mediaUrl, ')
           ..write('mediaType: $mediaType, ')
-          ..write('position: $position')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1708,20 +1768,20 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
   $LikesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
     'user_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -1729,11 +1789,11 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
   );
   static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
   @override
-  late final GeneratedColumn<int> postId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> postId = GeneratedColumn<String>(
     'post_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES posts (id)',
@@ -1803,15 +1863,15 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Like(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}user_id'],
       )!,
       postId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}post_id'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
@@ -1828,9 +1888,9 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
 }
 
 class Like extends DataClass implements Insertable<Like> {
-  final int id;
-  final int userId;
-  final int postId;
+  final String id;
+  final String userId;
+  final String postId;
   final DateTime createdAt;
   const Like({
     required this.id,
@@ -1841,9 +1901,9 @@ class Like extends DataClass implements Insertable<Like> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['user_id'] = Variable<int>(userId);
-    map['post_id'] = Variable<int>(postId);
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['post_id'] = Variable<String>(postId);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -1863,9 +1923,9 @@ class Like extends DataClass implements Insertable<Like> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Like(
-      id: serializer.fromJson<int>(json['id']),
-      userId: serializer.fromJson<int>(json['userId']),
-      postId: serializer.fromJson<int>(json['postId']),
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      postId: serializer.fromJson<String>(json['postId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -1873,20 +1933,24 @@ class Like extends DataClass implements Insertable<Like> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'userId': serializer.toJson<int>(userId),
-      'postId': serializer.toJson<int>(postId),
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
+      'postId': serializer.toJson<String>(postId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
-  Like copyWith({int? id, int? userId, int? postId, DateTime? createdAt}) =>
-      Like(
-        id: id ?? this.id,
-        userId: userId ?? this.userId,
-        postId: postId ?? this.postId,
-        createdAt: createdAt ?? this.createdAt,
-      );
+  Like copyWith({
+    String? id,
+    String? userId,
+    String? postId,
+    DateTime? createdAt,
+  }) => Like(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    postId: postId ?? this.postId,
+    createdAt: createdAt ?? this.createdAt,
+  );
   Like copyWithCompanion(LikesCompanion data) {
     return Like(
       id: data.id.present ? data.id.value : this.id,
@@ -1920,9 +1984,9 @@ class Like extends DataClass implements Insertable<Like> {
 }
 
 class LikesCompanion extends UpdateCompanion<Like> {
-  final Value<int> id;
-  final Value<int> userId;
-  final Value<int> postId;
+  final Value<String> id;
+  final Value<String> userId;
+  final Value<String> postId;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const LikesCompanion({
@@ -1933,9 +1997,9 @@ class LikesCompanion extends UpdateCompanion<Like> {
     this.rowid = const Value.absent(),
   });
   LikesCompanion.insert({
-    required int id,
-    required int userId,
-    required int postId,
+    required String id,
+    required String userId,
+    required String postId,
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -1943,9 +2007,9 @@ class LikesCompanion extends UpdateCompanion<Like> {
        postId = Value(postId),
        createdAt = Value(createdAt);
   static Insertable<Like> custom({
-    Expression<int>? id,
-    Expression<int>? userId,
-    Expression<int>? postId,
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<String>? postId,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -1959,9 +2023,9 @@ class LikesCompanion extends UpdateCompanion<Like> {
   }
 
   LikesCompanion copyWith({
-    Value<int>? id,
-    Value<int>? userId,
-    Value<int>? postId,
+    Value<String>? id,
+    Value<String>? userId,
+    Value<String>? postId,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
@@ -1978,13 +2042,13 @@ class LikesCompanion extends UpdateCompanion<Like> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (postId.present) {
-      map['post_id'] = Variable<int>(postId.value);
+      map['post_id'] = Variable<String>(postId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -2015,20 +2079,20 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
   $CommentsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
   @override
-  late final GeneratedColumn<int> postId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> postId = GeneratedColumn<String>(
     'post_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES posts (id)',
@@ -2036,11 +2100,11 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
     'user_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -2090,6 +2154,8 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('post_id')) {
       context.handle(
@@ -2136,15 +2202,15 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Comment(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       postId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}post_id'],
       )!,
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}user_id'],
       )!,
       textContent: attachedDatabase.typeMapping.read(
@@ -2165,9 +2231,9 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
 }
 
 class Comment extends DataClass implements Insertable<Comment> {
-  final int id;
-  final int postId;
-  final int userId;
+  final String id;
+  final String postId;
+  final String userId;
   final String textContent;
   final DateTime createdAt;
   const Comment({
@@ -2180,9 +2246,9 @@ class Comment extends DataClass implements Insertable<Comment> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['post_id'] = Variable<int>(postId);
-    map['user_id'] = Variable<int>(userId);
+    map['id'] = Variable<String>(id);
+    map['post_id'] = Variable<String>(postId);
+    map['user_id'] = Variable<String>(userId);
     map['text_content'] = Variable<String>(textContent);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -2204,9 +2270,9 @@ class Comment extends DataClass implements Insertable<Comment> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Comment(
-      id: serializer.fromJson<int>(json['id']),
-      postId: serializer.fromJson<int>(json['postId']),
-      userId: serializer.fromJson<int>(json['userId']),
+      id: serializer.fromJson<String>(json['id']),
+      postId: serializer.fromJson<String>(json['postId']),
+      userId: serializer.fromJson<String>(json['userId']),
       textContent: serializer.fromJson<String>(json['textContent']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -2215,18 +2281,18 @@ class Comment extends DataClass implements Insertable<Comment> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'postId': serializer.toJson<int>(postId),
-      'userId': serializer.toJson<int>(userId),
+      'id': serializer.toJson<String>(id),
+      'postId': serializer.toJson<String>(postId),
+      'userId': serializer.toJson<String>(userId),
       'textContent': serializer.toJson<String>(textContent),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
   Comment copyWith({
-    int? id,
-    int? postId,
-    int? userId,
+    String? id,
+    String? postId,
+    String? userId,
     String? textContent,
     DateTime? createdAt,
   }) => Comment(
@@ -2274,34 +2340,39 @@ class Comment extends DataClass implements Insertable<Comment> {
 }
 
 class CommentsCompanion extends UpdateCompanion<Comment> {
-  final Value<int> id;
-  final Value<int> postId;
-  final Value<int> userId;
+  final Value<String> id;
+  final Value<String> postId;
+  final Value<String> userId;
   final Value<String> textContent;
   final Value<DateTime> createdAt;
+  final Value<int> rowid;
   const CommentsCompanion({
     this.id = const Value.absent(),
     this.postId = const Value.absent(),
     this.userId = const Value.absent(),
     this.textContent = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   CommentsCompanion.insert({
-    this.id = const Value.absent(),
-    required int postId,
-    required int userId,
+    required String id,
+    required String postId,
+    required String userId,
     required String textContent,
     required DateTime createdAt,
-  }) : postId = Value(postId),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       postId = Value(postId),
        userId = Value(userId),
        textContent = Value(textContent),
        createdAt = Value(createdAt);
   static Insertable<Comment> custom({
-    Expression<int>? id,
-    Expression<int>? postId,
-    Expression<int>? userId,
+    Expression<String>? id,
+    Expression<String>? postId,
+    Expression<String>? userId,
     Expression<String>? textContent,
     Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2309,15 +2380,17 @@ class CommentsCompanion extends UpdateCompanion<Comment> {
       if (userId != null) 'user_id': userId,
       if (textContent != null) 'text_content': textContent,
       if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   CommentsCompanion copyWith({
-    Value<int>? id,
-    Value<int>? postId,
-    Value<int>? userId,
+    Value<String>? id,
+    Value<String>? postId,
+    Value<String>? userId,
     Value<String>? textContent,
     Value<DateTime>? createdAt,
+    Value<int>? rowid,
   }) {
     return CommentsCompanion(
       id: id ?? this.id,
@@ -2325,6 +2398,7 @@ class CommentsCompanion extends UpdateCompanion<Comment> {
       userId: userId ?? this.userId,
       textContent: textContent ?? this.textContent,
       createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2332,19 +2406,22 @@ class CommentsCompanion extends UpdateCompanion<Comment> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (postId.present) {
-      map['post_id'] = Variable<int>(postId.value);
+      map['post_id'] = Variable<String>(postId.value);
     }
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (textContent.present) {
       map['text_content'] = Variable<String>(textContent.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -2356,7 +2433,8 @@ class CommentsCompanion extends UpdateCompanion<Comment> {
           ..write('postId: $postId, ')
           ..write('userId: $userId, ')
           ..write('textContent: $textContent, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2370,12 +2448,12 @@ class $ConversationsTable extends Conversations
   $ConversationsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
@@ -2404,6 +2482,8 @@ class $ConversationsTable extends Conversations
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -2423,7 +2503,7 @@ class $ConversationsTable extends Conversations
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Conversation(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
@@ -2440,13 +2520,13 @@ class $ConversationsTable extends Conversations
 }
 
 class Conversation extends DataClass implements Insertable<Conversation> {
-  final int id;
+  final String id;
   final DateTime createdAt;
   const Conversation({required this.id, required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2461,7 +2541,7 @@ class Conversation extends DataClass implements Insertable<Conversation> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Conversation(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -2469,12 +2549,12 @@ class Conversation extends DataClass implements Insertable<Conversation> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
-  Conversation copyWith({int? id, DateTime? createdAt}) =>
+  Conversation copyWith({String? id, DateTime? createdAt}) =>
       Conversation(id: id ?? this.id, createdAt: createdAt ?? this.createdAt);
   Conversation copyWithCompanion(ConversationsCompanion data) {
     return Conversation(
@@ -2503,33 +2583,41 @@ class Conversation extends DataClass implements Insertable<Conversation> {
 }
 
 class ConversationsCompanion extends UpdateCompanion<Conversation> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<DateTime> createdAt;
+  final Value<int> rowid;
   const ConversationsCompanion({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ConversationsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required DateTime createdAt,
-  }) : createdAt = Value(createdAt);
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt);
   static Insertable<Conversation> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ConversationsCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<DateTime>? createdAt,
+    Value<int>? rowid,
   }) {
     return ConversationsCompanion(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2537,10 +2625,13 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -2549,7 +2640,8 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
   String toString() {
     return (StringBuffer('ConversationsCompanion(')
           ..write('id: $id, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2563,11 +2655,11 @@ class $ConversationMembersTable extends ConversationMembers
   $ConversationMembersTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
     'user_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -2577,11 +2669,11 @@ class $ConversationMembersTable extends ConversationMembers
     'conversationId',
   );
   @override
-  late final GeneratedColumn<int> conversationId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> conversationId = GeneratedColumn<String>(
     'conversation_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES conversations (id)',
@@ -2630,11 +2722,11 @@ class $ConversationMembersTable extends ConversationMembers
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ConversationMember(
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}user_id'],
       )!,
       conversationId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}conversation_id'],
       )!,
     );
@@ -2648,8 +2740,8 @@ class $ConversationMembersTable extends ConversationMembers
 
 class ConversationMember extends DataClass
     implements Insertable<ConversationMember> {
-  final int userId;
-  final int conversationId;
+  final String userId;
+  final String conversationId;
   const ConversationMember({
     required this.userId,
     required this.conversationId,
@@ -2657,8 +2749,8 @@ class ConversationMember extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['user_id'] = Variable<int>(userId);
-    map['conversation_id'] = Variable<int>(conversationId);
+    map['user_id'] = Variable<String>(userId);
+    map['conversation_id'] = Variable<String>(conversationId);
     return map;
   }
 
@@ -2675,20 +2767,20 @@ class ConversationMember extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ConversationMember(
-      userId: serializer.fromJson<int>(json['userId']),
-      conversationId: serializer.fromJson<int>(json['conversationId']),
+      userId: serializer.fromJson<String>(json['userId']),
+      conversationId: serializer.fromJson<String>(json['conversationId']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'userId': serializer.toJson<int>(userId),
-      'conversationId': serializer.toJson<int>(conversationId),
+      'userId': serializer.toJson<String>(userId),
+      'conversationId': serializer.toJson<String>(conversationId),
     };
   }
 
-  ConversationMember copyWith({int? userId, int? conversationId}) =>
+  ConversationMember copyWith({String? userId, String? conversationId}) =>
       ConversationMember(
         userId: userId ?? this.userId,
         conversationId: conversationId ?? this.conversationId,
@@ -2722,8 +2814,8 @@ class ConversationMember extends DataClass
 }
 
 class ConversationMembersCompanion extends UpdateCompanion<ConversationMember> {
-  final Value<int> userId;
-  final Value<int> conversationId;
+  final Value<String> userId;
+  final Value<String> conversationId;
   final Value<int> rowid;
   const ConversationMembersCompanion({
     this.userId = const Value.absent(),
@@ -2731,14 +2823,14 @@ class ConversationMembersCompanion extends UpdateCompanion<ConversationMember> {
     this.rowid = const Value.absent(),
   });
   ConversationMembersCompanion.insert({
-    required int userId,
-    required int conversationId,
+    required String userId,
+    required String conversationId,
     this.rowid = const Value.absent(),
   }) : userId = Value(userId),
        conversationId = Value(conversationId);
   static Insertable<ConversationMember> custom({
-    Expression<int>? userId,
-    Expression<int>? conversationId,
+    Expression<String>? userId,
+    Expression<String>? conversationId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2749,8 +2841,8 @@ class ConversationMembersCompanion extends UpdateCompanion<ConversationMember> {
   }
 
   ConversationMembersCompanion copyWith({
-    Value<int>? userId,
-    Value<int>? conversationId,
+    Value<String>? userId,
+    Value<String>? conversationId,
     Value<int>? rowid,
   }) {
     return ConversationMembersCompanion(
@@ -2764,10 +2856,10 @@ class ConversationMembersCompanion extends UpdateCompanion<ConversationMember> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<String>(userId.value);
     }
     if (conversationId.present) {
-      map['conversation_id'] = Variable<int>(conversationId.value);
+      map['conversation_id'] = Variable<String>(conversationId.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -2793,22 +2885,22 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
   $MessagesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _conversationIdMeta = const VerificationMeta(
     'conversationId',
   );
   @override
-  late final GeneratedColumn<int> conversationId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> conversationId = GeneratedColumn<String>(
     'conversation_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES conversations (id)',
@@ -2818,11 +2910,11 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     'senderId',
   );
   @override
-  late final GeneratedColumn<int> senderId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> senderId = GeneratedColumn<String>(
     'sender_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -2872,6 +2964,8 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('conversation_id')) {
       context.handle(
@@ -2921,15 +3015,15 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Message(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       conversationId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}conversation_id'],
       )!,
       senderId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}sender_id'],
       )!,
       textContent: attachedDatabase.typeMapping.read(
@@ -2950,9 +3044,9 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
 }
 
 class Message extends DataClass implements Insertable<Message> {
-  final int id;
-  final int conversationId;
-  final int senderId;
+  final String id;
+  final String conversationId;
+  final String senderId;
   final String textContent;
   final DateTime createdAt;
   const Message({
@@ -2965,9 +3059,9 @@ class Message extends DataClass implements Insertable<Message> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['conversation_id'] = Variable<int>(conversationId);
-    map['sender_id'] = Variable<int>(senderId);
+    map['id'] = Variable<String>(id);
+    map['conversation_id'] = Variable<String>(conversationId);
+    map['sender_id'] = Variable<String>(senderId);
     map['text_content'] = Variable<String>(textContent);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -2989,9 +3083,9 @@ class Message extends DataClass implements Insertable<Message> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Message(
-      id: serializer.fromJson<int>(json['id']),
-      conversationId: serializer.fromJson<int>(json['conversationId']),
-      senderId: serializer.fromJson<int>(json['senderId']),
+      id: serializer.fromJson<String>(json['id']),
+      conversationId: serializer.fromJson<String>(json['conversationId']),
+      senderId: serializer.fromJson<String>(json['senderId']),
       textContent: serializer.fromJson<String>(json['textContent']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -3000,18 +3094,18 @@ class Message extends DataClass implements Insertable<Message> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'conversationId': serializer.toJson<int>(conversationId),
-      'senderId': serializer.toJson<int>(senderId),
+      'id': serializer.toJson<String>(id),
+      'conversationId': serializer.toJson<String>(conversationId),
+      'senderId': serializer.toJson<String>(senderId),
       'textContent': serializer.toJson<String>(textContent),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
   Message copyWith({
-    int? id,
-    int? conversationId,
-    int? senderId,
+    String? id,
+    String? conversationId,
+    String? senderId,
     String? textContent,
     DateTime? createdAt,
   }) => Message(
@@ -3062,34 +3156,39 @@ class Message extends DataClass implements Insertable<Message> {
 }
 
 class MessagesCompanion extends UpdateCompanion<Message> {
-  final Value<int> id;
-  final Value<int> conversationId;
-  final Value<int> senderId;
+  final Value<String> id;
+  final Value<String> conversationId;
+  final Value<String> senderId;
   final Value<String> textContent;
   final Value<DateTime> createdAt;
+  final Value<int> rowid;
   const MessagesCompanion({
     this.id = const Value.absent(),
     this.conversationId = const Value.absent(),
     this.senderId = const Value.absent(),
     this.textContent = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   MessagesCompanion.insert({
-    this.id = const Value.absent(),
-    required int conversationId,
-    required int senderId,
+    required String id,
+    required String conversationId,
+    required String senderId,
     required String textContent,
     required DateTime createdAt,
-  }) : conversationId = Value(conversationId),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       conversationId = Value(conversationId),
        senderId = Value(senderId),
        textContent = Value(textContent),
        createdAt = Value(createdAt);
   static Insertable<Message> custom({
-    Expression<int>? id,
-    Expression<int>? conversationId,
-    Expression<int>? senderId,
+    Expression<String>? id,
+    Expression<String>? conversationId,
+    Expression<String>? senderId,
     Expression<String>? textContent,
     Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3097,15 +3196,17 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       if (senderId != null) 'sender_id': senderId,
       if (textContent != null) 'text_content': textContent,
       if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   MessagesCompanion copyWith({
-    Value<int>? id,
-    Value<int>? conversationId,
-    Value<int>? senderId,
+    Value<String>? id,
+    Value<String>? conversationId,
+    Value<String>? senderId,
     Value<String>? textContent,
     Value<DateTime>? createdAt,
+    Value<int>? rowid,
   }) {
     return MessagesCompanion(
       id: id ?? this.id,
@@ -3113,6 +3214,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       senderId: senderId ?? this.senderId,
       textContent: textContent ?? this.textContent,
       createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3120,19 +3222,22 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (conversationId.present) {
-      map['conversation_id'] = Variable<int>(conversationId.value);
+      map['conversation_id'] = Variable<String>(conversationId.value);
     }
     if (senderId.present) {
-      map['sender_id'] = Variable<int>(senderId.value);
+      map['sender_id'] = Variable<String>(senderId.value);
     }
     if (textContent.present) {
       map['text_content'] = Variable<String>(textContent.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -3144,7 +3249,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
           ..write('conversationId: $conversationId, ')
           ..write('senderId: $senderId, ')
           ..write('textContent: $textContent, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -3159,11 +3265,11 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
     'followerId',
   );
   @override
-  late final GeneratedColumn<int> followerId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> followerId = GeneratedColumn<String>(
     'follower_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -3173,11 +3279,11 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
     'followingId',
   );
   @override
-  late final GeneratedColumn<int> followingId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> followingId = GeneratedColumn<String>(
     'following_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES users (id)',
@@ -3245,11 +3351,11 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Follow(
       followerId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}follower_id'],
       )!,
       followingId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}following_id'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
@@ -3266,8 +3372,8 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
 }
 
 class Follow extends DataClass implements Insertable<Follow> {
-  final int followerId;
-  final int followingId;
+  final String followerId;
+  final String followingId;
   final DateTime createdAt;
   const Follow({
     required this.followerId,
@@ -3277,8 +3383,8 @@ class Follow extends DataClass implements Insertable<Follow> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['follower_id'] = Variable<int>(followerId);
-    map['following_id'] = Variable<int>(followingId);
+    map['follower_id'] = Variable<String>(followerId);
+    map['following_id'] = Variable<String>(followingId);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -3297,8 +3403,8 @@ class Follow extends DataClass implements Insertable<Follow> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Follow(
-      followerId: serializer.fromJson<int>(json['followerId']),
-      followingId: serializer.fromJson<int>(json['followingId']),
+      followerId: serializer.fromJson<String>(json['followerId']),
+      followingId: serializer.fromJson<String>(json['followingId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -3306,18 +3412,21 @@ class Follow extends DataClass implements Insertable<Follow> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'followerId': serializer.toJson<int>(followerId),
-      'followingId': serializer.toJson<int>(followingId),
+      'followerId': serializer.toJson<String>(followerId),
+      'followingId': serializer.toJson<String>(followingId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
-  Follow copyWith({int? followerId, int? followingId, DateTime? createdAt}) =>
-      Follow(
-        followerId: followerId ?? this.followerId,
-        followingId: followingId ?? this.followingId,
-        createdAt: createdAt ?? this.createdAt,
-      );
+  Follow copyWith({
+    String? followerId,
+    String? followingId,
+    DateTime? createdAt,
+  }) => Follow(
+    followerId: followerId ?? this.followerId,
+    followingId: followingId ?? this.followingId,
+    createdAt: createdAt ?? this.createdAt,
+  );
   Follow copyWithCompanion(FollowsCompanion data) {
     return Follow(
       followerId: data.followerId.present
@@ -3352,8 +3461,8 @@ class Follow extends DataClass implements Insertable<Follow> {
 }
 
 class FollowsCompanion extends UpdateCompanion<Follow> {
-  final Value<int> followerId;
-  final Value<int> followingId;
+  final Value<String> followerId;
+  final Value<String> followingId;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const FollowsCompanion({
@@ -3363,16 +3472,16 @@ class FollowsCompanion extends UpdateCompanion<Follow> {
     this.rowid = const Value.absent(),
   });
   FollowsCompanion.insert({
-    required int followerId,
-    required int followingId,
+    required String followerId,
+    required String followingId,
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   }) : followerId = Value(followerId),
        followingId = Value(followingId),
        createdAt = Value(createdAt);
   static Insertable<Follow> custom({
-    Expression<int>? followerId,
-    Expression<int>? followingId,
+    Expression<String>? followerId,
+    Expression<String>? followingId,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -3385,8 +3494,8 @@ class FollowsCompanion extends UpdateCompanion<Follow> {
   }
 
   FollowsCompanion copyWith({
-    Value<int>? followerId,
-    Value<int>? followingId,
+    Value<String>? followerId,
+    Value<String>? followingId,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
@@ -3402,10 +3511,10 @@ class FollowsCompanion extends UpdateCompanion<Follow> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (followerId.present) {
-      map['follower_id'] = Variable<int>(followerId.value);
+      map['follower_id'] = Variable<String>(followerId.value);
     }
     if (followingId.present) {
-      map['following_id'] = Variable<int>(followingId.value);
+      map['following_id'] = Variable<String>(followingId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -3464,21 +3573,23 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$UsersTableCreateCompanionBuilder =
     UsersCompanion Function({
-      Value<int> id,
+      required String id,
       required String username,
       required String name,
       Value<String?> avatarUrl,
       Value<String?> bio,
       required DateTime createdAt,
+      Value<int> rowid,
     });
 typedef $$UsersTableUpdateCompanionBuilder =
     UsersCompanion Function({
-      Value<int> id,
+      Value<String> id,
       Value<String> username,
       Value<String> name,
       Value<String?> avatarUrl,
       Value<String?> bio,
       Value<DateTime> createdAt,
+      Value<int> rowid,
     });
 
 final class $$UsersTableReferences
@@ -3496,7 +3607,7 @@ final class $$UsersTableReferences
     final manager = $$StoriesTableTableManager(
       $_db,
       $_db.stories,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_storiesRefsTable($_db));
     return ProcessedTableManager(
@@ -3514,7 +3625,7 @@ final class $$UsersTableReferences
     final manager = $$StoryViewsTableTableManager(
       $_db,
       $_db.storyViews,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_storyViewsRefsTable($_db));
     return ProcessedTableManager(
@@ -3533,7 +3644,7 @@ final class $$UsersTableReferences
     final manager = $$PostsTableTableManager(
       $_db,
       $_db.posts,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_postsRefsTable($_db));
     return ProcessedTableManager(
@@ -3552,7 +3663,7 @@ final class $$UsersTableReferences
     final manager = $$LikesTableTableManager(
       $_db,
       $_db.likes,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_likesRefsTable($_db));
     return ProcessedTableManager(
@@ -3571,7 +3682,7 @@ final class $$UsersTableReferences
     final manager = $$CommentsTableTableManager(
       $_db,
       $_db.comments,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_commentsRefsTable($_db));
     return ProcessedTableManager(
@@ -3593,7 +3704,7 @@ final class $$UsersTableReferences
     final manager = $$ConversationMembersTableTableManager(
       $_db,
       $_db.conversationMembers,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(
       _conversationMembersRefsTable($_db),
@@ -3614,7 +3725,7 @@ final class $$UsersTableReferences
     final manager = $$MessagesTableTableManager(
       $_db,
       $_db.messages,
-    ).filter((f) => f.senderId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.senderId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_messagesRefsTable($_db));
     return ProcessedTableManager(
@@ -3631,7 +3742,7 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -3846,7 +3957,7 @@ class $$UsersTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -3886,7 +3997,7 @@ class $$UsersTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get username =>
@@ -4117,12 +4228,13 @@ class $$UsersTableTableManager
               $$UsersTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                Value<String> id = const Value.absent(),
                 Value<String> username = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> avatarUrl = const Value.absent(),
                 Value<String?> bio = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => UsersCompanion(
                 id: id,
                 username: username,
@@ -4130,15 +4242,17 @@ class $$UsersTableTableManager
                 avatarUrl: avatarUrl,
                 bio: bio,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                required String id,
                 required String username,
                 required String name,
                 Value<String?> avatarUrl = const Value.absent(),
                 Value<String?> bio = const Value.absent(),
                 required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
               }) => UsersCompanion.insert(
                 id: id,
                 username: username,
@@ -4146,6 +4260,7 @@ class $$UsersTableTableManager
                 avatarUrl: avatarUrl,
                 bio: bio,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4320,21 +4435,23 @@ typedef $$UsersTableProcessedTableManager =
     >;
 typedef $$StoriesTableCreateCompanionBuilder =
     StoriesCompanion Function({
-      Value<int> id,
-      required int userId,
+      required String id,
+      required String userId,
       required String mediaUrl,
       required String mediaType,
       required DateTime createdAt,
       required DateTime expiresAt,
+      Value<int> rowid,
     });
 typedef $$StoriesTableUpdateCompanionBuilder =
     StoriesCompanion Function({
-      Value<int> id,
-      Value<int> userId,
+      Value<String> id,
+      Value<String> userId,
       Value<String> mediaUrl,
       Value<String> mediaType,
       Value<DateTime> createdAt,
       Value<DateTime> expiresAt,
+      Value<int> rowid,
     });
 
 final class $$StoriesTableReferences
@@ -4345,7 +4462,7 @@ final class $$StoriesTableReferences
       db.users.createAlias('stories__user_id__users__id');
 
   $$UsersTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<int>('user_id')!;
+    final $_column = $_itemColumn<String>('user_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -4368,7 +4485,7 @@ final class $$StoriesTableReferences
     final manager = $$StoryViewsTableTableManager(
       $_db,
       $_db.storyViews,
-    ).filter((f) => f.storyId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.storyId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_storyViewsRefsTable($_db));
     return ProcessedTableManager(
@@ -4386,7 +4503,7 @@ class $$StoriesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -4469,7 +4586,7 @@ class $$StoriesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4527,7 +4644,7 @@ class $$StoriesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get mediaUrl =>
@@ -4619,12 +4736,13 @@ class $$StoriesTableTableManager
               $$StoriesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<int> userId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
                 Value<String> mediaUrl = const Value.absent(),
                 Value<String> mediaType = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> expiresAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => StoriesCompanion(
                 id: id,
                 userId: userId,
@@ -4632,15 +4750,17 @@ class $$StoriesTableTableManager
                 mediaType: mediaType,
                 createdAt: createdAt,
                 expiresAt: expiresAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                required int userId,
+                required String id,
+                required String userId,
                 required String mediaUrl,
                 required String mediaType,
                 required DateTime createdAt,
                 required DateTime expiresAt,
+                Value<int> rowid = const Value.absent(),
               }) => StoriesCompanion.insert(
                 id: id,
                 userId: userId,
@@ -4648,6 +4768,7 @@ class $$StoriesTableTableManager
                 mediaType: mediaType,
                 createdAt: createdAt,
                 expiresAt: expiresAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4733,16 +4854,16 @@ typedef $$StoriesTableProcessedTableManager =
     >;
 typedef $$StoryViewsTableCreateCompanionBuilder =
     StoryViewsCompanion Function({
-      required int userId,
-      required int storyId,
-      required DateTime viewdAt,
+      required String userId,
+      required String storyId,
+      required DateTime viewedAt,
       Value<int> rowid,
     });
 typedef $$StoryViewsTableUpdateCompanionBuilder =
     StoryViewsCompanion Function({
-      Value<int> userId,
-      Value<int> storyId,
-      Value<DateTime> viewdAt,
+      Value<String> userId,
+      Value<String> storyId,
+      Value<DateTime> viewedAt,
       Value<int> rowid,
     });
 
@@ -4754,7 +4875,7 @@ final class $$StoryViewsTableReferences
       db.users.createAlias('story_views__user_id__users__id');
 
   $$UsersTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<int>('user_id')!;
+    final $_column = $_itemColumn<String>('user_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -4771,7 +4892,7 @@ final class $$StoryViewsTableReferences
       db.stories.createAlias('story_views__story_id__stories__id');
 
   $$StoriesTableProcessedTableManager get storyId {
-    final $_column = $_itemColumn<int>('story_id')!;
+    final $_column = $_itemColumn<String>('story_id')!;
 
     final manager = $$StoriesTableTableManager(
       $_db,
@@ -4794,8 +4915,8 @@ class $$StoryViewsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<DateTime> get viewdAt => $composableBuilder(
-    column: $table.viewdAt,
+  ColumnFilters<DateTime> get viewedAt => $composableBuilder(
+    column: $table.viewedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4855,8 +4976,8 @@ class $$StoryViewsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<DateTime> get viewdAt => $composableBuilder(
-    column: $table.viewdAt,
+  ColumnOrderings<DateTime> get viewedAt => $composableBuilder(
+    column: $table.viewedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4916,8 +5037,8 @@ class $$StoryViewsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<DateTime> get viewdAt =>
-      $composableBuilder(column: $table.viewdAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get viewedAt =>
+      $composableBuilder(column: $table.viewedAt, builder: (column) => column);
 
   $$UsersTableAnnotationComposer get userId {
     final $$UsersTableAnnotationComposer composer = $composerBuilder(
@@ -4994,26 +5115,26 @@ class $$StoryViewsTableTableManager
               $$StoryViewsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> userId = const Value.absent(),
-                Value<int> storyId = const Value.absent(),
-                Value<DateTime> viewdAt = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> storyId = const Value.absent(),
+                Value<DateTime> viewedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => StoryViewsCompanion(
                 userId: userId,
                 storyId: storyId,
-                viewdAt: viewdAt,
+                viewedAt: viewedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required int userId,
-                required int storyId,
-                required DateTime viewdAt,
+                required String userId,
+                required String storyId,
+                required DateTime viewedAt,
                 Value<int> rowid = const Value.absent(),
               }) => StoryViewsCompanion.insert(
                 userId: userId,
                 storyId: storyId,
-                viewdAt: viewdAt,
+                viewedAt: viewedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -5098,17 +5219,19 @@ typedef $$StoryViewsTableProcessedTableManager =
     >;
 typedef $$PostsTableCreateCompanionBuilder =
     PostsCompanion Function({
-      Value<int> id,
-      required int userId,
+      required String id,
+      required String userId,
       required String caption,
       required DateTime createdAt,
+      Value<int> rowid,
     });
 typedef $$PostsTableUpdateCompanionBuilder =
     PostsCompanion Function({
-      Value<int> id,
-      Value<int> userId,
+      Value<String> id,
+      Value<String> userId,
       Value<String> caption,
       Value<DateTime> createdAt,
+      Value<int> rowid,
     });
 
 final class $$PostsTableReferences
@@ -5119,7 +5242,7 @@ final class $$PostsTableReferences
       db.users.createAlias('posts__user_id__users__id');
 
   $$UsersTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<int>('user_id')!;
+    final $_column = $_itemColumn<String>('user_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -5142,7 +5265,7 @@ final class $$PostsTableReferences
     final manager = $$PostMediaTableTableManager(
       $_db,
       $_db.postMedia,
-    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_postMediaRefsTable($_db));
     return ProcessedTableManager(
@@ -5161,7 +5284,7 @@ final class $$PostsTableReferences
     final manager = $$LikesTableTableManager(
       $_db,
       $_db.likes,
-    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_likesRefsTable($_db));
     return ProcessedTableManager(
@@ -5180,7 +5303,7 @@ final class $$PostsTableReferences
     final manager = $$CommentsTableTableManager(
       $_db,
       $_db.comments,
-    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_commentsRefsTable($_db));
     return ProcessedTableManager(
@@ -5197,7 +5320,7 @@ class $$PostsTableFilterComposer extends Composer<_$AppDatabase, $PostsTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -5320,7 +5443,7 @@ class $$PostsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5368,7 +5491,7 @@ class $$PostsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get caption =>
@@ -5509,27 +5632,31 @@ class $$PostsTableTableManager
               $$PostsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<int> userId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
                 Value<String> caption = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => PostsCompanion(
                 id: id,
                 userId: userId,
                 caption: caption,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                required int userId,
+                required String id,
+                required String userId,
                 required String caption,
                 required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
               }) => PostsCompanion.insert(
                 id: id,
                 userId: userId,
                 caption: caption,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -5665,19 +5792,21 @@ typedef $$PostsTableProcessedTableManager =
     >;
 typedef $$PostMediaTableCreateCompanionBuilder =
     PostMediaCompanion Function({
-      Value<int> id,
-      required int postId,
+      required String id,
+      required String postId,
       required String mediaUrl,
       required String mediaType,
       required int position,
+      Value<int> rowid,
     });
 typedef $$PostMediaTableUpdateCompanionBuilder =
     PostMediaCompanion Function({
-      Value<int> id,
-      Value<int> postId,
+      Value<String> id,
+      Value<String> postId,
       Value<String> mediaUrl,
       Value<String> mediaType,
       Value<int> position,
+      Value<int> rowid,
     });
 
 final class $$PostMediaTableReferences
@@ -5688,7 +5817,7 @@ final class $$PostMediaTableReferences
       db.posts.createAlias('post_media__post_id__posts__id');
 
   $$PostsTableProcessedTableManager get postId {
-    final $_column = $_itemColumn<int>('post_id')!;
+    final $_column = $_itemColumn<String>('post_id')!;
 
     final manager = $$PostsTableTableManager(
       $_db,
@@ -5711,7 +5840,7 @@ class $$PostMediaTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -5764,7 +5893,7 @@ class $$PostMediaTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5817,7 +5946,7 @@ class $$PostMediaTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get mediaUrl =>
@@ -5881,31 +6010,35 @@ class $$PostMediaTableTableManager
               $$PostMediaTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<int> postId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> postId = const Value.absent(),
                 Value<String> mediaUrl = const Value.absent(),
                 Value<String> mediaType = const Value.absent(),
                 Value<int> position = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => PostMediaCompanion(
                 id: id,
                 postId: postId,
                 mediaUrl: mediaUrl,
                 mediaType: mediaType,
                 position: position,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                required int postId,
+                required String id,
+                required String postId,
                 required String mediaUrl,
                 required String mediaType,
                 required int position,
+                Value<int> rowid = const Value.absent(),
               }) => PostMediaCompanion.insert(
                 id: id,
                 postId: postId,
                 mediaUrl: mediaUrl,
                 mediaType: mediaType,
                 position: position,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -5976,17 +6109,17 @@ typedef $$PostMediaTableProcessedTableManager =
     >;
 typedef $$LikesTableCreateCompanionBuilder =
     LikesCompanion Function({
-      required int id,
-      required int userId,
-      required int postId,
+      required String id,
+      required String userId,
+      required String postId,
       required DateTime createdAt,
       Value<int> rowid,
     });
 typedef $$LikesTableUpdateCompanionBuilder =
     LikesCompanion Function({
-      Value<int> id,
-      Value<int> userId,
-      Value<int> postId,
+      Value<String> id,
+      Value<String> userId,
+      Value<String> postId,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -5999,7 +6132,7 @@ final class $$LikesTableReferences
       db.users.createAlias('likes__user_id__users__id');
 
   $$UsersTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<int>('user_id')!;
+    final $_column = $_itemColumn<String>('user_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -6016,7 +6149,7 @@ final class $$LikesTableReferences
       db.posts.createAlias('likes__post_id__posts__id');
 
   $$PostsTableProcessedTableManager get postId {
-    final $_column = $_itemColumn<int>('post_id')!;
+    final $_column = $_itemColumn<String>('post_id')!;
 
     final manager = $$PostsTableTableManager(
       $_db,
@@ -6038,7 +6171,7 @@ class $$LikesTableFilterComposer extends Composer<_$AppDatabase, $LikesTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -6104,7 +6237,7 @@ class $$LikesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6170,7 +6303,7 @@ class $$LikesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -6251,9 +6384,9 @@ class $$LikesTableTableManager
               $$LikesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<int> userId = const Value.absent(),
-                Value<int> postId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> postId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LikesCompanion(
@@ -6265,9 +6398,9 @@ class $$LikesTableTableManager
               ),
           createCompanionCallback:
               ({
-                required int id,
-                required int userId,
-                required int postId,
+                required String id,
+                required String userId,
+                required String postId,
                 required DateTime createdAt,
                 Value<int> rowid = const Value.absent(),
               }) => LikesCompanion.insert(
@@ -6357,19 +6490,21 @@ typedef $$LikesTableProcessedTableManager =
     >;
 typedef $$CommentsTableCreateCompanionBuilder =
     CommentsCompanion Function({
-      Value<int> id,
-      required int postId,
-      required int userId,
+      required String id,
+      required String postId,
+      required String userId,
       required String textContent,
       required DateTime createdAt,
+      Value<int> rowid,
     });
 typedef $$CommentsTableUpdateCompanionBuilder =
     CommentsCompanion Function({
-      Value<int> id,
-      Value<int> postId,
-      Value<int> userId,
+      Value<String> id,
+      Value<String> postId,
+      Value<String> userId,
       Value<String> textContent,
       Value<DateTime> createdAt,
+      Value<int> rowid,
     });
 
 final class $$CommentsTableReferences
@@ -6380,7 +6515,7 @@ final class $$CommentsTableReferences
       db.posts.createAlias('comments__post_id__posts__id');
 
   $$PostsTableProcessedTableManager get postId {
-    final $_column = $_itemColumn<int>('post_id')!;
+    final $_column = $_itemColumn<String>('post_id')!;
 
     final manager = $$PostsTableTableManager(
       $_db,
@@ -6397,7 +6532,7 @@ final class $$CommentsTableReferences
       db.users.createAlias('comments__user_id__users__id');
 
   $$UsersTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<int>('user_id')!;
+    final $_column = $_itemColumn<String>('user_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -6420,7 +6555,7 @@ class $$CommentsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -6491,7 +6626,7 @@ class $$CommentsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6562,7 +6697,7 @@ class $$CommentsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get textContent => $composableBuilder(
@@ -6648,31 +6783,35 @@ class $$CommentsTableTableManager
               $$CommentsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<int> postId = const Value.absent(),
-                Value<int> userId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> postId = const Value.absent(),
+                Value<String> userId = const Value.absent(),
                 Value<String> textContent = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => CommentsCompanion(
                 id: id,
                 postId: postId,
                 userId: userId,
                 textContent: textContent,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                required int postId,
-                required int userId,
+                required String id,
+                required String postId,
+                required String userId,
                 required String textContent,
                 required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
               }) => CommentsCompanion.insert(
                 id: id,
                 postId: postId,
                 userId: userId,
                 textContent: textContent,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -6756,11 +6895,16 @@ typedef $$CommentsTableProcessedTableManager =
     >;
 typedef $$ConversationsTableCreateCompanionBuilder =
     ConversationsCompanion Function({
-      Value<int> id,
+      required String id,
       required DateTime createdAt,
+      Value<int> rowid,
     });
 typedef $$ConversationsTableUpdateCompanionBuilder =
-    ConversationsCompanion Function({Value<int> id, Value<DateTime> createdAt});
+    ConversationsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
 
 final class $$ConversationsTableReferences
     extends BaseReferences<_$AppDatabase, $ConversationsTable, Conversation> {
@@ -6784,7 +6928,7 @@ final class $$ConversationsTableReferences
     final manager = $$ConversationMembersTableTableManager(
       $_db,
       $_db.conversationMembers,
-    ).filter((f) => f.conversationId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.conversationId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(
       _conversationMembersRefsTable($_db),
@@ -6805,7 +6949,7 @@ final class $$ConversationsTableReferences
     final manager = $$MessagesTableTableManager(
       $_db,
       $_db.messages,
-    ).filter((f) => f.conversationId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.conversationId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_messagesRefsTable($_db));
     return ProcessedTableManager(
@@ -6823,7 +6967,7 @@ class $$ConversationsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -6893,7 +7037,7 @@ class $$ConversationsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6913,7 +7057,7 @@ class $$ConversationsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -7002,14 +7146,24 @@ class $$ConversationsTableTableManager
               $$ConversationsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                Value<String> id = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
-              }) => ConversationsCompanion(id: id, createdAt: createdAt),
+                Value<int> rowid = const Value.absent(),
+              }) => ConversationsCompanion(
+                id: id,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                required String id,
                 required DateTime createdAt,
-              }) => ConversationsCompanion.insert(id: id, createdAt: createdAt),
+                Value<int> rowid = const Value.absent(),
+              }) => ConversationsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
@@ -7095,14 +7249,14 @@ typedef $$ConversationsTableProcessedTableManager =
     >;
 typedef $$ConversationMembersTableCreateCompanionBuilder =
     ConversationMembersCompanion Function({
-      required int userId,
-      required int conversationId,
+      required String userId,
+      required String conversationId,
       Value<int> rowid,
     });
 typedef $$ConversationMembersTableUpdateCompanionBuilder =
     ConversationMembersCompanion Function({
-      Value<int> userId,
-      Value<int> conversationId,
+      Value<String> userId,
+      Value<String> conversationId,
       Value<int> rowid,
     });
 
@@ -7123,7 +7277,7 @@ final class $$ConversationMembersTableReferences
       db.users.createAlias('conversation_members__user_id__users__id');
 
   $$UsersTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<int>('user_id')!;
+    final $_column = $_itemColumn<String>('user_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -7141,7 +7295,7 @@ final class $$ConversationMembersTableReferences
       .createAlias('conversation_members__conversation_id__conversations__id');
 
   $$ConversationsTableProcessedTableManager get conversationId {
-    final $_column = $_itemColumn<int>('conversation_id')!;
+    final $_column = $_itemColumn<String>('conversation_id')!;
 
     final manager = $$ConversationsTableTableManager(
       $_db,
@@ -7359,8 +7513,8 @@ class $$ConversationMembersTableTableManager
               ),
           updateCompanionCallback:
               ({
-                Value<int> userId = const Value.absent(),
-                Value<int> conversationId = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> conversationId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ConversationMembersCompanion(
                 userId: userId,
@@ -7369,8 +7523,8 @@ class $$ConversationMembersTableTableManager
               ),
           createCompanionCallback:
               ({
-                required int userId,
-                required int conversationId,
+                required String userId,
+                required String conversationId,
                 Value<int> rowid = const Value.absent(),
               }) => ConversationMembersCompanion.insert(
                 userId: userId,
@@ -7463,19 +7617,21 @@ typedef $$ConversationMembersTableProcessedTableManager =
     >;
 typedef $$MessagesTableCreateCompanionBuilder =
     MessagesCompanion Function({
-      Value<int> id,
-      required int conversationId,
-      required int senderId,
+      required String id,
+      required String conversationId,
+      required String senderId,
       required String textContent,
       required DateTime createdAt,
+      Value<int> rowid,
     });
 typedef $$MessagesTableUpdateCompanionBuilder =
     MessagesCompanion Function({
-      Value<int> id,
-      Value<int> conversationId,
-      Value<int> senderId,
+      Value<String> id,
+      Value<String> conversationId,
+      Value<String> senderId,
       Value<String> textContent,
       Value<DateTime> createdAt,
+      Value<int> rowid,
     });
 
 final class $$MessagesTableReferences
@@ -7487,7 +7643,7 @@ final class $$MessagesTableReferences
       .createAlias('messages__conversation_id__conversations__id');
 
   $$ConversationsTableProcessedTableManager get conversationId {
-    final $_column = $_itemColumn<int>('conversation_id')!;
+    final $_column = $_itemColumn<String>('conversation_id')!;
 
     final manager = $$ConversationsTableTableManager(
       $_db,
@@ -7504,7 +7660,7 @@ final class $$MessagesTableReferences
       db.users.createAlias('messages__sender_id__users__id');
 
   $$UsersTableProcessedTableManager get senderId {
-    final $_column = $_itemColumn<int>('sender_id')!;
+    final $_column = $_itemColumn<String>('sender_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -7527,7 +7683,7 @@ class $$MessagesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -7598,7 +7754,7 @@ class $$MessagesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -7669,7 +7825,7 @@ class $$MessagesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get textContent => $composableBuilder(
@@ -7755,31 +7911,35 @@ class $$MessagesTableTableManager
               $$MessagesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<int> conversationId = const Value.absent(),
-                Value<int> senderId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> conversationId = const Value.absent(),
+                Value<String> senderId = const Value.absent(),
                 Value<String> textContent = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => MessagesCompanion(
                 id: id,
                 conversationId: conversationId,
                 senderId: senderId,
                 textContent: textContent,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                required int conversationId,
-                required int senderId,
+                required String id,
+                required String conversationId,
+                required String senderId,
                 required String textContent,
                 required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
               }) => MessagesCompanion.insert(
                 id: id,
                 conversationId: conversationId,
                 senderId: senderId,
                 textContent: textContent,
                 createdAt: createdAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -7863,15 +8023,15 @@ typedef $$MessagesTableProcessedTableManager =
     >;
 typedef $$FollowsTableCreateCompanionBuilder =
     FollowsCompanion Function({
-      required int followerId,
-      required int followingId,
+      required String followerId,
+      required String followingId,
       required DateTime createdAt,
       Value<int> rowid,
     });
 typedef $$FollowsTableUpdateCompanionBuilder =
     FollowsCompanion Function({
-      Value<int> followerId,
-      Value<int> followingId,
+      Value<String> followerId,
+      Value<String> followingId,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -7884,7 +8044,7 @@ final class $$FollowsTableReferences
       db.users.createAlias('follows__follower_id__users__id');
 
   $$UsersTableProcessedTableManager get followerId {
-    final $_column = $_itemColumn<int>('follower_id')!;
+    final $_column = $_itemColumn<String>('follower_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -7901,7 +8061,7 @@ final class $$FollowsTableReferences
       db.users.createAlias('follows__following_id__users__id');
 
   $$UsersTableProcessedTableManager get followingId {
-    final $_column = $_itemColumn<int>('following_id')!;
+    final $_column = $_itemColumn<String>('following_id')!;
 
     final manager = $$UsersTableTableManager(
       $_db,
@@ -8124,8 +8284,8 @@ class $$FollowsTableTableManager
               $$FollowsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> followerId = const Value.absent(),
-                Value<int> followingId = const Value.absent(),
+                Value<String> followerId = const Value.absent(),
+                Value<String> followingId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FollowsCompanion(
@@ -8136,8 +8296,8 @@ class $$FollowsTableTableManager
               ),
           createCompanionCallback:
               ({
-                required int followerId,
-                required int followingId,
+                required String followerId,
+                required String followingId,
                 required DateTime createdAt,
                 Value<int> rowid = const Value.absent(),
               }) => FollowsCompanion.insert(

@@ -1,220 +1,473 @@
-import 'dart:convert';
+import 'package:drift/drift.dart';
+import 'package:instagram_clone/database/database.dart';
+import 'package:instagram_clone/models/message_model.dart';
+import 'package:instagram_clone/models/story_model.dart';
+import 'package:instagram_clone/models/user_model.dart';
+import 'package:instagram_clone/models/post_model.dart';
+import 'package:instagram_clone/models/post_media_model.dart';
+import 'package:instagram_clone/models/comment_model.dart';
+import 'package:instagram_clone/models/like_model.dart';
+import 'package:instagram_clone/models/follow_model.dart';
+import 'package:instagram_clone/models/story_view_model.dart';
+import 'package:instagram_clone/models/conversation_model.dart';
+import 'package:instagram_clone/models/converstion_member_model.dart';
 
-// import 'package:drift/drift.dart';
-// import 'package:instagram_clone/database/database.dart';
-// import 'package:instagram_clone/models/message_model.dart';
-// import 'package:instagram_clone/models/story_model.dart';
-// import 'package:instagram_clone/models/user_model.dart';
-// import 'package:instagram_clone/models/post_model.dart';
-
-// class LocalDataSource {
-//   final AppDatabase database;
+class LocalDataSource {
+  final AppDatabase _database;
 
   LocalDataSource([AppDatabase? database])
-    : database = database ?? AppDatabase.instance;
+    : _database = database ?? AppDatabase.instance;
 
-//   Future<void> cacheMe(UserModel user) async {
-//     try {
-//       await database
-//           .into(database.users)
-//           .insertOnConflictUpdate(
-//             UsersCompanion.insert(
-//               name: user.name,
-//               username: user.username,
-//               avatar: user.avatar,
-//               totalPosts: user.totalPosts,
-//               totalFollowers: user.totalFollowers,
-//               totalFollowings: user.totalFollowings,
-//               bio: user.bio,
-//             ),
-//           );
-//     } catch (e) {
-//       throw Exception('Failed to cache user: $e');
-//     }
-//   }
+  Future<UserModel> getUser(String userId) async {
+    final user = await (_database.select(_database.users)
+          ..where((table) => table.id.equals(userId)))
+        .getSingle();
 
-//   Future<UserModel> getMe() async {
-//     try {
-//       final users = await database.select(database.users).get();
-//       return UserModel(
-//         userId: users.first.userId,
-//         name: users.first.name,
-//         username: users.first.username,
-//         avatar: users.first.avatar,
-//         bio: users.first.bio,
-//       );
-//     } catch (e) {
-//       throw Exception('Failed to find the user: $e');
-//     }
-//   }
+    return UserModel.fromJson(user.toJson());
+  }
 
-//   Future<List<PostModel>> getPosts() async {
-//     try {
-//       final posts = await database.select(database.posts).get();
-//       return posts
-//           .map(
-//             (post) => PostModel(
-//               user: _userFromJson(post.userJson),
-//               subtitle: post.subtitle,
-//               postImage: post.postImage,
-//               caption: post.caption,
-//               likedBy: post.likedByJson == null
-//                   ? null
-//                   : _userFromJson(post.likedByJson!),
-//               totalLikes: post.totalLikes,
-//               totalComments: post.totalComments,
-//             ),
-//           )
-//           .toList();
-//     } catch (e) {
-//       throw Exception('Failed to get posts: $e');
-//     }
-//   }
+  Future<List<UserModel>> searchUsers(String query) async {
+    final users = await (_database.select(_database.users)
+          ..where((table) => table.username.like('%$query%')))
+        .get();
 
-//   Future<void> cachePosts(List<PostModel> posts) async {
-//     try {
-//       for (var post in posts) {
-//         await database
-//             .into(database.posts)
-//             .insertOnConflictUpdate(
-//               PostsCompanion.insert(
-//                 userId: Value(post.user.userId),
-//                 userJson: jsonEncode(post.user.toJson()),
-//                 subtitle: post.subtitle,
-//                 postImage: post.postImage,
-//                 caption: post.caption,
-//                 likedByJson: Value(
-//                   post.likedBy == null
-//                       ? null
-//                       : jsonEncode(post.likedBy!.toJson()),
-//                 ),
-//                 totalLikes: Value(post.totalLikes),
-//                 totalComments: Value(post.totalComments),
-//               ),
-//             );
-//       }
-//     } catch (e) {
-//       throw Exception('Failed to cache posts: $e');
-//     }
-//   }
+    return users
+        .map((user) => UserModel.fromJson(user.toJson()))
+        .toList();
+  }
 
-//   Future<List<StoryModel>> getStories() async {
-//     try {
-//       final stories = await database.select(database.stories).get();
-//       return stories
-//           .map(
-//             (story) => StoryModel(
-//               user: _userFromJson(story.userJson),
-//               seen: story.seen,
-//             ),
-//           )
-//           .toList();
-//     } catch (e) {
-//       throw Exception('Failed to get stories: $e');
-//     }
-//   }
+  Future<void> updateUser(
+    String userId,
+    Map<String, dynamic> data,
+  ) async {
+    await (_database.update(_database.users)
+          ..where((table) => table.id.equals(userId)))
+        .write(
+      UsersCompanion(
+        username: data['username'] != null
+            ? Value(data['username'])
+            : const Value.absent(),
+        name: data['name'] != null
+            ? Value(data['name'])
+            : const Value.absent(),
+        avatarUrl: data['avatar_url'] != null
+            ? Value(data['avatar_url'])
+            : const Value.absent(),
+        bio: data['bio'] != null
+            ? Value(data['bio'])
+            : const Value.absent(),
+      ),
+    );
+  }
 
-//   Future<void> cacheStories(List<StoryModel> stories) async {
-//     try {
-//       for (var story in stories) {
-//         await database
-//             .into(database.stories)
-//             .insertOnConflictUpdate(
-//               StoriesCompanion.insert(
-//                 userId: Value(story.user.userId),
-//                 userJson: jsonEncode(story.user.toJson()),
-//                 seen: Value(story.seen),
-//               ),
-//             );
-//       }
-//     } catch (e) {
-//       throw Exception('Failed to cache stories: $e');
-//     }
-//   }
+  // =========================
+  // POSTS
+  // =========================
 
-//   Future<List<MessageModel>> getMessages() async {
-//     try {
-//       final messages = await database.select(database.messages).get();
-//       return messages
-//           .map(
-//             (message) => MessageModel(
-//               user: _userFromJson(message.userJson),
-//               lastMessage: message.lastMessage,
-//               date: message.date,
-//             ),
-//           )
-//           .toList();
-//     } catch (e) {
-//       throw Exception('Failed to get messages: $e');
-//     }
-//   }
+  Future<List<PostModel>> getPosts() async {
+    final posts = await (_database.select(_database.posts)
+          ..orderBy([
+            (table) => OrderingTerm.desc(table.createdAt),
+          ]))
+        .get();
 
-//   Future<void> cacheMessages(List<MessageModel> messages) async {
-//     try {
-//       for (var message in messages) {
-//         await database
-//             .into(database.messages)
-//             .insertOnConflictUpdate(
-//               MessagesCompanion.insert(
-//                 userId: Value(message.user.userId),
-//                 userJson: jsonEncode(message.user.toJson()),
-//                 lastMessage: message.lastMessage,
-//                 date: message.date,
-//               ),
-//             );
-//       }
-//     } catch (e) {
-//       throw Exception('Failed to cache messages: $e');
-//     }
-//   }
+    return posts
+        .map((post) => PostModel.fromJson(post.toJson()))
+        .toList();
+  }
 
-//   UserModel _userFromJson(String userJson) {
-//     return UserModel.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
-//   }
+  Future<List<PostModel>> getUserPosts(String userId) async {
+    final posts = await (_database.select(_database.posts)
+          ..where((table) => table.userId.equals(userId))
+          ..orderBy([
+            (table) => OrderingTerm.desc(table.createdAt),
+          ]))
+        .get();
 
-//   Future<List<UserModel>> getUsers() async {
-//     try {
-//       final posts = await getPosts();
-//       final stories = await getStories();
-//       final messages = await getMessages();
-//       final users = <int, UserModel>{};
+    return posts
+        .map((post) => PostModel.fromJson(post.toJson()))
+        .toList();
+  }
 
-//       for (final post in posts) {
-//         users[post.user.userId] = post.user;
-//         if (post.likedBy != null) {
-//           users[post.likedBy!.userId] = post.likedBy!;
-//         }
-//       }
-//       for (final story in stories) {
-//         users[story.user.userId] = story.user;
-//       }
-//       for (final message in messages) {
-//         users[message.user.userId] = message.user;
-//       }
+  Future<PostModel> getPost(String postId) async {
+    final post = await (_database.select(_database.posts)
+          ..where((table) => table.id.equals(postId)))
+        .getSingle();
 
-//       return users.values.toList();
-//     } catch (e) {
-//       throw Exception('Failed to get cached users: $e');
-//     }
-//   }
+    return PostModel.fromJson(post.toJson());
+  }
 
-//   Future<UserModel?> getUserById(int id) async {
-//     final users = await getUsers();
-//     for (final user in users) {
-//       if (user.userId == id) {
-//         return user;
-//       }
-//     }
-//     return null;
-//   }
+  Future<void> createPost(PostModel post) async {
+    await _database.into(_database.posts).insert(
+          PostsCompanion.insert(
+            id: post.id,
+            userId: post.userId,
+            caption: post.caption,
+            createdAt: post.createdAt,
+          ),
+        );
+  }
 
-//   Future<UserModel?> getUserByUsername(String username) async {
-//     final users = await getUsers();
-//     for (final user in users) {
-//       if (user.username == username) {
-//         return user;
-//       }
-//     }
-//     return null;
-//   }
-// }
+  Future<void> deletePost(String postId) async {
+    await (_database.delete(_database.posts)
+          ..where((table) => table.id.equals(postId)))
+        .go();
+  }
+
+  // =========================
+  // POST MEDIA
+  // =========================
+
+  Future<List<PostMediaModel>> getPostMedia(String postId) async {
+    final media = await (_database.select(_database.postMedia)
+          ..where((table) => table.postId.equals(postId))
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.position),
+          ]))
+        .get();
+
+    return media
+        .map((item) => PostMediaModel.fromJson(item.toJson()))
+        .toList();
+  }
+
+  Future<void> createPostMedia(PostMediaModel media) async {
+    await _database.into(_database.postMedia).insert(
+          PostMediaCompanion.insert(
+            id: media.id,
+            postId: media.postId,
+            mediaUrl: media.mediaUrl,
+            mediaType: media.mediaType,
+            position: media.position,
+          ),
+        );
+  }
+
+  Future<void> deletePostMedia(String mediaId) async {
+    await (_database.delete(_database.postMedia)
+          ..where((table) => table.id.equals(mediaId)))
+        .go();
+  }
+
+  // =========================
+  // COMMENTS
+  // =========================
+
+  Future<List<CommentModel>> getComments(String postId) async {
+    final comments = await (_database.select(_database.comments)
+          ..where((table) => table.postId.equals(postId))
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.createdAt),
+          ]))
+        .get();
+
+    return comments
+        .map((comment) => CommentModel.fromJson(comment.toJson()))
+        .toList();
+  }
+
+  Future<void> createComment(CommentModel comment) async {
+    await _database.into(_database.comments).insert(
+          CommentsCompanion.insert(
+            id: comment.id,
+            postId: comment.postId,
+            userId: comment.userId,
+            textContent: comment.text,
+            createdAt: comment.createdAt,
+          ),
+        );
+  }
+
+  Future<void> deleteComment(String commentId) async {
+    await (_database.delete(_database.comments)
+          ..where((table) => table.id.equals(commentId)))
+        .go();
+  }
+
+  // =========================
+  // LIKES
+  // =========================
+
+  Future<bool> isPostLiked(
+    String userId,
+    String postId,
+  ) async {
+    final like = await (_database.select(_database.likes)
+          ..where(
+            (table) =>
+                table.userId.equals(userId) &
+                table.postId.equals(postId),
+          ))
+        .get();
+
+    return like.isNotEmpty;
+  }
+
+  Future<void> likePost(LikeModel like) async {
+    await _database.into(_database.likes).insert(
+          LikesCompanion.insert(
+            id: like.id,
+            userId: like.userId,
+            postId: like.postId,
+            createdAt: like.createdAt,
+          ),
+        );
+  }
+
+  Future<void> unlikePost(
+    String userId,
+    String postId,
+  ) async {
+    await (_database.delete(_database.likes)
+          ..where(
+            (table) =>
+                table.userId.equals(userId) &
+                table.postId.equals(postId),
+          ))
+        .go();
+  }
+
+  // =========================
+  // FOLLOWS
+  // =========================
+
+  Future<List<FollowModel>> getFollowers(String userId) async {
+    final follows = await (_database.select(_database.follows)
+          ..where((table) => table.followingId.equals(userId)))
+        .get();
+
+    return follows
+        .map((follow) => FollowModel.fromJson(follow.toJson()))
+        .toList();
+  }
+
+  Future<List<FollowModel>> getFollowing(String userId) async {
+    final follows = await (_database.select(_database.follows)
+          ..where((table) => table.followerId.equals(userId)))
+        .get();
+
+    return follows
+        .map((follow) => FollowModel.fromJson(follow.toJson()))
+        .toList();
+  }
+
+  Future<void> followUser(FollowModel follow) async {
+    await _database.into(_database.follows).insert(
+          FollowsCompanion.insert(
+            followerId: follow.followerId,
+            followingId: follow.followingId,
+            createdAt: follow.createdAt,
+          ),
+        );
+  }
+
+  Future<void> unfollowUser(
+    String followerId,
+    String followingId,
+  ) async {
+    await (_database.delete(_database.follows)
+          ..where(
+            (table) =>
+                table.followerId.equals(followerId) &
+                table.followingId.equals(followingId),
+          ))
+        .go();
+  }
+
+  // =========================
+  // STORIES
+  // =========================
+
+  Future<List<StoryModel>> getActiveStories() async {
+    final now = DateTime.now();
+
+    final stories = await (_database.select(_database.stories)
+          ..where((table) => table.expiresAt.isBiggerThanValue(now))
+          ..orderBy([
+            (table) => OrderingTerm.desc(table.createdAt),
+          ]))
+        .get();
+
+    return stories
+        .map((story) => StoryModel.fromJson(story.toJson()))
+        .toList();
+  }
+
+  Future<List<StoryModel>> getUserStories(String userId) async {
+    final now = DateTime.now();
+
+    final stories = await (_database.select(_database.stories)
+          ..where(
+            (table) =>
+                table.userId.equals(userId) &
+                table.expiresAt.isBiggerThanValue(now),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.createdAt),
+          ]))
+        .get();
+
+    return stories
+        .map((story) => StoryModel.fromJson(story.toJson()))
+        .toList();
+  }
+
+  Future<void> createStory(StoryModel story) async {
+    await _database.into(_database.stories).insert(
+          StoriesCompanion.insert(
+            id: story.id,
+            userId: story.userId,
+            mediaUrl: story.mediaUrl,
+            mediaType: story.mediaType,
+            createdAt: story.createdAt,
+            expiresAt: story.expiresAt,
+          ),
+        );
+  }
+
+  Future<void> deleteStory(String storyId) async {
+    await (_database.delete(_database.stories)
+          ..where((table) => table.id.equals(storyId)))
+        .go();
+  }
+
+  // =========================
+  // STORY VIEWS
+  // =========================
+
+  Future<bool> hasViewedStory(
+    String storyId,
+    String userId,
+  ) async {
+    final views = await (_database.select(_database.storyViews)
+          ..where(
+            (table) =>
+                table.storyId.equals(storyId) &
+                table.userId.equals(userId),
+          ))
+        .get();
+
+    return views.isNotEmpty;
+  }
+
+  Future<void> addStoryView(StoryViewModel view) async {
+    await _database.into(_database.storyViews).insert(
+          StoryViewsCompanion.insert(
+            storyId: view.storyId,
+            userId: view.userId,
+            viewedAt: view.viewedAt,
+          ),
+        );
+  }
+
+  // =========================
+  // CONVERSATIONS
+  // =========================
+
+Future<List<ConversationModel>> getUserConversations(
+  String userId,
+) async {
+  final memberships = await (_database.select(
+    _database.conversationMembers,
+  )..where((table) => table.userId.equals(userId)))
+      .get();
+
+  final conversations = <ConversationModel>[];
+
+  for (final membership in memberships) {
+    final conversation = await (_database.select(
+      _database.conversations,
+    )..where(
+        (table) => table.id.equals(membership.conversationId),
+      ))
+        .getSingle();
+
+    conversations.add(
+      ConversationModel.fromJson(conversation.toJson()),
+    );
+  }
+
+  return conversations;
+}
+
+Future<List<ConversationMemberModel>> getConversationMembers(
+  String conversationId,
+) async {
+  final members = await (_database.select(
+    _database.conversationMembers,
+  )..where(
+      (table) => table.conversationId.equals(conversationId),
+    ))
+      .get();
+
+  return members
+      .map(
+        (member) => ConversationMemberModel.fromJson(
+          member.toJson(),
+        ),
+      )
+      .toList();
+}
+
+Future<void> createConversation(
+  ConversationModel conversation,
+) async {
+  await _database.into(_database.conversations).insert(
+        ConversationsCompanion.insert(
+          id: conversation.id,
+          createdAt: conversation.createdAt,
+        ),
+      );
+}
+
+Future<void> addConversationMember(
+  ConversationMemberModel member,
+) async {
+  await _database.into(_database.conversationMembers).insert(
+        ConversationMembersCompanion.insert(
+          conversationId: member.conversationId,
+          userId: member.userId,
+        ),
+      );
+}
+
+
+  // =========================
+  // MESSAGES
+  // =========================
+
+  Future<List<MessageModel>> getMessages(
+    String conversationId,
+  ) async {
+    final messages = await (_database.select(_database.messages)
+          ..where(
+            (table) => table.conversationId.equals(conversationId),
+          )
+          ..orderBy([
+            (table) => OrderingTerm.asc(table.createdAt),
+          ]))
+        .get();
+
+    return messages
+        .map((message) => MessageModel.fromJson(message.toJson()))
+        .toList();
+  }
+
+  Future<void> sendMessage(MessageModel message) async {
+    await _database.into(_database.messages).insert(
+          MessagesCompanion.insert(
+            id: message.id,
+            conversationId: message.conversationId,
+            senderId: message.senderId,
+            textContent: message.text,
+            createdAt: message.createdAt,
+          ),
+        );
+  }
+
+  Future<void> deleteMessage(String messageId) async {
+    await (_database.delete(_database.messages)
+          ..where((table) => table.id.equals(messageId)))
+        .go();
+  }
+}
