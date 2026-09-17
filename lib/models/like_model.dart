@@ -1,8 +1,8 @@
 class LikeModel{
 
-  final int id;
-  final int userId;
-  final int postId;
+  final String id;
+  final String userId;
+  final String postId;
   final DateTime createdAt;
 
   LikeModel({

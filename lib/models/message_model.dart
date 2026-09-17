@@ -1,8 +1,8 @@
 class MessageModel {
 
-final int id;
-final int conversationId;
-final int senderId;
+final String id;
+final String conversationId;
+final String senderId;
 final String text;
 final DateTime createdAt;
 

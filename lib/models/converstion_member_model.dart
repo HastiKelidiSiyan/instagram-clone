@@ -1,14 +1,14 @@
-class ConverstionMembersModel {
+class ConversationMemberModel {
 
-  final int conversationId;
-  final int userId;
+  final String conversationId;
+  final String userId;
 
-  ConverstionMembersModel({
+  ConversationMemberModel({
     required this.conversationId,
     required this.userId,
   });
 
-  factory ConverstionMembersModel.fromJson(Map<String, dynamic> json) => ConverstionMembersModel(
+  factory ConversationMemberModel.fromJson(Map<String, dynamic> json) => ConversationMemberModel(
     conversationId: json['conversationId'],
     userId: json['userId'],
   );

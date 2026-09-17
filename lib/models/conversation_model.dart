@@ -1,6 +1,6 @@
 class ConversationModel {
 
-  final int id;
+  final String id;
   final DateTime createdAt;
 
   ConversationModel({

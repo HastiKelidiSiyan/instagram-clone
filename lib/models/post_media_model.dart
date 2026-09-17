@@ -1,7 +1,7 @@
 class PostMediaModel {
 
-  final int id;
-  final int postId;
+  final String id;
+  final String postId;
   final String mediaUrl;
   final String mediaType;
   final int position;

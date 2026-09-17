@@ -1,8 +1,8 @@
 import 'user_model.dart';
 
 class PostModel {
-  final int id;
-  final int userId;
+  final String id;
+  final String userId;
   final String caption;
   final DateTime createdAt;
 

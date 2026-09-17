@@ -1,11 +1,11 @@
-class CommentsModel {
-  final int id;
-  final int postId;
-  final int userId;
+class CommentModel {
+  final String id;
+  final String postId;
+  final String userId;
   final String text;
   final DateTime createdAt;
 
-  CommentsModel({
+  CommentModel({
     required this.id,
     required this.userId,
     required this.postId,
@@ -13,7 +13,7 @@ class CommentsModel {
     required this.createdAt,
   });
 
-  factory CommentsModel.fromJson(Map<String, dynamic> json) => CommentsModel(
+  factory CommentModel.fromJson(Map<String, dynamic> json) => CommentModel(
         id: json['id'],
         userId: json['userId'],
         postId: json['postId'],

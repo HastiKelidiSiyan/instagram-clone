@@ -1,8 +1,8 @@
 import 'user_model.dart';
 
 class StoryModel {
-  final int id;
-  final int userId; 
+  final String id;
+  final String userId; 
   final String mediaUrl;
   final String mediaType;
   final DateTime createdAt;

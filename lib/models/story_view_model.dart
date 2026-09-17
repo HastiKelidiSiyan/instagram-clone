@@ -1,6 +1,6 @@
 class StoryViewModel {
-  final int userId;
-  final int storyId;
+  final String userId;
+  final String storyId;
   final DateTime viewedAt;
 
   StoryViewModel({

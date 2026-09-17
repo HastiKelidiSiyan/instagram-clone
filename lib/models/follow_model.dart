@@ -1,23 +1,23 @@
-class FollowsModel{
+class FollowModel{
 
-  final int follwerId;
-  final int followingId;
+  final String followerId;
+  final String followingId;
   final DateTime createdAt;
 
-  FollowsModel({
-    required this.follwerId,
+  FollowModel({
+    required this.followerId,
     required this.followingId,
     required this.createdAt,
   });
 
-  factory FollowsModel.fromJson(Map<String, dynamic> json) => FollowsModel(
-        follwerId: json['followerId'],
+  factory FollowModel.fromJson(Map<String, dynamic> json) => FollowModel(
+        followerId: json['followerId'],
         followingId: json['followingId'],
         createdAt: DateTime.parse(json['createdAt']),
       );
 
   Map<String, dynamic> toJson() => {
-        'followerId': follwerId,
+        'followerId': followerId,
         'followingId': followingId,
         'createdAt': createdAt.toIso8601String(),
       };
