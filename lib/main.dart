@@ -1,73 +1,73 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:instagram_clone/ui/loading_screen.dart';
-// import 'package:instagram_clone/ui/login_screen.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:instagram_clone/ui/loading_screen.dart';
+import 'package:instagram_clone/ui/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// void main() {
-//   runApp(
-//     GetMaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: SafeArea(child: const SplashScreen()),
-//       theme: ThemeData(
-//         scaffoldBackgroundColor: Colors.white,
-//         appBarTheme: AppBarTheme(backgroundColor: Colors.white),
-//         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-//           backgroundColor: Colors.white,
-//         ),
-//         brightness: Brightness.light,
-//       ),
-//       darkTheme: ThemeData(
-//         scaffoldBackgroundColor: Colors.black,
-//         brightness: Brightness.dark,
-//         appBarTheme: AppBarTheme(backgroundColor: Colors.black),
-//         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-//         backgroundColor: Colors.black,
-//         ),
-//       ),
+void main() {
+  runApp(
+    GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SafeArea(child: const SplashScreen()),
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(backgroundColor: Colors.white),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+        ),
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        scaffoldBackgroundColor: Colors.black,
+        brightness: Brightness.dark,
+        appBarTheme: AppBarTheme(backgroundColor: Colors.black),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.black,
+        ),
+      ),
 
-//       themeMode: ThemeMode.system,
-//     ),
-//   );
-// }
+      themeMode: ThemeMode.system,
+    ),
+  );
+}
 
-// class SplashScreen extends StatefulWidget {
-//   const SplashScreen({super.key});
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
 
-//   @override
-//   State<SplashScreen> createState() => _SplashScreenState();
-// }
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
-// class _SplashScreenState extends State<SplashScreen> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     checkLoginStatus();
-//   }
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    checkLoginStatus();
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: Image.asset(
-//           'assets/images/InstagramIcon.png',
-//           width: 120,
-//           height: 120,
-//         ),
-//       ),
-//     );
-//   }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Image.asset(
+          'assets/images/InstagramIcon.png',
+          width: 120,
+          height: 120,
+        ),
+      ),
+    );
+  }
 
-//   void checkLoginStatus() async {
-//     await Future.delayed(const Duration(seconds: 2), () async {
-//       SharedPreferences prefs = await SharedPreferences.getInstance();
-//       bool isloggedIn = prefs.getBool('isLoggedIn') ?? false;
+  void checkLoginStatus() async {
+    await Future.delayed(const Duration(seconds: 2), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      bool isloggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-//       if (isloggedIn) {
-//         Get.off(() => const LoadingScreen());
-//       } else {
-//         Get.off(() => const LoginScreen());
-//       }
-//     });
-//   }
-// }
+      if (isloggedIn) {
+        Get.off(() => const LoadingScreen());
+      } else {
+        Get.off(() => const LoginScreen());
+      }
+    });
+  }
+}
