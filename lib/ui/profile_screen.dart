@@ -171,7 +171,7 @@ Widget _profileContents(UserModel user, BuildContext context) {
       children: [
         Row(
           children: [
-            _profileProfile(user.avatar, context),
+            _profileProfile(user.avatarUrl, context),
             SizedBox(width: 35),
             ProfileInfo(number: user.totalPosts.toString(), label: "Posts"),
             SizedBox(width: 21),

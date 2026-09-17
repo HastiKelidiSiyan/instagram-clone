@@ -188,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return HomeProfile(
-                      imageUrl: currentUser.avatar,
+                      imageUrl: currentUser.avatarUrl,
                       label: "Your Story",
                     );
                   } else {

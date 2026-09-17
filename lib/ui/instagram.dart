@@ -95,7 +95,7 @@ class _InstagramState extends State<Instagram> {
               radius: 9,
               child: ClipOval(
                 child: CachedNetworkImage(
-                  imageUrl: currentUser.avatar,
+                  imageUrl: currentUser.avatarUrl,
                   placeholder: (context, url) =>
                       Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) =>
