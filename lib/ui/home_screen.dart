@@ -1,5 +1,9 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import 'package:instagram_clone/repositories/user_repository.dart';
+>>>>>>> refactor/models
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/models/user_model.dart';
@@ -14,9 +18,8 @@ import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.me, required this.onProfileTap});
+  const HomeScreen({super.key, required this.onProfileTap});
 
-  final UserModel me;
   final Function(int) onProfileTap;
 
   @override
@@ -26,6 +29,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<PostModel>>? postsFuture = PostRepository().getPosts();
   Future<List<StoryModel>>? storiesFuture = StoryRepository().getStories();
+  Future<UserModel> currentUser = UserRepository().getMe();
 
   Future<void> _refreshPosts() async {
     setState(() {
@@ -42,9 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _homeAppBar(widget.me),
+      appBar: _homeAppBar(currentUser),
       body: _homeBody(
-        widget.me,
+        currentUser,
         widget.onProfileTap,
         postsFuture,
         storiesFuture,
@@ -90,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 17,
                   ),
                   onTap: () {
-                    Get.to(() => DirectsScreen(me: me));
+                    Get.to(() => DirectsScreen(currentUser: me));
                   },
                 ),
               ],
@@ -168,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _storiesSection(
-    UserModel me,
+    UserModel currentUser,
     Function(int) onProfileTap,
     Future<List<StoryModel>>? storiesFuture,
     Future<void> Function() refreshStories,
@@ -187,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return HomeProfile(
-                      imageUrl: me.avatar,
+                      imageUrl: currentUser.avatarUrl,
                       label: "Your Story",
                     );
                   } else {

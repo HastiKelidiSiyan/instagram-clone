@@ -2,7 +2,7 @@ class UserModel {
   final int id;
   final String username;
   final String name;
-  final String? avatar;
+  final String? avatarUrl;
   final String? bio;
   final DateTime createdAt;
 
@@ -10,7 +10,7 @@ class UserModel {
     required this.id,
     required this.name,
     required this.username,
-    required this.avatar,
+    required this.avatarUrl,
     required this.bio,
     required this.createdAt,
   });
@@ -19,7 +19,7 @@ class UserModel {
     id: json['id'],
     name: json['name'],
     username: json['username'],
-    avatar: json['avatar'],
+    avatarUrl: json['avatar'],
     createdAt: DateTime.parse(json['createdAt']),
     bio: json['bio'],
   );
@@ -28,7 +28,7 @@ class UserModel {
     'id': id,
     'name': name,
     'username': username,
-    'avatar': avatar,
+    'avatar': avatarUrl,
     'createdAt': createdAt.toIso8601String(),
     'bio': bio,
   };

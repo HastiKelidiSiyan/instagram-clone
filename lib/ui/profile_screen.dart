@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
-import 'package:instagram_clone/ui/login_screen.dart';
 import '../models/user_model.dart';
 
 class ProfileScreen extends StatelessWidget {

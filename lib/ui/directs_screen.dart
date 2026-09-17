@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/app_failure.dart';
+import 'package:instagram_clone/models/conversation_model.dart';
 import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/repositories/message_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
+import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/widgets/direct_list_item.dart';
@@ -13,11 +15,11 @@ import '../models/message_model.dart';
 
 class DirectsScreen extends StatefulWidget {
   const DirectsScreen({
-    required this.me,
+    required this.userId,
     super.key,
   });
 
-  final UserModel me;
+  final int userId;
   @override
   State<DirectsScreen> createState() => _DirectsScreenState();
 }
@@ -36,9 +38,12 @@ class _DirectsScreenState extends State<DirectsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    UserModel currentUser = UserRepository().getUserById(widget.userId);
+    // ConversationModel conversations = ConversationRepository().getConversations(widget.userId));
+
     return SafeArea(
       child: Scaffold(
-        appBar: _directsAppBar(widget.me),
+        appBar: _directsAppBar(currentUser),
         body: _directsList(),
         bottomNavigationBar: _footer(),
       ),

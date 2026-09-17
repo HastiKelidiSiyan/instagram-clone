@@ -11,4 +11,18 @@ class LikeModel{
     required this.postId,
     required this.createdAt,
   });
+
+  factory LikeModel.fromJson(Map<String, dynamic> json) => LikeModel(
+        id: json['id'],
+        userId: json['userId'],
+        postId: json['postId'],
+        createdAt: DateTime.parse(json['createdAt']),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'userId': userId,
+        'postId': postId,
+        'createdAt': createdAt.toIso8601String(),
+      };
 }
