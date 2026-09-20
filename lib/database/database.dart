@@ -145,7 +145,7 @@ class AppDatabase extends _$AppDatabase {
       await migrator.deleteTable('stories');
       await migrator.deleteTable('posts');
       await migrator.deleteTable('messages');
-      await migrator.deleteTable('conversation');
+      await migrator.deleteTable('conversations');
       await migrator.deleteTable('likes');
       await migrator.deleteTable('follows');
       await migrator.deleteTable('post_media');

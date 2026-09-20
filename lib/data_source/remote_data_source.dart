@@ -12,6 +12,11 @@ import 'package:instagram_clone/models/post_media_model.dart';
 import 'package:instagram_clone/models/comment_model.dart';
 import 'package:instagram_clone/models/like_model.dart';
 import 'package:instagram_clone/models/follow_model.dart';
+import 'package:instagram_clone/database/database.dart';
+import 'package:instagram_clone/models/domain/feed_item.dart';
+import 'package:instagram_clone/models/domain/story_item_data.dart';
+import 'package:instagram_clone/models/domain/profile_data.dart';
+import 'package:instagram_clone/models/domain/direct_conversation_item.dart';
 
 class RemoteDataSource {
   final Dio _dio;
@@ -30,6 +35,20 @@ class RemoteDataSource {
     return UserModel.fromJson(response.data[0]);
   }
 
+  Future<void> addUser(UserModel user) async {
+    await _dio.post(
+      '/rest/v1/users',
+      data: {
+        'id': user.id,
+        'username': user.username,
+        'name': user.name,
+        'avatar_url': user.avatarUrl,
+        'bio': user.bio,
+        'created_at': user.createdAt.toIso8601String(),
+      },
+    );
+  }
+
   Future<List<UserModel>> searchUsers(String username) async {
     final response = await _dio.get(
       '/rest/v1/users',
@@ -45,9 +64,34 @@ class RemoteDataSource {
   }
 
   Future<List<PostModel>> getPosts() async {
+    // Determine current user from local DB (first user row)
+    final db = AppDatabase.instance;
+    final users = await (db.select(db.users)).get();
+    if (users.isEmpty) return [];
+
+    final currentUserId = users.first.id;
+
+    // Get the list of users the current user follows
+    final followsResp = await _dio.get(
+      '/rest/v1/follows',
+      queryParameters: {
+        'follower_id': 'eq.$currentUserId',
+        'select': 'following_id',
+      },
+    );
+
+    final followingIds = (followsResp.data as List)
+        .map((j) => j['following_id'].toString())
+        .toList();
+
+    if (followingIds.isEmpty) return [];
+
+    final inList = followingIds.join(',');
+
     final response = await _dio.get(
       '/rest/v1/posts',
       queryParameters: {
+        'user_id': 'in.($inList)',
         'select': '*',
         'order': 'created_at.desc',
       },
@@ -303,9 +347,34 @@ class RemoteDataSource {
   // =========================
 
   Future<List<StoryModel>> getActiveStories() async {
+    // Determine current user from local DB
+    final db = AppDatabase.instance;
+    final users = await (db.select(db.users)).get();
+    if (users.isEmpty) return [];
+
+    final currentUserId = users.first.id;
+
+    // Get users the current user follows
+    final followsResp = await _dio.get(
+      '/rest/v1/follows',
+      queryParameters: {
+        'follower_id': 'eq.$currentUserId',
+        'select': 'following_id',
+      },
+    );
+
+    final followingIds = (followsResp.data as List)
+        .map((j) => j['following_id'].toString())
+        .toList();
+
+    if (followingIds.isEmpty) return [];
+
+    final inList = followingIds.join(',');
+
     final response = await _dio.get(
       '/rest/v1/stories',
       queryParameters: {
+        'user_id': 'in.($inList)',
         'expires_at': 'gt.${DateTime.now().toIso8601String()}',
         'select': '*',
         'order': 'created_at.desc',
@@ -497,6 +566,192 @@ class RemoteDataSource {
     );
 
     return MessageModel.fromJson(response.data[0]);
+  }
+
+  // =========================
+  // Screen-ready remote reads
+  // =========================
+
+  Future<List<FeedItem>> getFeedItems(String currentUserId) async {
+    // get follows
+    final followsResp = await _dio.get(
+      '/rest/v1/follows',
+      queryParameters: {
+        'follower_id': 'eq.$currentUserId',
+        'select': 'following_id',
+      },
+    );
+
+    final followingIds = (followsResp.data as List)
+        .map((j) => j['following_id'].toString())
+        .toList();
+    if (followingIds.isEmpty) return [];
+
+    final inList = followingIds.join(',');
+    final postsResp = await _dio.get(
+      '/rest/v1/posts',
+      queryParameters: {
+        'user_id': 'in.($inList)',
+        'select': '*',
+        'order': 'created_at.desc',
+      },
+    );
+
+    final items = <FeedItem>[];
+
+    for (final p in (postsResp.data as List)) {
+      final post = PostModel.fromJson(p);
+      final author = await getUser(post.userId);
+      final media = await getPostMedia(post.id);
+
+      final likesResp = await _dio.get(
+        '/rest/v1/likes',
+        queryParameters: {
+          'post_id': 'eq.${post.id}',
+          'select': '*',
+          'order': 'created_at.desc',
+        },
+      );
+      final likeCount = (likesResp.data as List).length;
+      UserModel? latestLiker;
+      if (likesResp.data.isNotEmpty) {
+        latestLiker = await getUser(likesResp.data[0]['user_id'].toString());
+      }
+
+      final commentsResp = await _dio.get(
+        '/rest/v1/comments',
+        queryParameters: {
+          'post_id': 'eq.${post.id}',
+          'select': '*',
+        },
+      );
+      final commentCount = (commentsResp.data as List).length;
+
+      final isLiked = await isPostLiked(currentUserId, post.id);
+
+      items.add(
+        FeedItem(
+          post: post,
+          author: author,
+          media: media,
+          likeCount: likeCount,
+          latestLiker: latestLiker,
+          commentCount: commentCount,
+          isLikedByCurrentUser: isLiked,
+        ),
+      );
+    }
+
+    return items;
+  }
+
+  Future<List<StoryItemData>> getActiveStoryItems(String currentUserId) async {
+    final followsResp = await _dio.get(
+      '/rest/v1/follows',
+      queryParameters: {
+        'follower_id': 'eq.$currentUserId',
+        'select': 'following_id',
+      },
+    );
+
+    final followingIds = (followsResp.data as List)
+        .map((j) => j['following_id'].toString())
+        .toList();
+    if (followingIds.isEmpty) return [];
+
+    final inList = followingIds.join(',');
+    final response = await _dio.get(
+      '/rest/v1/stories',
+      queryParameters: {
+        'user_id': 'in.($inList)',
+        'expires_at': 'gt.${DateTime.now().toIso8601String()}',
+        'select': '*',
+        'order': 'created_at.desc',
+      },
+    );
+
+    final out = <StoryItemData>[];
+    for (final s in (response.data as List)) {
+      final story = StoryModel.fromJson(s);
+      final author = await getUser(story.userId);
+      final viewed = await hasViewedStory(story.id, currentUserId);
+      out.add(
+        StoryItemData(
+          story: story,
+          author: author,
+          isViewedByCurrentUser: viewed,
+        ),
+      );
+    }
+
+    return out;
+  }
+
+  Future<ProfileData> getProfileData(
+    String userId,
+    String currentUserId,
+  ) async {
+    final user = await getUser(userId);
+    final posts = await getUserPosts(userId);
+    final followers = await getFollowers(userId);
+    final following = await getFollowing(userId);
+    final isFollowed = followers.any((f) => f.followerId == currentUserId);
+    final activeStories = await getUserStories(userId);
+
+    return ProfileData(
+      user: user,
+      posts: posts,
+      followerCount: followers.length,
+      followingCount: following.length,
+      isFollowedByCurrentUser: isFollowed,
+      activeStories: activeStories,
+    );
+  }
+
+  Future<List<DirectConversationItem>> getDirectConversationItems(
+    String currentUserId,
+  ) async {
+    final convs = await getUserConversations(currentUserId);
+    final out = <DirectConversationItem>[];
+
+    for (final conv in convs) {
+      final members = await getConversationMembers(conv.id);
+      final other = members.firstWhere(
+        (m) => m.userId != currentUserId,
+        orElse: () => members.first,
+      );
+      final otherUser = await getUser(other.userId);
+      final messages = await getMessages(conv.id);
+      final latest = messages.isNotEmpty ? messages.last : null;
+      final stories = await getUserStories(other.userId);
+      final activeStory = stories.isNotEmpty
+          ? StoryItemData(
+              story: stories.first,
+              author: otherUser,
+              isViewedByCurrentUser: await hasViewedStory(
+                stories.first.id,
+                currentUserId,
+              ),
+            )
+          : null;
+
+      out.add(
+        DirectConversationItem(
+          conversation: conv,
+          otherParticipant: otherUser,
+          latestMessage: latest,
+          activeStory: activeStory,
+        ),
+      );
+    }
+
+    return out;
+  }
+
+  Future<List<MessageModel>> getConversationMessages(
+    String conversationId,
+  ) async {
+    return getMessages(conversationId);
   }
 
   Future<void> deleteMessage(String messageId) async {

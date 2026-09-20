@@ -14,12 +14,15 @@ class PostModel {
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
-    id: json['id'],
-    userId: json['userId'],
-    caption: json['caption'],
-    createdAt: DateTime.parse(json['createdAt']),
+    id: json['id'].toString(),
+    userId: json['userId'] ?? json['user_id'],
+    caption: json['caption'] ?? json['text'] ?? '',
+    createdAt: json['createdAt'] != null
+        ? DateTime.parse(json['createdAt'])
+        : (json['created_at'] != null
+              ? DateTime.parse(json['created_at'])
+              : DateTime.now()),
   );
-
 
   Map<String, dynamic> toJson() => {
     'id': id,

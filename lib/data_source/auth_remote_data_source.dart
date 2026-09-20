@@ -22,6 +22,18 @@ class AuthRemoteDataSource {
   }
 
   Future<void> logout() async {
-  await dio.post('/auth/v1/logout');
-}
+    await dio.post('/auth/v1/logout');
+  }
+
+  Future<AuthModel> signup(String email, String password) async {
+    final response = await dio.post(
+      '/auth/v1/signup',
+      data: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    return AuthModel.fromJson(response.data);
+  }
 }
