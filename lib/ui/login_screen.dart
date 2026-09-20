@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/signup_screen.dart';
@@ -56,11 +57,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<bool> _isUserValid(String username, String password) async {
-    final prefs = await SharedPreferences.getInstance();
-    String? storedUsername = prefs.getString('username');
-    String? storedPassword = prefs.getString('password');
+    try {
+      await AuthRepository().login(
+        username,
+        password,
+      );
 
-    return storedUsername == username && storedPassword == password;
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   void _submitForm() async {

@@ -6,7 +6,7 @@ import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/home_screen.dart';
 
-import 'package:instagram_clone/ui/profile_screen.dart' hide ProfileBody;
+import 'package:instagram_clone/ui/profile_screen.dart';
 
 class Instagram extends StatefulWidget {
   const Instagram({required this.me, super.key});
@@ -26,7 +26,7 @@ class _InstagramState extends State<Instagram> {
         index = 4;
       });
     } else {
-      UserModel? user = await UserRepository().getUserById(userId);
+      final user = await UserRepository().getUserById(userId.toString());
       Get.to(() => ProfileScreen(user: user));
     }
   }
@@ -35,13 +35,8 @@ class _InstagramState extends State<Instagram> {
   Widget build(BuildContext context) {
     final currentUser = widget.me;
 
-
     final screens = [
-<<<<<<< HEAD
-      HomeScreen(me: currentUser, onProfileTap: handleProfileTap),
-=======
       HomeScreen(currentUser: currentUser, onProfileTap: handleProfileTap),
->>>>>>> refactor/models
       const Placeholder(child: Text("Explore Body")),
       const Placeholder(child: Text("Reel Body")),
       const Placeholder(child: Text("Shop Body")),
@@ -99,7 +94,7 @@ class _InstagramState extends State<Instagram> {
               radius: 9,
               child: ClipOval(
                 child: CachedNetworkImage(
-                  imageUrl: currentUser.avatarUrl,
+                  imageUrl: currentUser.avatarUrl ?? '',
                   placeholder: (context, url) =>
                       Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) =>

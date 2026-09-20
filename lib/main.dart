@@ -66,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (isloggedIn) {
         Get.off(() => const LoadingScreen());
       } else {
-        Get.off(() => const LoginScreen());
+        Get.off(() => const LoadingScreen());
       }
     });
   }

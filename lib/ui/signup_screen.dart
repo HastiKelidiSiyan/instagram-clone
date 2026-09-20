@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
+import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
+import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +64,7 @@ class _SignupScreenState extends State<SignupScreen> {
       child: _signupForm(),
     );
   }
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -231,19 +234,30 @@ class _SignupScreenState extends State<SignupScreen> {
     _validateGender();
 
     if (_isFormValid) {
-      var newId = (await UserRepository().getUsers()).length + 1;
-      // UserModel user = UserModel(
-      //   userId: newId,
-      //   name: _nameController.text.trim(),
-      //   username: _usernameController.text.trim(),
-      //   avatar: 'https://images.unsplash.    photo-150268510422    32379fefbe',
-      //   bio: "",
-      // );
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', _usernameController.text.trim());
-      await prefs.setString('password', _passwordController.text.trim());
-      UserRepository().addUser(user);
-      Get.back();
+      final authRepository = AuthRepository();
+      try {
+        final auth = await authRepository.signup(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
+
+        UserModel user = UserModel(
+          id: auth.userId,
+          name: _nameController.text,
+          username: _usernameController.text,
+          avatarUrl: null,
+          bio: null,
+          createdAt: DateTime.now(),
+        );
+        if (await UserRepository().addUser(user)) {
+          AppFeedback.showSuccess(context, 'User was created successfully');
+          Get.back();
+        } else {
+          AppFeedback.showException(context, 'User creation failed. Try again');
+        }
+      } catch (e) {
+        AppFeedback.showException(context, 'User creation failed. Try again: $e');
+      }
     }
   }
 

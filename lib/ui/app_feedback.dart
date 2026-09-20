@@ -11,7 +11,8 @@ class AppFeedback {
         backgroundColor: const Color.fromARGB(255, 124, 39, 39),
         content: Text(
           style: TextStyle(color: Colors.red),
-          failureMessage(failure)),
+          failureMessage(failure),
+        ),
       ),
     );
   }
@@ -23,10 +24,20 @@ class AppFeedback {
     messenger.showSnackBar(
       SnackBar(
         backgroundColor: const Color.fromARGB(255, 124, 39, 39),
-        content: Text(
-          style: TextStyle(color: Colors.red),
-          error),
-        ),
+        content: Text(style: TextStyle(color: Colors.red), error),
+      ),
+    );
+  }
+
+  static void showSuccess(BuildContext context, String message) {
+    final messenger = ScaffoldMessenger.of(context);
+
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(
+        backgroundColor: const Color.fromARGB(255, 3, 167, 44),
+        content: Text(style: TextStyle(color: const Color.fromARGB(255, 0, 249, 108)), message),
+      ),
     );
   }
 }

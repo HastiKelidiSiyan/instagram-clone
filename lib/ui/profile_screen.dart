@@ -1,11 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
+import 'package:instagram_clone/ui/login_screen.dart';
 import '../models/user_model.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final UserModel? user;
+  final UserModel user;
 
   const ProfileScreen({super.key, required this.user});
 
@@ -13,14 +15,19 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: _profileAppBar(user!),
-        body: _profileBody(user!, context),
+        appBar: _profileAppBar(user),
+        body: _profileBody(user, context),
       ),
     );
   }
 }
 
 PreferredSizeWidget _profileAppBar(UserModel user) {
+  Future<void> logout() async {
+    final auth = AuthRepository();
+    Get.off(LoginScreen());
+    await auth.logout();
+  }
   Widget content = Row(
     children: [
       SizedBox(width: 15),
@@ -46,7 +53,7 @@ PreferredSizeWidget _profileAppBar(UserModel user) {
     ],
   );
 
-  if (user.userId == 1) {
+  if (true) {
     content = Padding(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       child: Stack(
@@ -76,10 +83,13 @@ PreferredSizeWidget _profileAppBar(UserModel user) {
           Row(
             children: [
               Spacer(),
-              AppIcon(
-                asset: "assets/images/MenuIcon.png",
-                height: 17,
-                width: 20,
+              InkWell(
+                onTap: logout,
+                child: AppIcon(
+                  asset: "assets/images/MenuIcon.png",
+                  height: 17,
+                  width: 20,
+                ),
               ),
             ],
           ),
@@ -165,19 +175,13 @@ Widget _profileContents(UserModel user, BuildContext context) {
       children: [
         Row(
           children: [
-            _profileProfile(user.avatar, context),
+            _profileProfile(user.avatarUrl ?? '', context),
             SizedBox(width: 35),
-            ProfileInfo(number: user.totalPosts.toString(), label: "Posts"),
+            ProfileInfo(number: '0', label: "Posts"),
             SizedBox(width: 21),
-            ProfileInfo(
-              number: user.totalFollowers.toString(),
-              label: "Followers",
-            ),
+            ProfileInfo(number: '0', label: "Followers"),
             SizedBox(width: 21),
-            ProfileInfo(
-              number: user.totalFollowings.toString(),
-              label: "Following",
-            ),
+            ProfileInfo(number: '0', label: "Following"),
           ],
         ),
         SizedBox(height: 12),
@@ -190,7 +194,9 @@ Widget _profileContents(UserModel user, BuildContext context) {
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 1),
-            Row(children: [Text(user.bio, style: TextStyle(fontSize: 12))]),
+            Row(
+              children: [Text(user.bio ?? '', style: TextStyle(fontSize: 12))],
+            ),
           ],
         ),
       ],
@@ -199,7 +205,7 @@ Widget _profileContents(UserModel user, BuildContext context) {
 }
 
 Widget _editProfileButton(UserModel user) {
-  if (user.userId != 1) {
+  if (user.id != '1') {
     return SizedBox.shrink();
   }
   return Container(
@@ -270,8 +276,10 @@ class ProfileInfo extends StatelessWidget {
   }
 }
 
-Widget _profileProfile(String imageUrl,
-BuildContext context, ) {
+Widget _profileProfile(
+  String imageUrl,
+  BuildContext context,
+) {
   return Column(
     children: [
       Container(

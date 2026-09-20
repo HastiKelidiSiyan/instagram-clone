@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-=======
+import 'package:instagram_clone/models/domain/feed_item.dart';
+import 'package:instagram_clone/models/domain/story_item_data.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
->>>>>>> refactor/models
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/models/user_model.dart';
@@ -18,8 +17,13 @@ import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.onProfileTap});
+  const HomeScreen({
+    super.key,
+    required this.currentUser,
+    required this.onProfileTap,
+  });
 
+  final UserModel currentUser;
   final Function(int) onProfileTap;
 
   @override
@@ -27,32 +31,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Future<List<PostModel>>? postsFuture = PostRepository().getPosts();
-  Future<List<StoryModel>>? storiesFuture = StoryRepository().getStories();
-  Future<UserModel> currentUser = UserRepository().getMe();
+  late Future<List<FeedItem>> feedItems;
+  late Future<List<StoryItemData>> storyItems;
 
-  Future<void> _refreshPosts() async {
+  @override
+  void initState() {
+    super.initState();
+    feedItems = PostRepository().getFeedItems();
+    storyItems = StoryRepository().getActiveStoryItems();
+  }
+
+  Future<void> _refreshFeed() async {
     setState(() {
-      postsFuture = PostRepository().getPosts();
+      feedItems = PostRepository().getFeedItems();
     });
   }
 
   Future<void> _refreshStories() async {
     setState(() {
-      storiesFuture = StoryRepository().getStories();
+      storyItems = StoryRepository().getActiveStoryItems();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _homeAppBar(currentUser),
+      appBar: _homeAppBar(widget.currentUser),
       body: _homeBody(
-        currentUser,
+        widget.currentUser,
         widget.onProfileTap,
-        postsFuture,
-        storiesFuture,
-        _refreshPosts,
+        feedItems,
+        storyItems,
+        _refreshFeed,
         _refreshStories,
       ),
     );
@@ -108,8 +118,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _homeBody(
     UserModel me,
     Function(int) onProfileTap,
-    Future<List<PostModel>>? postsFuture,
-    Future<List<StoryModel>>? storiesFuture,
+    Future<List<FeedItem>>? postsFuture,
+    Future<List<StoryItemData>>? storiesFuture,
     Future<void> Function() refreshPosts,
     Future<void> Function() refreshStories,
   ) {
@@ -128,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _postsSection(
     UserModel me,
     Function(int) onProfileTap,
-    Future<List<PostModel>>? postsFuture,
+    Future<List<FeedItem>>? postsFuture,
     Future<void> Function() refreshPosts,
   ) {
     return RefreshIndicator(
@@ -140,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return ListView.separated(
               itemBuilder: (context, index) {
                 return PostListItem(
-                  post: snapshot.data![index],
+                  feedItem: snapshot.data![index],
                   onProfileTap: onProfileTap,
                 );
               },
@@ -174,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _storiesSection(
     UserModel currentUser,
     Function(int) onProfileTap,
-    Future<List<StoryModel>>? storiesFuture,
+    Future<List<StoryItemData>>? storiesFuture,
     Future<void> Function() refreshStories,
   ) {
     return SizedBox(
@@ -195,10 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: "Your Story",
                     );
                   } else {
+                    final item = snapshot.data![index - 1];
                     return StoryItem(
-                      story: snapshot.data![index - 1],
+                      storyItem: item,
                       onTap: () => onProfileTap(index - 1),
-                      radius: 25, isDirect: false,
+                      radius: 25,
+                      isDirect: false,
                     );
                   }
                 },
@@ -231,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeProfile extends StatelessWidget {
-  final String imageUrl;
+  final String? imageUrl;
   final String label;
 
   const HomeProfile({super.key, required this.imageUrl, required this.label});
@@ -262,7 +274,7 @@ class HomeProfile extends StatelessWidget {
                   radius: 25,
                   child: ClipOval(
                     child: CachedNetworkImage(
-                      imageUrl: imageUrl,
+                      imageUrl: imageUrl ?? '',
                       placeholder: (context, url) =>
                           Center(child: CircularProgressIndicator()),
                       errorWidget: (context, url, error) =>
@@ -280,4 +292,3 @@ class HomeProfile extends StatelessWidget {
     );
   }
 }
-
