@@ -1,4 +1,5 @@
 import 'package:instagram_clone/models/auth_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/storage/secure_token_storage.dart';
 import '../data_source/auth_remote_data_source.dart';
@@ -21,18 +22,30 @@ class AuthRepository {
       accessToken: auth.accessToken,
       refreshToken: auth.refreshToken,
     );
-  }
 
-  Future<void> logout() async {
-    await remoteDataSource.logout();
-    await tokenStorage.clearTokens();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('currentUserId', auth.userId);
+    await prefs.setBool('isLoggedIn', true);
   }
 
   Future<bool> isLoggedIn() async {
-    final accessToken = await tokenStorage.getAccessToken();
+  final prefs = await SharedPreferences.getInstance();
 
-    return accessToken != null;
+  return prefs.getBool('isLoggedIn') ?? false;
+}
+
+Future<void> logout() async {
+  
+  final prefs = await SharedPreferences.getInstance();
+
+  try {
+    await remoteDataSource.logout();
+  } finally {
+    await tokenStorage.clearTokens();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.remove('currentUserId');
   }
+}
 
   Future<AuthModel> signup(String email, String password) async {
     final auth = await remoteDataSource.signup(email, password);

@@ -2,16 +2,19 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/home_screen.dart';
 
 import 'package:instagram_clone/ui/profile_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Instagram extends StatefulWidget {
-  const Instagram({required this.me, super.key});
+  const Instagram({super.key});
 
-  final UserModel me;
+
 
   @override
   State<Instagram> createState() => _InstagramState();
@@ -33,14 +36,14 @@ class _InstagramState extends State<Instagram> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = widget.me;
+    final currentUser = context.watch<UserProvider>().currentUser;
 
     final screens = [
-      HomeScreen(currentUser: currentUser, onProfileTap: handleProfileTap),
+      HomeScreen(onProfileTap: handleProfileTap),
       const Placeholder(child: Text("Explore Body")),
       const Placeholder(child: Text("Reel Body")),
       const Placeholder(child: Text("Shop Body")),
-      ProfileScreen(user: currentUser),
+      ProfileScreen(user: currentUser!),
     ];
 
     return Scaffold(

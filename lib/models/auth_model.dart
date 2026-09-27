@@ -5,10 +5,10 @@ class AuthModel {
   final String userId;
 
   AuthModel({
+    required this.userId,
     required this.accessToken,
     required this.refreshToken,
     required this.expiresIn,
-    required this.userId,
   });
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/providers/auth_provider.dart';
 import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/signup_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -62,7 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
         username,
         password,
       );
-
+      
+      context.read<AuthProvider>().setLoggedIn(true);
       return true;
     } catch (e) {
       return false;

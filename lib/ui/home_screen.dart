@@ -2,28 +2,25 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/domain/feed_item.dart';
 import 'package:instagram_clone/models/domain/story_item_data.dart';
-import 'package:instagram_clone/repositories/user_repository.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/ui/directs_screen.dart';
-import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/app_failure.dart';
-import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/widgets/story_item.dart';
 import 'package:instagram_clone/widgets/post_list_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:instagram_clone/repositories/post_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
-    required this.currentUser,
     required this.onProfileTap,
   });
 
-  final UserModel currentUser;
   final Function(int) onProfileTap;
 
   @override
@@ -55,10 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.watch<UserProvider>().currentUser;
+
     return Scaffold(
-      appBar: _homeAppBar(widget.currentUser),
+      appBar: _homeAppBar(currentUser!),
       body: _homeBody(
-        widget.currentUser,
+        currentUser!,
         widget.onProfileTap,
         feedItems,
         storyItems,
@@ -104,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 17,
                   ),
                   onTap: () {
-                    Get.to(() => DirectsScreen(currentUser: me));
+                    Get.to(() => DirectsScreen());
                   },
                 ),
               ],

@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:instagram_clone/repositories/auth_repository.dart';
+import 'package:provider/provider.dart';
+import 'package:instagram_clone/providers/auth_provider.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 import '../models/user_model.dart';
@@ -15,19 +16,20 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: _profileAppBar(user),
+        appBar: _profileAppBar(user, context),
         body: _profileBody(user, context),
       ),
     );
   }
 }
 
-PreferredSizeWidget _profileAppBar(UserModel user) {
+PreferredSizeWidget _profileAppBar(UserModel user, BuildContext context) {
   Future<void> logout() async {
-    final auth = AuthRepository();
-    Get.off(LoginScreen());
-    await auth.logout();
+    await context.read<AuthProvider>().logout();
+
+    Get.off(() => const LoginScreen());
   }
+
   Widget content = Row(
     children: [
       SizedBox(width: 15),

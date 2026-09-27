@@ -2,24 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/conversation_model.dart';
-import 'package:instagram_clone/models/domain/direct_conversation_item.dart';
 import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/models/user_model.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/repositories/conversation_repository.dart';
 import 'package:instagram_clone/repositories/story_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/widgets/direct_list_item.dart';
+import 'package:provider/provider.dart';
 
 class DirectsScreen extends StatelessWidget {
-  const DirectsScreen({super.key, required this.currentUser});
-
-  final UserModel currentUser;
+  const DirectsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.watch<UserProvider>().currentUser;
+
     final conversationsFuture = ConversationRepository().getUserConversations(
-      currentUser.id,
+      currentUser!.id,
     );
     final storiesFuture = StoryRepository().getUserStories(currentUser.id);
 
