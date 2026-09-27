@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:instagram_clone/core/storage/secure_token_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DioClient {
   static final Dio dio = Dio(
@@ -30,8 +31,7 @@ class DioClient {
           final accessToken = await storage.getAccessToken();
 
           if (accessToken != null) {
-            options.headers['Authorization'] =
-                'Bearer $accessToken';
+            options.headers['Authorization'] = 'Bearer $accessToken';
           }
 
           handler.next(options);
@@ -59,11 +59,9 @@ class DioClient {
               },
             );
 
-            final newAccessToken =
-                response.data['access_token'];
+            final newAccessToken = response.data['access_token'];
 
-            final newRefreshToken =
-                response.data['refresh_token'];
+            final newRefreshToken = response.data['refresh_token'];
 
             await storage.saveTokens(
               accessToken: newAccessToken,
@@ -72,14 +70,18 @@ class DioClient {
 
             final request = error.requestOptions;
 
-            request.headers['Authorization'] =
-                'Bearer $newAccessToken';
+            request.headers['Authorization'] = 'Bearer $newAccessToken';
 
             final retryResponse = await dio.fetch(request);
 
             handler.resolve(retryResponse);
           } catch (e) {
+            final prefs = await SharedPreferences.getInstance();
+
             await storage.clearTokens();
+            await prefs.setBool('isLoggedIn', false);
+            await prefs.remove('currentUserId');
+
             handler.next(error);
           }
         },
@@ -87,4 +89,3 @@ class DioClient {
     );
   }
 }
-

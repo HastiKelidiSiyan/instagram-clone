@@ -1,32 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/core/network/dio_client.dart';
+import 'package:instagram_clone/providers/auth_provider.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
+import 'package:instagram_clone/repositories/auth_repository.dart';
+import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/loading_screen.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 void main() {
+  DioClient.setupInterceptors();
   runApp(
-    GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SafeArea(child: const SplashScreen()),
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.white),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(AuthRepository()),
         ),
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
-        brightness: Brightness.dark,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.black),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.black,
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(UserRepository()),
         ),
-      ),
+      ],
 
-      themeMode: ThemeMode.system,
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SafeArea(child: const SplashScreen()),
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: AppBarTheme(backgroundColor: Colors.white),
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            backgroundColor: Colors.white,
+          ),
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData(
+          scaffoldBackgroundColor: Colors.black,
+          brightness: Brightness.dark,
+          appBarTheme: AppBarTheme(backgroundColor: Colors.black),
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            backgroundColor: Colors.black,
+          ),
+        ),
+
+        themeMode: ThemeMode.system,
+      ),
     ),
   );
 }
@@ -59,15 +76,18 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 2), () async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      bool isloggedIn = prefs.getBool('isLoggedIn') ?? false;
+    await Future.delayed(const Duration(seconds: 2));
 
-      if (isloggedIn) {
-        Get.off(() => const LoadingScreen());
-      } else {
-        Get.off(() => const LoadingScreen());
-      }
-    });
+    final authProvider = context.read<AuthProvider>();
+
+    await authProvider.checkLoginStatus();
+
+    if (!mounted) return;
+
+    if (authProvider.isLoggedIn) {
+      Get.off(() => const LoadingScreen());
+    } else {
+      Get.off(() => const LoginScreen());
+    }
   }
 }
