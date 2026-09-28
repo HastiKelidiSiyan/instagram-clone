@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: _homeAppBar(currentUser!),
       body: _homeBody(
-        currentUser!,
+        currentUser,
         widget.onProfileTap,
         feedItems,
         storyItems,

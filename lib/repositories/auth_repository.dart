@@ -50,7 +50,7 @@ Future<void> logout() async {
   Future<AuthModel> signup(String email, String password) async {
     final auth = await remoteDataSource.signup(email, password);
 
-    if (auth.accessToken != null && auth.refreshToken != null) {
+    if (auth.refreshToken != null) {
       await tokenStorage.saveTokens(
         accessToken: auth.accessToken,
         refreshToken: auth.refreshToken,

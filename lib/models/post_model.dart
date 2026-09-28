@@ -1,4 +1,3 @@
-import 'user_model.dart';
 
 class PostModel {
   final String id;

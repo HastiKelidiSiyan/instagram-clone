@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/conversation_model.dart';
-import 'package:instagram_clone/models/story_model.dart';
-import 'package:instagram_clone/models/message_model.dart';
-import 'package:instagram_clone/models/user_model.dart';
-import 'package:instagram_clone/widgets/story_item.dart';
 
 class DirectListItem extends StatelessWidget {
   const DirectListItem({

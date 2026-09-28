@@ -140,8 +140,9 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
             ),
           ),
           onTap: () {
-            if (item.latestLiker != null)
+            if (item.latestLiker != null) {
               onProfileTap(int.tryParse(item.latestLiker!.id) ?? 0);
+            }
           },
         ),
         SizedBox(width: 7),
@@ -155,8 +156,9 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
               onTap: () {
-                if (item.latestLiker != null)
+                if (item.latestLiker != null) {
                   onProfileTap(int.tryParse(item.latestLiker!.id) ?? 0);
+                }
               },
             ),
             SizedBox(width: 2),
@@ -197,7 +199,7 @@ Widget _postTopComment(FeedItem item) {
       SizedBox(height: 6),
       Text(
         "View the ${item.commentCount} comments",
-        style: TextStyle(fontSize: 11, color: Colors.black.withOpacity(0.4)),
+        style: TextStyle(fontSize: 11, color: Colors.black.withValues(alpha: 0.4)),
       ),
     ],
   );

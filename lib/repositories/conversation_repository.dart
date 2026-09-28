@@ -37,8 +37,9 @@ class ConversationRepository {
       for (final item in items) {
         await localDataSource.cacheConversation(item.conversation);
         await localDataSource.cacheUser(item.otherParticipant);
-        if (item.latestMessage != null)
+        if (item.latestMessage != null) {
           await localDataSource.cacheMessage(item.latestMessage!);
+        }
       }
       return items;
     }

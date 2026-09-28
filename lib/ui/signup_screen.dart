@@ -5,7 +5,6 @@ import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
