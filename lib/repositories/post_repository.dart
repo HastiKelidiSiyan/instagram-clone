@@ -5,8 +5,7 @@ import 'package:instagram_clone/models/follow_model.dart';
 import 'package:instagram_clone/models/like_model.dart';
 import 'package:instagram_clone/models/post_media_model.dart';
 import 'package:instagram_clone/models/post_model.dart';
-import 'package:instagram_clone/models/domain/feed_item.dart';
-import 'package:instagram_clone/database/database.dart';
+import 'package:instagram_clone/models/domain/home_post.dart';
 import 'package:instagram_clone/services/connection_availability%20.dart';
 
 class PostRepository {
@@ -14,39 +13,28 @@ class PostRepository {
   final LocalDataSource localDataSource = LocalDataSource();
   final ConnectionAvailibility connectivityResult = ConnectionAvailibility();
 
-  Future<List<PostModel>> getPosts() async {
+  Future<List<HomePostModel>> getHomePosts(String currentUserId) async {
     if (await connectivityResult.isConnected()) {
-      final posts = await remoteDataSource.getPosts();
-      for (final post in posts) {
-        await localDataSource.createPost(post);
+      final posts = await remoteDataSource.getHomePosts(currentUserId);
+      for (final item in posts) {
+        await localDataSource.cacheUser(item.author);
+        await localDataSource.cachePost(item.post);
+        for (final media in item.media) {
+          await localDataSource.cachePostMedia(media);
+        }
+        for (final like in item.likes) {
+          await localDataSource.cacheUser(like.user);
+          await localDataSource.cacheLike(like.like);
+        }
+        for (final comment in item.comments) {
+          await localDataSource.cacheUser(comment.user);
+          await localDataSource.cacheComment(comment.comment);
+        }
       }
       return posts;
     }
 
-    return localDataSource.getPosts();
-  }
-
-  Future<List<FeedItem>> getFeedItems() async {
-    final db = AppDatabase.instance;
-    final users = await (db.select(db.users)).get();
-    if (users.isEmpty) return [];
-
-    final currentUserId = users.first.id;
-
-    if (await connectivityResult.isConnected()) {
-      final items = await remoteDataSource.getFeedItems(currentUserId);
-      // cache author, post, media
-      for (final item in items) {
-        await localDataSource.cacheUser(item.author);
-        await localDataSource.cachePost(item.post);
-        for (final m in item.media) {
-          await localDataSource.cachePostMedia(m);
-        }
-      }
-      return items;
-    }
-
-    return localDataSource.getFeedItems(currentUserId);
+    return localDataSource.getHomePosts(currentUserId);
   }
 
   Future<PostModel> getPost(String postId) async {

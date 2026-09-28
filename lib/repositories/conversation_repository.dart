@@ -2,8 +2,7 @@ import 'package:instagram_clone/data_source/local_data_source.dart';
 import 'package:instagram_clone/data_source/remote_data_source.dart';
 import 'package:instagram_clone/models/conversation_model.dart';
 import 'package:instagram_clone/models/converstion_member_model.dart';
-import 'package:instagram_clone/models/domain/direct_conversation_item.dart';
-import 'package:instagram_clone/database/database.dart';
+import 'package:instagram_clone/models/domain/conversation_preview.dart';
 import 'package:instagram_clone/services/connection_availability%20.dart';
 
 class ConversationRepository {
@@ -23,28 +22,34 @@ class ConversationRepository {
     return localDataSource.getUserConversations(userId);
   }
 
-  Future<List<DirectConversationItem>> getDirectConversationItems() async {
-    final db = AppDatabase.instance;
-    final users = await (db.select(db.users)).get();
-    if (users.isEmpty) return [];
-
-    final currentUserId = users.first.id;
-
+  Future<List<ConversationPreviewModel>> getConversationPreviews(
+    String currentUserId,
+  ) async {
     if (await connectivityResult.isConnected()) {
-      final items = await remoteDataSource.getDirectConversationItems(
+      final previews = await remoteDataSource.getConversationPreviews(
         currentUserId,
       );
-      for (final item in items) {
-        await localDataSource.cacheConversation(item.conversation);
-        await localDataSource.cacheUser(item.otherParticipant);
-        if (item.latestMessage != null) {
-          await localDataSource.cacheMessage(item.latestMessage!);
+      for (final preview in previews) {
+        await localDataSource.cacheConversation(preview.conversation);
+        for (final participant in preview.participants) {
+          await localDataSource.cacheUser(participant);
+          await localDataSource.cacheConversationMember(
+            ConversationMemberModel(
+              conversationId: preview.conversation.id,
+              userId: participant.id,
+            ),
+          );
+        }
+        final lastMessage = preview.lastMessage;
+        if (lastMessage != null) {
+          await localDataSource.cacheUser(lastMessage.sender);
+          await localDataSource.cacheMessage(lastMessage.message);
         }
       }
-      return items;
+      return previews;
     }
 
-    return localDataSource.getDirectConversationItems(currentUserId);
+    return localDataSource.getConversationPreviews(currentUserId);
   }
 
   Future<List<ConversationMemberModel>> getConversationMembers(

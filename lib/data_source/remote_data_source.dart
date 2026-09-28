@@ -12,11 +12,10 @@ import 'package:instagram_clone/models/post_media_model.dart';
 import 'package:instagram_clone/models/comment_model.dart';
 import 'package:instagram_clone/models/like_model.dart';
 import 'package:instagram_clone/models/follow_model.dart';
-import 'package:instagram_clone/database/database.dart';
-import 'package:instagram_clone/models/domain/feed_item.dart';
-import 'package:instagram_clone/models/domain/story_item_data.dart';
-import 'package:instagram_clone/models/domain/profile_data.dart';
-import 'package:instagram_clone/models/domain/direct_conversation_item.dart';
+import 'package:instagram_clone/models/domain/home_post.dart';
+import 'package:instagram_clone/models/domain/home_story.dart';
+import 'package:instagram_clone/models/domain/conversation_preview.dart';
+import 'package:instagram_clone/models/domain/profile_model.dart';
 
 class RemoteDataSource {
   final Dio _dio;
@@ -60,45 +59,6 @@ class RemoteDataSource {
 
     return (response.data as List)
         .map((json) => UserModel.fromJson(json))
-        .toList();
-  }
-
-  Future<List<PostModel>> getPosts() async {
-    // Determine current user from local DB (first user row)
-    final db = AppDatabase.instance;
-    final users = await (db.select(db.users)).get();
-    if (users.isEmpty) return [];
-
-    final currentUserId = users.first.id;
-
-    // Get the list of users the current user follows
-    final followsResp = await _dio.get(
-      '/rest/v1/follows',
-      queryParameters: {
-        'follower_id': 'eq.$currentUserId',
-        'select': 'following_id',
-      },
-    );
-
-    final followingIds = (followsResp.data as List)
-        .map((j) => j['following_id'].toString())
-        .toList();
-
-    if (followingIds.isEmpty) return [];
-
-    final inList = followingIds.join(',');
-
-    final response = await _dio.get(
-      '/rest/v1/posts',
-      queryParameters: {
-        'user_id': 'in.($inList)',
-        'select': '*',
-        'order': 'created_at.desc',
-      },
-    );
-
-    return (response.data as List)
-        .map((json) => PostModel.fromJson(json))
         .toList();
   }
 
@@ -346,46 +306,6 @@ class RemoteDataSource {
   // STORIES
   // =========================
 
-  Future<List<StoryModel>> getActiveStories() async {
-    // Determine current user from local DB
-    final db = AppDatabase.instance;
-    final users = await (db.select(db.users)).get();
-    if (users.isEmpty) return [];
-
-    final currentUserId = users.first.id;
-
-    // Get users the current user follows
-    final followsResp = await _dio.get(
-      '/rest/v1/follows',
-      queryParameters: {
-        'follower_id': 'eq.$currentUserId',
-        'select': 'following_id',
-      },
-    );
-
-    final followingIds = (followsResp.data as List)
-        .map((j) => j['following_id'].toString())
-        .toList();
-
-    if (followingIds.isEmpty) return [];
-
-    final inList = followingIds.join(',');
-
-    final response = await _dio.get(
-      '/rest/v1/stories',
-      queryParameters: {
-        'user_id': 'in.($inList)',
-        'expires_at': 'gt.${DateTime.now().toIso8601String()}',
-        'select': '*',
-        'order': 'created_at.desc',
-      },
-    );
-
-    return (response.data as List)
-        .map((json) => StoryModel.fromJson(json))
-        .toList();
-  }
-
   Future<List<StoryModel>> getUserStories(String userId) async {
     final response = await _dio.get(
       '/rest/v1/stories',
@@ -554,6 +474,10 @@ class RemoteDataSource {
         .toList();
   }
 
+  Future<List<MessageModel>> getConversationMessages(
+    String conversationId,
+  ) => getMessages(conversationId);
+
   Future<MessageModel> sendMessage(MessageModel message) async {
     final response = await _dio.post(
       '/rest/v1/messages',
@@ -568,199 +492,430 @@ class RemoteDataSource {
     return MessageModel.fromJson(response.data[0]);
   }
 
-  // =========================
-  // Screen-ready remote reads
-  // =========================
-
-  Future<List<FeedItem>> getFeedItems(String currentUserId) async {
-    // get follows
-    final followsResp = await _dio.get(
-      '/rest/v1/follows',
-      queryParameters: {
-        'follower_id': 'eq.$currentUserId',
-        'select': 'following_id',
-      },
-    );
-
-    final followingIds = (followsResp.data as List)
-        .map((j) => j['following_id'].toString())
-        .toList();
-    if (followingIds.isEmpty) return [];
-
-    final inList = followingIds.join(',');
-    final postsResp = await _dio.get(
-      '/rest/v1/posts',
-      queryParameters: {
-        'user_id': 'in.($inList)',
-        'select': '*',
-        'order': 'created_at.desc',
-      },
-    );
-
-    final items = <FeedItem>[];
-
-    for (final p in (postsResp.data as List)) {
-      final post = PostModel.fromJson(p);
-      final author = await getUser(post.userId);
-      final media = await getPostMedia(post.id);
-
-      final likesResp = await _dio.get(
-        '/rest/v1/likes',
-        queryParameters: {
-          'post_id': 'eq.${post.id}',
-          'select': '*',
-          'order': 'created_at.desc',
-        },
-      );
-      final likeCount = (likesResp.data as List).length;
-      UserModel? latestLiker;
-      if (likesResp.data.isNotEmpty) {
-        latestLiker = await getUser(likesResp.data[0]['user_id'].toString());
-      }
-
-      final commentsResp = await _dio.get(
-        '/rest/v1/comments',
-        queryParameters: {
-          'post_id': 'eq.${post.id}',
-          'select': '*',
-        },
-      );
-      final commentCount = (commentsResp.data as List).length;
-
-      final isLiked = await isPostLiked(currentUserId, post.id);
-
-      items.add(
-        FeedItem(
-          post: post,
-          author: author,
-          media: media,
-          likeCount: likeCount,
-          latestLiker: latestLiker,
-          commentCount: commentCount,
-          isLikedByCurrentUser: isLiked,
-        ),
-      );
-    }
-
-    return items;
-  }
-
-  Future<List<StoryItemData>> getActiveStoryItems(String currentUserId) async {
-    final followsResp = await _dio.get(
-      '/rest/v1/follows',
-      queryParameters: {
-        'follower_id': 'eq.$currentUserId',
-        'select': 'following_id',
-      },
-    );
-
-    final followingIds = (followsResp.data as List)
-        .map((j) => j['following_id'].toString())
-        .toList();
-    if (followingIds.isEmpty) return [];
-
-    final inList = followingIds.join(',');
-    final response = await _dio.get(
-      '/rest/v1/stories',
-      queryParameters: {
-        'user_id': 'in.($inList)',
-        'expires_at': 'gt.${DateTime.now().toIso8601String()}',
-        'select': '*',
-        'order': 'created_at.desc',
-      },
-    );
-
-    final out = <StoryItemData>[];
-    for (final s in (response.data as List)) {
-      final story = StoryModel.fromJson(s);
-      final author = await getUser(story.userId);
-      final viewed = await hasViewedStory(story.id, currentUserId);
-      out.add(
-        StoryItemData(
-          story: story,
-          author: author,
-          isViewedByCurrentUser: viewed,
-        ),
-      );
-    }
-
-    return out;
-  }
-
-  Future<ProfileData> getProfileData(
-    String userId,
-    String currentUserId,
-  ) async {
-    final user = await getUser(userId);
-    final posts = await getUserPosts(userId);
-    final followers = await getFollowers(userId);
-    final following = await getFollowing(userId);
-    final isFollowed = followers.any((f) => f.followerId == currentUserId);
-    final activeStories = await getUserStories(userId);
-
-    return ProfileData(
-      user: user,
-      posts: posts,
-      followerCount: followers.length,
-      followingCount: following.length,
-      isFollowedByCurrentUser: isFollowed,
-      activeStories: activeStories,
-    );
-  }
-
-  Future<List<DirectConversationItem>> getDirectConversationItems(
-    String currentUserId,
-  ) async {
-    final convs = await getUserConversations(currentUserId);
-    final out = <DirectConversationItem>[];
-
-    for (final conv in convs) {
-      final members = await getConversationMembers(conv.id);
-      final other = members.firstWhere(
-        (m) => m.userId != currentUserId,
-        orElse: () => members.first,
-      );
-      final otherUser = await getUser(other.userId);
-      final messages = await getMessages(conv.id);
-      final latest = messages.isNotEmpty ? messages.last : null;
-      final stories = await getUserStories(other.userId);
-      final activeStory = stories.isNotEmpty
-          ? StoryItemData(
-              story: stories.first,
-              author: otherUser,
-              isViewedByCurrentUser: await hasViewedStory(
-                stories.first.id,
-                currentUserId,
-              ),
-            )
-          : null;
-
-      out.add(
-        DirectConversationItem(
-          conversation: conv,
-          otherParticipant: otherUser,
-          latestMessage: latest,
-          activeStory: activeStory,
-        ),
-      );
-    }
-
-    return out;
-  }
-
-  Future<List<MessageModel>> getConversationMessages(
-    String conversationId,
-  ) async {
-    return getMessages(conversationId);
-  }
-
   Future<void> deleteMessage(String messageId) async {
     await _dio.delete(
       '/rest/v1/messages',
+      queryParameters: {'id': 'eq.$messageId'},
+    );
+  }
+
+  Future<List<StoryGroupModel>> getStoryGroups(String currentUserId) async {
+    final followsResponse = await _dio.get(
+      '/rest/v1/follows',
       queryParameters: {
-        'id': 'eq.$messageId',
+        'follower_id': 'eq.$currentUserId',
+        'select': 'following_id',
       },
     );
+
+    final followingIds = (followsResponse.data as List)
+        .map((row) => row['following_id'].toString())
+        .toList();
+    if (followingIds.isEmpty) return [];
+
+    final response = await _dio.get(
+      '/rest/v1/stories',
+      queryParameters: {
+        'user_id': 'in.(${followingIds.join(',')})',
+        'expires_at': 'gt.${DateTime.now().toIso8601String()}',
+        'select': '*,users(*)',
+        'order': 'created_at.asc',
+      },
+    );
+
+    final rows = response.data as List;
+    final storiesByUserId = <String, List<StoryModel>>{};
+    final usersById = <String, UserModel>{};
+    for (final row in rows) {
+      final story = StoryModel.fromJson(_storyJson(row));
+      storiesByUserId.putIfAbsent(story.userId, () => []).add(story);
+      final userRow = row['users'];
+      if (userRow is Map<String, dynamic>) {
+        final user = UserModel.fromJson(userRow);
+        usersById[user.id] = user;
+      }
+    }
+
+    return storiesByUserId.entries.map((entry) {
+      final user = usersById[entry.key];
+      if (user == null) throw const ServerFailure();
+      return StoryGroupModel(user: user, stories: entry.value);
+    }).toList();
+  }
+
+  Future<List<ConversationPreviewModel>> getConversationPreviews(
+    String currentUserId,
+  ) async {
+    final membersResponse = await _dio.get(
+      '/rest/v1/conversation_members',
+      queryParameters: {
+        'user_id': 'eq.$currentUserId',
+        'select': 'conversation_id',
+      },
+    );
+    final conversationIds = (membersResponse.data as List)
+        .map((row) => row['conversation_id'].toString())
+        .toList();
+    if (conversationIds.isEmpty) return [];
+
+    final idFilter = 'in.(${conversationIds.join(',')})';
+    final responses = await Future.wait([
+      _dio.get(
+        '/rest/v1/conversations',
+        queryParameters: {'id': idFilter, 'select': '*'},
+      ),
+      _dio.get(
+        '/rest/v1/conversation_members',
+        queryParameters: {
+          'conversation_id': idFilter,
+          'select': 'conversation_id,user_id,users(*)',
+        },
+      ),
+      _dio.get(
+        '/rest/v1/messages',
+        queryParameters: {
+          'conversation_id': idFilter,
+          'select': '*',
+          'order': 'created_at.desc',
+        },
+      ),
+    ]);
+
+    final conversations = (responses[0].data as List)
+        .map((row) => ConversationModel.fromJson(_conversationJson(row)))
+        .toList();
+    final participantsByConversation = <String, List<UserModel>>{};
+    final usersById = <String, UserModel>{};
+    for (final row in responses[1].data as List) {
+      final userRow = row['users'];
+      if (userRow is! Map<String, dynamic>) continue;
+      final user = UserModel.fromJson(userRow);
+      usersById[user.id] = user;
+      participantsByConversation
+          .putIfAbsent(row['conversation_id'].toString(), () => [])
+          .add(user);
+    }
+
+    final lastMessagesByConversation = <String, MessageModel>{};
+    for (final row in responses[2].data as List) {
+      final message = MessageModel.fromJson(row);
+      lastMessagesByConversation.putIfAbsent(
+        message.conversationId,
+        () => message,
+      );
+    }
+
+    final senderIds = lastMessagesByConversation.values
+        .map((message) => message.senderId)
+        .where((id) => !usersById.containsKey(id))
+        .toSet();
+    if (senderIds.isNotEmpty) {
+      final sendersResponse = await _dio.get(
+        '/rest/v1/users',
+        queryParameters: {'id': 'in.(${senderIds.join(',')})', 'select': '*'},
+      );
+      for (final row in sendersResponse.data as List) {
+        final user = UserModel.fromJson(row);
+        usersById[user.id] = user;
+      }
+    }
+
+    return conversations.map((conversation) {
+      final message = lastMessagesByConversation[conversation.id];
+      final sender = message == null ? null : usersById[message.senderId];
+      if (message != null && sender == null) throw const ServerFailure();
+      return ConversationPreviewModel(
+        conversation: conversation,
+        participants: participantsByConversation[conversation.id] ?? [],
+        lastMessage: message == null
+            ? null
+            : MessageWithUserModel(message: message, sender: sender!),
+      );
+    }).toList();
+  }
+
+  Future<ProfileModel> getProfile(String userId) async {
+    final userResponse = await _dio.get(
+      '/rest/v1/users',
+      queryParameters: {'id': 'eq.$userId', 'select': '*'},
+    );
+    final userRows = userResponse.data as List;
+    if (userRows.isEmpty) throw const ServerFailure();
+
+    final results = await Future.wait([
+      _dio.get(
+        '/rest/v1/stories',
+        queryParameters: {
+          'user_id': 'eq.$userId',
+          'expires_at': 'gt.${DateTime.now().toIso8601String()}',
+          'select': '*',
+          'order': 'created_at.asc',
+        },
+      ),
+      _dio.get(
+        '/rest/v1/posts',
+        queryParameters: {
+          'user_id': 'eq.$userId',
+          'select': '*,users(*)',
+          'order': 'created_at.desc',
+        },
+      ),
+    ]);
+
+    final stories = (results[0].data as List)
+        .map((row) => StoryModel.fromJson(_storyJson(row)))
+        .toList();
+    final postRows = results[1].data as List;
+    final posts = postRows.map((row) => PostModel.fromJson(row)).toList();
+    if (posts.isEmpty) {
+      return ProfileModel(
+        user: UserModel.fromJson(userRows.first),
+        stories: stories,
+        posts: [],
+      );
+    }
+
+    final postIdFilter = 'in.(${posts.map((post) => post.id).join(',')})';
+    final detailResponses = await Future.wait([
+      _dio.get(
+        '/rest/v1/post_media',
+        queryParameters: {
+          'post_id': postIdFilter,
+          'select': '*',
+          'order': 'position.asc',
+        },
+      ),
+      _dio.get(
+        '/rest/v1/likes',
+        queryParameters: {
+          'post_id': postIdFilter,
+          'select': '*',
+          'order': 'created_at.desc',
+        },
+      ),
+      _dio.get(
+        '/rest/v1/comments',
+        queryParameters: {
+          'post_id': postIdFilter,
+          'select': '*',
+          'order': 'created_at.asc',
+        },
+      ),
+    ]);
+
+    final media = (detailResponses[0].data as List)
+        .map((row) => PostMediaModel.fromJson(row))
+        .toList();
+    final likes = (detailResponses[1].data as List)
+        .map((row) => LikeModel.fromJson(_likeJson(row)))
+        .toList();
+    final comments = (detailResponses[2].data as List)
+        .map((row) => CommentModel.fromJson(row))
+        .toList();
+    final usersById = <String, UserModel>{
+      userId: UserModel.fromJson(userRows.first),
+    };
+    final relatedUserIds = {
+      ...likes.map((like) => like.userId),
+      ...comments.map((comment) => comment.userId),
+    }..remove(userId);
+    if (relatedUserIds.isNotEmpty) {
+      final relatedUsersResponse = await _dio.get(
+        '/rest/v1/users',
+        queryParameters: {
+          'id': 'in.(${relatedUserIds.join(',')})',
+          'select': '*',
+        },
+      );
+      for (final row in relatedUsersResponse.data as List) {
+        final user = UserModel.fromJson(row);
+        usersById[user.id] = user;
+      }
+    }
+
+    return ProfileModel(
+      user: UserModel.fromJson(userRows.first),
+      stories: stories,
+      posts: posts.map((post) {
+        final postRow = postRows.firstWhere(
+          (row) => row['id'].toString() == post.id,
+        );
+        final author = UserModel.fromJson(postRow['users']);
+        return HomePostModel(
+          post: post,
+          author: author,
+          media: media.where((item) => item.postId == post.id).toList(),
+          likes: likes.where((like) => like.postId == post.id).map((like) {
+            final likeUser = usersById[like.userId];
+            if (likeUser == null) throw const ServerFailure();
+            return LikeWithUserModel(like: like, user: likeUser);
+          }).toList(),
+          comments: comments.where((comment) => comment.postId == post.id).map((
+            comment,
+          ) {
+            final commentUser = usersById[comment.userId];
+            if (commentUser == null) throw const ServerFailure();
+            return CommentWithUserModel(comment: comment, user: commentUser);
+          }).toList(),
+        );
+      }).toList(),
+    );
+  }
+
+  Map<String, dynamic> _storyJson(Map<String, dynamic> json) => {
+    ...json,
+    'userId': json['userId'] ?? json['user_id'],
+    'mediaUrl': json['mediaUrl'] ?? json['media_url'],
+    'mediaType': json['mediaType'] ?? json['media_type'],
+    'createdAt': json['createdAt'] ?? json['created_at'],
+    'expiresAt': json['expiresAt'] ?? json['expires_at'],
+  };
+
+  Map<String, dynamic> _conversationJson(Map<String, dynamic> json) => {
+    ...json,
+    'createdAt': json['createdAt'] ?? json['created_at'],
+  };
+
+  Map<String, dynamic> _likeJson(Map<String, dynamic> json) => {
+    ...json,
+    'userId': json['userId'] ?? json['user_id'],
+    'postId': json['postId'] ?? json['post_id'],
+    'createdAt': json['createdAt'] ?? json['created_at'],
+  };
+
+  Future<List<HomePostModel>> getHomePosts(String currentUserId) async {
+    final followsResponse = await _dio.get(
+      '/rest/v1/follows',
+      queryParameters: {
+        'follower_id': 'eq.$currentUserId',
+        'select': 'following_id',
+      },
+    );
+
+    final followingIds = (followsResponse.data as List)
+        .map((json) => json['following_id'].toString())
+        .toList();
+    if (followingIds.isEmpty) return [];
+
+    final postsResponse = await _dio.get(
+      '/rest/v1/posts',
+      queryParameters: {
+        'user_id': 'in.(${followingIds.join(',')})',
+        'select': '*,users(*)',
+        'order': 'created_at.desc',
+      },
+    );
+
+    final postRows = postsResponse.data as List;
+    if (postRows.isEmpty) return [];
+
+    final posts = postRows.map((row) => PostModel.fromJson(row)).toList();
+    final postIds = posts.map((post) => post.id).toList();
+    final postIdFilter = 'in.(${postIds.join(',')})';
+
+    final results = await Future.wait([
+      _dio.get(
+        '/rest/v1/post_media',
+        queryParameters: {
+          'post_id': postIdFilter,
+          'select': '*',
+          'order': 'position.asc',
+        },
+      ),
+      _dio.get(
+        '/rest/v1/likes',
+        queryParameters: {
+          'post_id': postIdFilter,
+          'select': '*',
+          'order': 'created_at.desc',
+        },
+      ),
+      _dio.get(
+        '/rest/v1/comments',
+        queryParameters: {
+          'post_id': postIdFilter,
+          'select': '*',
+          'order': 'created_at.asc',
+        },
+      ),
+    ]);
+
+    final media = (results[0].data as List)
+        .map((row) => PostMediaModel.fromJson(row))
+        .toList();
+    final likes = (results[1].data as List)
+        .map(
+          (row) => LikeModel.fromJson({
+            ...row,
+            'userId': row['userId'] ?? row['user_id'],
+            'postId': row['postId'] ?? row['post_id'],
+            'createdAt': row['createdAt'] ?? row['created_at'],
+          }),
+        )
+        .toList();
+    final comments = (results[2].data as List)
+        .map((row) => CommentModel.fromJson(row))
+        .toList();
+
+    final authorRows = postRows
+        .map((row) => row['users'])
+        .whereType<Map<String, dynamic>>()
+        .toList();
+    final userRows = <Map<String, dynamic>>[...authorRows];
+    final relatedUserIds = {
+      ...likes.map((like) => like.userId),
+      ...comments.map((comment) => comment.userId),
+    }.toSet();
+
+    if (relatedUserIds.isNotEmpty) {
+      final usersResponse = await _dio.get(
+        '/rest/v1/users',
+        queryParameters: {
+          'id': 'in.(${relatedUserIds.join(',')})',
+          'select': '*',
+        },
+      );
+      userRows.addAll(
+        (usersResponse.data as List).cast<Map<String, dynamic>>(),
+      );
+    }
+
+    final usersById = <String, UserModel>{};
+    for (final row in userRows) {
+      final user = UserModel.fromJson(row);
+      usersById[user.id] = user;
+    }
+
+    return posts.map((post) {
+      final authorRow = postRows.firstWhere(
+        (row) => row['id'].toString() == post.id,
+      )['users'];
+      final author = authorRow is Map<String, dynamic>
+          ? UserModel.fromJson(authorRow)
+          : usersById[post.userId];
+
+      if (author == null) {
+        throw const ServerFailure();
+      }
+
+      return HomePostModel(
+        post: post,
+        author: author,
+        media: media.where((item) => item.postId == post.id).toList(),
+        likes: likes.where((like) => like.postId == post.id).map((like) {
+          final user = usersById[like.userId];
+          if (user == null) throw const ServerFailure();
+          return LikeWithUserModel(like: like, user: user);
+        }).toList(),
+        comments: comments.where((comment) => comment.postId == post.id).map((
+          comment,
+        ) {
+          final user = usersById[comment.userId];
+          if (user == null) throw const ServerFailure();
+          return CommentWithUserModel(comment: comment, user: user);
+        }).toList(),
+      );
+    }).toList();
   }
 
   AppFailure mapDioException(DioException exception) {

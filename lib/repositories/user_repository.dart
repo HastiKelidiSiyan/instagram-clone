@@ -11,9 +11,11 @@ class UserRepository {
   Future<List<UserModel>> getUsers([String query = '']) async {
     if (await connectivityResult.isConnected()) {
       final users = await remoteDataSource.searchUsers(query);
+      for (final user in users) {
+        await localDataSource.cacheUser(user);
+      }
       return users;
     }
-
     return localDataSource.searchUsers(query);
   }
 
@@ -42,19 +44,5 @@ class UserRepository {
     }
 
     return users.first;
-  }
-
-  Future<UserModel> getMe() async {
-    final users = await getUserByUsername('hasti_kelidi');
-
-
-    return UserModel(
-      id: 'me',
-      name: 'Current User',
-      username: 'current_user',
-      avatarUrl: null,
-      bio: null,
-      createdAt: DateTime.now(),
-    );
   }
 }
