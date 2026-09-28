@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/app_failure.dart';
-import 'package:instagram_clone/models/conversation_model.dart';
-import 'package:instagram_clone/models/story_model.dart';
+import 'package:instagram_clone/models/domain/conversation_preview.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/repositories/conversation_repository.dart';
-import 'package:instagram_clone/repositories/story_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/widgets/direct_list_item.dart';
@@ -18,16 +16,19 @@ class DirectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserProvider>().currentUser;
+    if (currentUser == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
-    final conversationsFuture = ConversationRepository().getUserConversations(
-      currentUser!.id,
-    );
-    final storiesFuture = StoryRepository().getUserStories(currentUser.id);
+    final conversationsFuture = ConversationRepository()
+        .getConversationPreviews(
+          currentUser.id,
+        );
 
     return SafeArea(
       child: Scaffold(
         appBar: _directsAppBar(currentUser),
-        body: _directsList(conversationsFuture, storiesFuture, currentUser),
+        body: _directsList(conversationsFuture),
         bottomNavigationBar: _footer(),
       ),
     );
@@ -71,9 +72,7 @@ PreferredSizeWidget _directsAppBar(UserModel me) {
 }
 
 Widget _directsList(
-  Future<List<ConversationModel>> conversationsFuture,
-  Future<List<StoryModel>> storiesFuture,
-  UserModel currentUser,
+  Future<List<ConversationPreviewModel>> conversationsFuture,
 ) {
   Future<void> refresh() async {}
 
@@ -83,34 +82,14 @@ Widget _directsList(
       future: conversationsFuture,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return FutureBuilder<List<StoryModel>>(
-            future: storiesFuture,
-            builder: (context, storiesSnapshot) {
-              if (storiesSnapshot.hasData) {
-                return ListView.separated(
-                  itemCount: snapshot.data!.length,
-                  separatorBuilder: (context, index) =>
-                      Divider(height: 1, color: Color(0xffC7C7CC)),
-                  itemBuilder: (context, index) {
-                    final conv = snapshot.data![index];
-
-                    return DirectListItem(
-                      conversation: conv,
-                      onTap: () {},
-                    );
-                  },
-                );
-              } else if (storiesSnapshot.hasError) {
-                return Center(
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.refresh),
-                  ),
-                );
-              }
-
-              return Center(child: CircularProgressIndicator());
-            },
+          return ListView.separated(
+            itemCount: snapshot.data!.length,
+            separatorBuilder: (context, index) =>
+                Divider(height: 1, color: Color(0xffC7C7CC)),
+            itemBuilder: (context, index) => DirectListItem(
+              preview: snapshot.data![index],
+              onTap: () {},
+            ),
           );
         } else if (snapshot.hasError) {
           WidgetsBinding.instance.addPostFrameCallback((_) {

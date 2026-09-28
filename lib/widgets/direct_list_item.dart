@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/conversation_model.dart';
+import 'package:instagram_clone/models/domain/conversation_preview.dart';
 
 class DirectListItem extends StatelessWidget {
   const DirectListItem({
     super.key,
     required this.onTap,
-    required this.conversation,
+    required this.preview,
   });
 
-  final ConversationModel conversation;
+  final ConversationPreviewModel preview;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final conversation = preview.conversation;
     return SizedBox(
       height: 72,
       child: Row(
@@ -31,13 +32,16 @@ class DirectListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(conversation.id, style: TextStyle(fontSize: 13)),
+              Text(
+                preview.participants.map((user) => user.username).join(', '),
+                style: TextStyle(fontSize: 13),
+              ),
               Row(
                 children: [
                   SizedBox(
                     width: 190,
                     child: Text(
-                      '',
+                      preview.lastMessage?.message.text ?? '',
                       style: TextStyle(fontSize: 13, color: Colors.grey),
                       overflow: TextOverflow.ellipsis,
                     ),

@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/domain/story_item_data.dart';
+import 'package:instagram_clone/models/domain/home_story.dart';
 
 class StoryItem extends StatelessWidget {
   const StoryItem({
@@ -11,7 +11,7 @@ class StoryItem extends StatelessWidget {
     required this.isDirect,
   });
 
-  final StoryItemData storyItem;
+  final StoryGroupModel storyItem;
   final VoidCallback onTap;
   final double radius;
   final bool isDirect;
@@ -32,17 +32,11 @@ class StoryItem extends StatelessWidget {
                 height: (radius * 2) + 4,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: storyItem.isViewedByCurrentUser
-                      ? LinearGradient(
-                          colors: [Colors.grey, Colors.grey],
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomLeft,
-                        )
-                      : LinearGradient(
-                          colors: [Color(0xFA9E2692), Color(0xFAFAA958)],
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomLeft,
-                        ),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFA9E2692), Color(0xFAFAA958)],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
                 ),
               ),
               Container(
@@ -59,7 +53,7 @@ class StoryItem extends StatelessWidget {
                   radius: radius,
                   child: ClipOval(
                     child: CachedNetworkImage(
-                      imageUrl: storyItem.author.avatarUrl ?? '',
+                      imageUrl: storyItem.user.avatarUrl ?? '',
                       placeholder: (context, url) =>
                           Center(child: CircularProgressIndicator()),
                       errorWidget: (context, url, error) =>
@@ -72,7 +66,7 @@ class StoryItem extends StatelessWidget {
           ),
           SizedBox(height: 8),
           if (!isDirect)
-            Text(storyItem.author.username, style: TextStyle(fontSize: 11)),
+            Text(storyItem.user.username, style: TextStyle(fontSize: 11)),
         ],
       ),
     );

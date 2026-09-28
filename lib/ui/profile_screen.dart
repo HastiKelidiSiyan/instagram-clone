@@ -5,19 +5,45 @@ import 'package:provider/provider.dart';
 import 'package:instagram_clone/providers/auth_provider.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
+import 'package:instagram_clone/models/domain/profile_model.dart';
+import 'package:instagram_clone/repositories/profile_repository.dart';
 import '../models/user_model.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final UserModel user;
 
   const ProfileScreen({super.key, required this.user});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late final Future<ProfileModel> _profile;
+
+  @override
+  void initState() {
+    super.initState();
+    _profile = ProfileRepository().getProfile(widget.user.id);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: _profileAppBar(user, context),
-        body: _profileBody(user, context),
+        appBar: _profileAppBar(widget.user, context),
+        body: FutureBuilder<ProfileModel>(
+          future: _profile,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return _profileBody(snapshot.data!, context);
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Could not load profile.'));
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }
@@ -109,25 +135,26 @@ PreferredSizeWidget _profileAppBar(UserModel user, BuildContext context) {
   );
 }
 
-Widget _profileBody(UserModel user, BuildContext context) {
+Widget _profileBody(ProfileModel profile, BuildContext context) {
+  final user = profile.user;
   return DefaultTabController(
     length: 2,
     child: Column(
       children: [
-        _profileContents(user, context),
+        _profileContents(profile, context),
         SizedBox(height: 15),
         _editProfileButton(user),
         SizedBox(height: 1),
         _highlights(),
         _tabBar(),
         Container(height: 1, color: Color(0xdacecece)),
-        Expanded(child: _tabBarView(user)),
+        Expanded(child: _tabBarView(profile)),
       ],
     ),
   );
 }
 
-Widget _tabBarView(UserModel user) {
+Widget _tabBarView(ProfileModel profile) {
   return TabBarView(
     children: [
       CustomScrollView(
@@ -135,12 +162,14 @@ Widget _tabBarView(UserModel user) {
           SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.teal[100 * (index % 9)],
+                final media = profile.posts[index].media;
+                if (media.isEmpty) return const SizedBox.shrink();
+                return CachedNetworkImage(
+                  imageUrl: media.first.mediaUrl,
+                  fit: BoxFit.cover,
                 );
               },
-              childCount: 20,
+              childCount: profile.posts.length,
             ),
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 140.0,
@@ -170,7 +199,8 @@ Widget _tabBar() {
   );
 }
 
-Widget _profileContents(UserModel user, BuildContext context) {
+Widget _profileContents(ProfileModel profile, BuildContext context) {
+  final user = profile.user;
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16.0),
     child: Column(
@@ -179,7 +209,10 @@ Widget _profileContents(UserModel user, BuildContext context) {
           children: [
             _profileProfile(user.avatarUrl ?? '', context),
             SizedBox(width: 35),
-            ProfileInfo(number: '0', label: "Posts"),
+            ProfileInfo(
+              number: profile.posts.length.toString(),
+              label: "Posts",
+            ),
             SizedBox(width: 21),
             ProfileInfo(number: '0', label: "Followers"),
             SizedBox(width: 21),

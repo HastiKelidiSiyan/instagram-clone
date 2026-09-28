@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/post_model.dart';
-import 'package:instagram_clone/models/domain/feed_item.dart';
+import 'package:instagram_clone/models/domain/home_post.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 
 class PostListItem extends StatelessWidget {
-  final FeedItem feedItem;
+  final HomePostModel feedItem;
   final Function(int) onProfileTap;
 
   const PostListItem({
@@ -16,7 +15,6 @@ class PostListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final post = feedItem.post;
     return SizedBox(
       child: Column(
         children: [
@@ -31,7 +29,7 @@ class PostListItem extends StatelessWidget {
   }
 }
 
-Widget _postHeader(FeedItem item, Function(int) onProfileTap) {
+Widget _postHeader(HomePostModel item, Function(int) onProfileTap) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
     child: Row(
@@ -78,7 +76,7 @@ Widget _postHeader(FeedItem item, Function(int) onProfileTap) {
   );
 }
 
-Widget _postImage(FeedItem item) {
+Widget _postImage(HomePostModel item) {
   return SizedBox(
     width: double.infinity,
     child: CachedNetworkImage(
@@ -91,7 +89,7 @@ Widget _postImage(FeedItem item) {
   );
 }
 
-Widget _postFooter(FeedItem item, Function(int) onProfileTap) {
+Widget _postFooter(HomePostModel item, Function(int) onProfileTap) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: Column(
@@ -121,7 +119,8 @@ Widget _postActions() {
   );
 }
 
-Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
+Widget _postLikes(HomePostModel item, Function(int) onProfileTap) {
+  final latestLiker = item.likes.isEmpty ? null : item.likes.first.user;
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 6.0),
     child: Row(
@@ -131,7 +130,7 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
             radius: 8.5,
             child: ClipOval(
               child: CachedNetworkImage(
-                imageUrl: item.latestLiker?.avatarUrl ?? '',
+                imageUrl: latestLiker?.avatarUrl ?? '',
                 placeholder: (context, url) =>
                     Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) =>
@@ -140,8 +139,8 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
             ),
           ),
           onTap: () {
-            if (item.latestLiker != null) {
-              onProfileTap(int.tryParse(item.latestLiker!.id) ?? 0);
+            if (latestLiker != null) {
+              onProfileTap(int.tryParse(latestLiker.id) ?? 0);
             }
           },
         ),
@@ -152,12 +151,12 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
             SizedBox(width: 2),
             InkWell(
               child: Text(
-                item.latestLiker?.username ?? '',
+                latestLiker?.username ?? '',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
               onTap: () {
-                if (item.latestLiker != null) {
-                  onProfileTap(int.tryParse(item.latestLiker!.id) ?? 0);
+                if (latestLiker != null) {
+                  onProfileTap(int.tryParse(latestLiker.id) ?? 0);
                 }
               },
             ),
@@ -165,7 +164,7 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
             Text("and", style: TextStyle(fontSize: 12)),
             SizedBox(width: 2),
             Text(
-              "${item.likeCount > 0 ? item.likeCount - 1 : 0} others",
+              "${item.likes.isNotEmpty ? item.likes.length - 1 : 0} others",
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ],
@@ -175,7 +174,7 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
   );
 }
 
-Widget _postCaption(FeedItem item, Function(int) onProfileTap) {
+Widget _postCaption(HomePostModel item, Function(int) onProfileTap) {
   return Row(
     children: [
       InkWell(
@@ -193,13 +192,16 @@ Widget _postCaption(FeedItem item, Function(int) onProfileTap) {
   );
 }
 
-Widget _postTopComment(FeedItem item) {
+Widget _postTopComment(HomePostModel item) {
   return Column(
     children: [
       SizedBox(height: 6),
       Text(
-        "View the ${item.commentCount} comments",
-        style: TextStyle(fontSize: 11, color: Colors.black.withValues(alpha: 0.4)),
+        "View the ${item.comments.length} comments",
+        style: TextStyle(
+          fontSize: 11,
+          color: Colors.black.withValues(alpha: 0.4),
+        ),
       ),
     ],
   );

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/domain/feed_item.dart';
-import 'package:instagram_clone/models/domain/story_item_data.dart';
+import 'package:instagram_clone/models/domain/home_post.dart';
+import 'package:instagram_clone/models/domain/home_story.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
@@ -28,39 +28,59 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<List<FeedItem>> feedItems;
-  late Future<List<StoryItemData>> storyItems;
+  Future<List<HomePostModel>> posts = Future.value([]);
+  Future<List<StoryGroupModel>> stories = Future.value([]);
+  String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    feedItems = PostRepository().getFeedItems();
-    storyItems = StoryRepository().getActiveStoryItems();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentUserId = context.watch<UserProvider>().currentUser?.id;
+    if (currentUserId == null || currentUserId == _currentUserId) return;
+    _currentUserId = currentUserId;
+    _loadScreenData(currentUserId);
+  }
+
+  void _loadScreenData(String currentUserId) {
+    posts = PostRepository().getHomePosts(currentUserId);
+    stories = StoryRepository().getStoryGroups(currentUserId);
   }
 
   Future<void> _refreshFeed() async {
+    final userId = _currentUserId;
+    if (userId == null) return;
     setState(() {
-      feedItems = PostRepository().getFeedItems();
+      posts = PostRepository().getHomePosts(userId);
     });
   }
 
   Future<void> _refreshStories() async {
+    final userId = _currentUserId;
+    if (userId == null) return;
     setState(() {
-      storyItems = StoryRepository().getActiveStoryItems();
+      stories = StoryRepository().getStoryGroups(userId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserProvider>().currentUser;
+    if (currentUser == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
-      appBar: _homeAppBar(currentUser!),
+      appBar: _homeAppBar(currentUser),
       body: _homeBody(
         currentUser,
         widget.onProfileTap,
-        feedItems,
-        storyItems,
+        posts,
+        stories,
         _refreshFeed,
         _refreshStories,
       ),
@@ -117,8 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _homeBody(
     UserModel me,
     Function(int) onProfileTap,
-    Future<List<FeedItem>>? postsFuture,
-    Future<List<StoryItemData>>? storiesFuture,
+    Future<List<HomePostModel>>? postsFuture,
+    Future<List<StoryGroupModel>>? storiesFuture,
     Future<void> Function() refreshPosts,
     Future<void> Function() refreshStories,
   ) {
@@ -137,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _postsSection(
     UserModel me,
     Function(int) onProfileTap,
-    Future<List<FeedItem>>? postsFuture,
+    Future<List<HomePostModel>>? postsFuture,
     Future<void> Function() refreshPosts,
   ) {
     return RefreshIndicator(
@@ -183,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _storiesSection(
     UserModel currentUser,
     Function(int) onProfileTap,
-    Future<List<StoryItemData>>? storiesFuture,
+    Future<List<StoryGroupModel>>? storiesFuture,
     Future<void> Function() refreshStories,
   ) {
     return SizedBox(
