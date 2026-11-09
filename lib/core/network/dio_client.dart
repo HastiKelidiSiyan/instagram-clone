@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:instagram_clone/core/storage/secure_token_storage.dart';
 
 class DioClient {
+  static bool _isInitialized = false;
+
   static final Dio dio = Dio(
     BaseOptions(
       baseUrl: 'https://dnjndajnhincyjrwdiqb.supabase.co',
@@ -23,6 +25,12 @@ class DioClient {
   );
 
   static void setupInterceptors() {
+    if (_isInitialized) {
+      return;
+    }
+
+    _isInitialized = true;
+
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -30,8 +38,7 @@ class DioClient {
           final accessToken = await storage.getAccessToken();
 
           if (accessToken != null) {
-            options.headers['Authorization'] =
-                'Bearer $accessToken';
+            options.headers['Authorization'] = 'Bearer $accessToken';
           }
 
           handler.next(options);
@@ -59,27 +66,25 @@ class DioClient {
               },
             );
 
-            final newAccessToken =
-                response.data['access_token'];
+            final newAccessToken = response.data['access_token'];
 
-            final newRefreshToken =
-                response.data['refresh_token'];
+            final newRefreshToken = response.data['refresh_token'];
 
-            await storage.saveTokens(
+            await storage.saveSession(
               accessToken: newAccessToken,
               refreshToken: newRefreshToken,
+              userId: response.data['user']['id'],
             );
 
             final request = error.requestOptions;
 
-            request.headers['Authorization'] =
-                'Bearer $newAccessToken';
+            request.headers['Authorization'] = 'Bearer $newAccessToken';
 
             final retryResponse = await dio.fetch(request);
 
             handler.resolve(retryResponse);
           } catch (e) {
-            await storage.clearTokens();
+            await storage.clearSession();
             handler.next(error);
           }
         },
@@ -87,4 +92,3 @@ class DioClient {
     );
   }
 }
-

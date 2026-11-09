@@ -1,12 +1,15 @@
 import 'package:instagram_clone/data_source/local_data_source.dart';
 import 'package:instagram_clone/data_source/remote_data_source.dart';
+import 'package:instagram_clone/models/app_failure.dart';
 import 'package:instagram_clone/models/user_model.dart';
+import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/services/connection_availability%20.dart';
 
 class UserRepository {
   final RemoteDataSource remoteDataSource = RemoteDataSource();
   final LocalDataSource localDataSource = LocalDataSource();
   final ConnectionAvailibility connectivityResult = ConnectionAvailibility();
+  final AuthRepository authRepository = AuthRepository();
 
   Future<List<UserModel>> getUsers([String query = '']) async {
     if (await connectivityResult.isConnected()) {
@@ -45,16 +48,12 @@ class UserRepository {
   }
 
   Future<UserModel> getMe() async {
-    final users = await getUserByUsername('hasti_kelidi');
+    final userId = await authRepository.getCurrentUserId();
 
+    if (userId == null) {
+      throw const UnauthorizedFailure();
+    }
 
-    return UserModel(
-      id: 'me',
-      name: 'Current User',
-      username: 'current_user',
-      avatarUrl: null,
-      bio: null,
-      createdAt: DateTime.now(),
-    );
+    return getUserById(userId);
   }
 }

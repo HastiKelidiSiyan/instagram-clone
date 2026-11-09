@@ -26,6 +26,10 @@ class UnknownFailure extends AppFailure {
   const UnknownFailure();
 }
 
+class UnauthorizedFailure extends AppFailure {
+  const UnauthorizedFailure();
+}
+
 String failureMessage(AppFailure failure) {
   return switch (failure) {
   NetworkFailure() =>
@@ -45,5 +49,8 @@ String failureMessage(AppFailure failure) {
 
     UnknownFailure() =>
       'Something went wrong. Please try again.',
+
+    UnauthorizedFailure() =>
+      'You are not authorized to perform this action. Please log in again.',
   };
 }

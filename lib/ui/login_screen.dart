@@ -17,21 +17,21 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
   bool _checkboxValue = false;
 
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  String? _usernameError;
+  String? _emailError;
   String? _passwordError;
 
-  void _validateUsername() {
-    final username = _usernameController.text.trim();
-    if (username.isEmpty) {
+  void _validateEmail() {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
       setState(() {
-        _usernameError = "Username cannot be empty";
+        _emailError = "Email cannot be empty";
       });
     } else {
       setState(() {
-        _usernameError = null;
+        _emailError = null;
       });
     }
   }
@@ -50,9 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   bool get _isFormValid {
-    return _usernameError == null &&
+    return _emailError == null &&
         _passwordError == null &&
-        _usernameController.text.trim().isNotEmpty &&
+        _emailController.text.trim().isNotEmpty &&
         _passwordController.text.trim().isNotEmpty;
   }
 
@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _submitForm() async {
     String password = _passwordController.text.trim();
-    String username = _usernameController.text.trim();
+    String username = _emailController.text.trim();
 
     if (_isFormValid) {
       bool isUservalid = await _isUserValid(username, password);
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -154,19 +154,19 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             AnimatedContainer(
-              height: _usernameError != null ? 69 : 48,
+              height: _emailError != null ? 69 : 48,
               duration: Duration(milliseconds: 200),
               width: 315,
               child: TextField(
-                controller: _usernameController,
-                onChanged: (value) => _validateUsername(),
+                controller: _emailController,
+                onChanged: (value) => _validateEmail(),
                 decoration: InputDecoration(
                   hintText: "Username or Email",
-                  errorText: _usernameError,
+                  errorText: _emailError,
                   errorStyle: TextStyle(fontSize: 12),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: _usernameError != null
+                      color: _emailError != null
                           ? Colors.red
                           : Color(0xFFDBDBDB),
                       width: 1,
@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: _usernameError != null
+                      color: _emailError != null
                           ? Colors.red
                           : Color(0xFF3897F0),
                       width: 2,
