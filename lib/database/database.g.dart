@@ -27,6 +27,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
@@ -431,7 +432,7 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _mediaUrlMeta = const VerificationMeta(
@@ -465,7 +466,8 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   static const VerificationMeta _expiresAtMeta = const VerificationMeta(
     'expiresAt',
@@ -533,8 +535,6 @@ class $StoriesTable extends Stories with TableInfo<$StoriesTable, Story> {
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     if (data.containsKey('expires_at')) {
       context.handle(
@@ -727,14 +727,13 @@ class StoriesCompanion extends UpdateCompanion<Story> {
     required String userId,
     required String mediaUrl,
     required String mediaType,
-    required DateTime createdAt,
+    this.createdAt = const Value.absent(),
     required DateTime expiresAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        userId = Value(userId),
        mediaUrl = Value(mediaUrl),
        mediaType = Value(mediaType),
-       createdAt = Value(createdAt),
        expiresAt = Value(expiresAt);
   static Insertable<Story> custom({
     Expression<String>? id,
@@ -833,7 +832,7 @@ class $StoryViewsTable extends StoryViews
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _storyIdMeta = const VerificationMeta(
@@ -847,7 +846,7 @@ class $StoryViewsTable extends StoryViews
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES stories (id)',
+      'REFERENCES stories (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _viewedAtMeta = const VerificationMeta(
@@ -859,7 +858,8 @@ class $StoryViewsTable extends StoryViews
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   @override
   List<GeneratedColumn> get $columns => [userId, storyId, viewedAt];
@@ -896,8 +896,6 @@ class $StoryViewsTable extends StoryViews
         _viewedAtMeta,
         viewedAt.isAcceptableOrUnknown(data['viewed_at']!, _viewedAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_viewedAtMeta);
     }
     return context;
   }
@@ -1025,11 +1023,10 @@ class StoryViewsCompanion extends UpdateCompanion<StoryView> {
   StoryViewsCompanion.insert({
     required String userId,
     required String storyId,
-    required DateTime viewedAt,
+    this.viewedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : userId = Value(userId),
-       storyId = Value(storyId),
-       viewedAt = Value(viewedAt);
+       storyId = Value(storyId);
   static Insertable<StoryView> custom({
     Expression<String>? userId,
     Expression<String>? storyId,
@@ -1111,7 +1108,7 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _captionMeta = const VerificationMeta(
@@ -1134,7 +1131,8 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   @override
   List<GeneratedColumn> get $columns => [id, userId, caption, createdAt];
@@ -1176,8 +1174,6 @@ class $PostsTable extends Posts with TableInfo<$PostsTable, Post> {
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     return context;
   }
@@ -1326,12 +1322,11 @@ class PostsCompanion extends UpdateCompanion<Post> {
     required String id,
     required String userId,
     required String caption,
-    required DateTime createdAt,
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        userId = Value(userId),
-       caption = Value(caption),
-       createdAt = Value(createdAt);
+       caption = Value(caption);
   static Insertable<Post> custom({
     Expression<String>? id,
     Expression<String>? userId,
@@ -1422,7 +1417,7 @@ class $PostMediaTable extends PostMedia
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES posts (id)',
+      'REFERENCES posts (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _mediaUrlMeta = const VerificationMeta(
@@ -1456,7 +1451,8 @@ class $PostMediaTable extends PostMedia
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -1512,14 +1508,16 @@ class $PostMediaTable extends PostMedia
         _positionMeta,
         position.isAcceptableOrUnknown(data['position']!, _positionMeta),
       );
-    } else if (isInserting) {
-      context.missing(_positionMeta);
     }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {postId, position},
+  ];
   @override
   PostMediaData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1680,13 +1678,12 @@ class PostMediaCompanion extends UpdateCompanion<PostMediaData> {
     required String postId,
     required String mediaUrl,
     required String mediaType,
-    required int position,
+    this.position = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        postId = Value(postId),
        mediaUrl = Value(mediaUrl),
-       mediaType = Value(mediaType),
-       position = Value(position);
+       mediaType = Value(mediaType);
   static Insertable<PostMediaData> custom({
     Expression<String>? id,
     Expression<String>? postId,
@@ -1766,15 +1763,6 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $LikesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
   late final GeneratedColumn<String> userId = GeneratedColumn<String>(
@@ -1784,7 +1772,7 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
@@ -1796,7 +1784,7 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES posts (id)',
+      'REFERENCES posts (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
@@ -1808,10 +1796,11 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, userId, postId, createdAt];
+  List<GeneratedColumn> get $columns => [userId, postId, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1824,11 +1813,6 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
     if (data.containsKey('user_id')) {
       context.handle(
         _userIdMeta,
@@ -1850,22 +1834,16 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id, postId, userId};
+  Set<GeneratedColumn> get $primaryKey => {userId, postId};
   @override
   Like map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Like(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
       userId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}user_id'],
@@ -1888,12 +1866,10 @@ class $LikesTable extends Likes with TableInfo<$LikesTable, Like> {
 }
 
 class Like extends DataClass implements Insertable<Like> {
-  final String id;
   final String userId;
   final String postId;
   final DateTime createdAt;
   const Like({
-    required this.id,
     required this.userId,
     required this.postId,
     required this.createdAt,
@@ -1901,7 +1877,6 @@ class Like extends DataClass implements Insertable<Like> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
     map['user_id'] = Variable<String>(userId);
     map['post_id'] = Variable<String>(postId);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -1910,7 +1885,6 @@ class Like extends DataClass implements Insertable<Like> {
 
   LikesCompanion toCompanion(bool nullToAbsent) {
     return LikesCompanion(
-      id: Value(id),
       userId: Value(userId),
       postId: Value(postId),
       createdAt: Value(createdAt),
@@ -1923,7 +1897,6 @@ class Like extends DataClass implements Insertable<Like> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Like(
-      id: serializer.fromJson<String>(json['id']),
       userId: serializer.fromJson<String>(json['userId']),
       postId: serializer.fromJson<String>(json['postId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1933,27 +1906,19 @@ class Like extends DataClass implements Insertable<Like> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
       'userId': serializer.toJson<String>(userId),
       'postId': serializer.toJson<String>(postId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
-  Like copyWith({
-    String? id,
-    String? userId,
-    String? postId,
-    DateTime? createdAt,
-  }) => Like(
-    id: id ?? this.id,
+  Like copyWith({String? userId, String? postId, DateTime? createdAt}) => Like(
     userId: userId ?? this.userId,
     postId: postId ?? this.postId,
     createdAt: createdAt ?? this.createdAt,
   );
   Like copyWithCompanion(LikesCompanion data) {
     return Like(
-      id: data.id.present ? data.id.value : this.id,
       userId: data.userId.present ? data.userId.value : this.userId,
       postId: data.postId.present ? data.postId.value : this.postId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -1963,7 +1928,6 @@ class Like extends DataClass implements Insertable<Like> {
   @override
   String toString() {
     return (StringBuffer('Like(')
-          ..write('id: $id, ')
           ..write('userId: $userId, ')
           ..write('postId: $postId, ')
           ..write('createdAt: $createdAt')
@@ -1972,49 +1936,41 @@ class Like extends DataClass implements Insertable<Like> {
   }
 
   @override
-  int get hashCode => Object.hash(id, userId, postId, createdAt);
+  int get hashCode => Object.hash(userId, postId, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Like &&
-          other.id == this.id &&
           other.userId == this.userId &&
           other.postId == this.postId &&
           other.createdAt == this.createdAt);
 }
 
 class LikesCompanion extends UpdateCompanion<Like> {
-  final Value<String> id;
   final Value<String> userId;
   final Value<String> postId;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const LikesCompanion({
-    this.id = const Value.absent(),
     this.userId = const Value.absent(),
     this.postId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LikesCompanion.insert({
-    required String id,
     required String userId,
     required String postId,
-    required DateTime createdAt,
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       userId = Value(userId),
-       postId = Value(postId),
-       createdAt = Value(createdAt);
+  }) : userId = Value(userId),
+       postId = Value(postId);
   static Insertable<Like> custom({
-    Expression<String>? id,
     Expression<String>? userId,
     Expression<String>? postId,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (id != null) 'id': id,
       if (userId != null) 'user_id': userId,
       if (postId != null) 'post_id': postId,
       if (createdAt != null) 'created_at': createdAt,
@@ -2023,14 +1979,12 @@ class LikesCompanion extends UpdateCompanion<Like> {
   }
 
   LikesCompanion copyWith({
-    Value<String>? id,
     Value<String>? userId,
     Value<String>? postId,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
     return LikesCompanion(
-      id: id ?? this.id,
       userId: userId ?? this.userId,
       postId: postId ?? this.postId,
       createdAt: createdAt ?? this.createdAt,
@@ -2041,9 +1995,6 @@ class LikesCompanion extends UpdateCompanion<Like> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
     if (userId.present) {
       map['user_id'] = Variable<String>(userId.value);
     }
@@ -2062,7 +2013,6 @@ class LikesCompanion extends UpdateCompanion<Like> {
   @override
   String toString() {
     return (StringBuffer('LikesCompanion(')
-          ..write('id: $id, ')
           ..write('userId: $userId, ')
           ..write('postId: $postId, ')
           ..write('createdAt: $createdAt, ')
@@ -2095,7 +2045,7 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES posts (id)',
+      'REFERENCES posts (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
@@ -2107,7 +2057,7 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _textContentMeta = const VerificationMeta(
@@ -2115,7 +2065,7 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
   );
   @override
   late final GeneratedColumn<String> textContent = GeneratedColumn<String>(
-    'text_content',
+    'text',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -2130,7 +2080,8 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -2173,13 +2124,10 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
     } else if (isInserting) {
       context.missing(_userIdMeta);
     }
-    if (data.containsKey('text_content')) {
+    if (data.containsKey('text')) {
       context.handle(
         _textContentMeta,
-        textContent.isAcceptableOrUnknown(
-          data['text_content']!,
-          _textContentMeta,
-        ),
+        textContent.isAcceptableOrUnknown(data['text']!, _textContentMeta),
       );
     } else if (isInserting) {
       context.missing(_textContentMeta);
@@ -2189,8 +2137,6 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     return context;
   }
@@ -2215,7 +2161,7 @@ class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
       )!,
       textContent: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}text_content'],
+        data['${effectivePrefix}text'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -2249,7 +2195,7 @@ class Comment extends DataClass implements Insertable<Comment> {
     map['id'] = Variable<String>(id);
     map['post_id'] = Variable<String>(postId);
     map['user_id'] = Variable<String>(userId);
-    map['text_content'] = Variable<String>(textContent);
+    map['text'] = Variable<String>(textContent);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2359,13 +2305,12 @@ class CommentsCompanion extends UpdateCompanion<Comment> {
     required String postId,
     required String userId,
     required String textContent,
-    required DateTime createdAt,
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        postId = Value(postId),
        userId = Value(userId),
-       textContent = Value(textContent),
-       createdAt = Value(createdAt);
+       textContent = Value(textContent);
   static Insertable<Comment> custom({
     Expression<String>? id,
     Expression<String>? postId,
@@ -2378,7 +2323,7 @@ class CommentsCompanion extends UpdateCompanion<Comment> {
       if (id != null) 'id': id,
       if (postId != null) 'post_id': postId,
       if (userId != null) 'user_id': userId,
-      if (textContent != null) 'text_content': textContent,
+      if (textContent != null) 'text': textContent,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2415,7 +2360,7 @@ class CommentsCompanion extends UpdateCompanion<Comment> {
       map['user_id'] = Variable<String>(userId.value);
     }
     if (textContent.present) {
-      map['text_content'] = Variable<String>(textContent.value);
+      map['text'] = Variable<String>(textContent.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -2464,7 +2409,8 @@ class $ConversationsTable extends Conversations
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   @override
   List<GeneratedColumn> get $columns => [id, createdAt];
@@ -2490,8 +2436,6 @@ class $ConversationsTable extends Conversations
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     return context;
   }
@@ -2593,10 +2537,9 @@ class ConversationsCompanion extends UpdateCompanion<Conversation> {
   });
   ConversationsCompanion.insert({
     required String id,
-    required DateTime createdAt,
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       createdAt = Value(createdAt);
+  }) : id = Value(id);
   static Insertable<Conversation> custom({
     Expression<String>? id,
     Expression<DateTime>? createdAt,
@@ -2662,7 +2605,7 @@ class $ConversationMembersTable extends ConversationMembers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _conversationIdMeta = const VerificationMeta(
@@ -2676,7 +2619,7 @@ class $ConversationMembersTable extends ConversationMembers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES conversations (id)',
+      'REFERENCES conversations (id) ON DELETE CASCADE',
     ),
   );
   @override
@@ -2903,7 +2846,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES conversations (id)',
+      'REFERENCES conversations (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _senderIdMeta = const VerificationMeta(
@@ -2917,7 +2860,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _textContentMeta = const VerificationMeta(
@@ -2925,7 +2868,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
   );
   @override
   late final GeneratedColumn<String> textContent = GeneratedColumn<String>(
-    'text_content',
+    'text',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -2940,7 +2883,8 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -2986,13 +2930,10 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     } else if (isInserting) {
       context.missing(_senderIdMeta);
     }
-    if (data.containsKey('text_content')) {
+    if (data.containsKey('text')) {
       context.handle(
         _textContentMeta,
-        textContent.isAcceptableOrUnknown(
-          data['text_content']!,
-          _textContentMeta,
-        ),
+        textContent.isAcceptableOrUnknown(data['text']!, _textContentMeta),
       );
     } else if (isInserting) {
       context.missing(_textContentMeta);
@@ -3002,8 +2943,6 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     return context;
   }
@@ -3028,7 +2967,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
       )!,
       textContent: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}text_content'],
+        data['${effectivePrefix}text'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -3062,7 +3001,7 @@ class Message extends DataClass implements Insertable<Message> {
     map['id'] = Variable<String>(id);
     map['conversation_id'] = Variable<String>(conversationId);
     map['sender_id'] = Variable<String>(senderId);
-    map['text_content'] = Variable<String>(textContent);
+    map['text'] = Variable<String>(textContent);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -3175,13 +3114,12 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     required String conversationId,
     required String senderId,
     required String textContent,
-    required DateTime createdAt,
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        conversationId = Value(conversationId),
        senderId = Value(senderId),
-       textContent = Value(textContent),
-       createdAt = Value(createdAt);
+       textContent = Value(textContent);
   static Insertable<Message> custom({
     Expression<String>? id,
     Expression<String>? conversationId,
@@ -3194,7 +3132,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       if (id != null) 'id': id,
       if (conversationId != null) 'conversation_id': conversationId,
       if (senderId != null) 'sender_id': senderId,
-      if (textContent != null) 'text_content': textContent,
+      if (textContent != null) 'text': textContent,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3231,7 +3169,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       map['sender_id'] = Variable<String>(senderId.value);
     }
     if (textContent.present) {
-      map['text_content'] = Variable<String>(textContent.value);
+      map['text'] = Variable<String>(textContent.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -3272,7 +3210,7 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _followingIdMeta = const VerificationMeta(
@@ -3286,7 +3224,7 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
@@ -3298,7 +3236,8 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   @override
   List<GeneratedColumn> get $columns => [followerId, followingId, createdAt];
@@ -3338,8 +3277,6 @@ class $FollowsTable extends Follows with TableInfo<$FollowsTable, Follow> {
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     return context;
   }
@@ -3474,11 +3411,10 @@ class FollowsCompanion extends UpdateCompanion<Follow> {
   FollowsCompanion.insert({
     required String followerId,
     required String followingId,
-    required DateTime createdAt,
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : followerId = Value(followerId),
-       followingId = Value(followingId),
-       createdAt = Value(createdAt);
+       followingId = Value(followingId);
   static Insertable<Follow> custom({
     Expression<String>? followerId,
     Expression<String>? followingId,
@@ -3569,6 +3505,114 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     messages,
     follows,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('stories', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('story_views', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'stories',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('story_views', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('posts', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'posts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('post_media', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('likes', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'posts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('likes', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'posts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('comments', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('comments', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('conversation_members', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'conversations',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('conversation_members', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'conversations',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('messages', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('messages', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('follows', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('follows', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$UsersTableCreateCompanionBuilder =
@@ -4439,7 +4483,7 @@ typedef $$StoriesTableCreateCompanionBuilder =
       required String userId,
       required String mediaUrl,
       required String mediaType,
-      required DateTime createdAt,
+      Value<DateTime> createdAt,
       required DateTime expiresAt,
       Value<int> rowid,
     });
@@ -4758,7 +4802,7 @@ class $$StoriesTableTableManager
                 required String userId,
                 required String mediaUrl,
                 required String mediaType,
-                required DateTime createdAt,
+                Value<DateTime> createdAt = const Value.absent(),
                 required DateTime expiresAt,
                 Value<int> rowid = const Value.absent(),
               }) => StoriesCompanion.insert(
@@ -4856,7 +4900,7 @@ typedef $$StoryViewsTableCreateCompanionBuilder =
     StoryViewsCompanion Function({
       required String userId,
       required String storyId,
-      required DateTime viewedAt,
+      Value<DateTime> viewedAt,
       Value<int> rowid,
     });
 typedef $$StoryViewsTableUpdateCompanionBuilder =
@@ -5129,7 +5173,7 @@ class $$StoryViewsTableTableManager
               ({
                 required String userId,
                 required String storyId,
-                required DateTime viewedAt,
+                Value<DateTime> viewedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => StoryViewsCompanion.insert(
                 userId: userId,
@@ -5222,7 +5266,7 @@ typedef $$PostsTableCreateCompanionBuilder =
       required String id,
       required String userId,
       required String caption,
-      required DateTime createdAt,
+      Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$PostsTableUpdateCompanionBuilder =
@@ -5649,7 +5693,7 @@ class $$PostsTableTableManager
                 required String id,
                 required String userId,
                 required String caption,
-                required DateTime createdAt,
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PostsCompanion.insert(
                 id: id,
@@ -5796,7 +5840,7 @@ typedef $$PostMediaTableCreateCompanionBuilder =
       required String postId,
       required String mediaUrl,
       required String mediaType,
-      required int position,
+      Value<int> position,
       Value<int> rowid,
     });
 typedef $$PostMediaTableUpdateCompanionBuilder =
@@ -6030,7 +6074,7 @@ class $$PostMediaTableTableManager
                 required String postId,
                 required String mediaUrl,
                 required String mediaType,
-                required int position,
+                Value<int> position = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PostMediaCompanion.insert(
                 id: id,
@@ -6109,15 +6153,13 @@ typedef $$PostMediaTableProcessedTableManager =
     >;
 typedef $$LikesTableCreateCompanionBuilder =
     LikesCompanion Function({
-      required String id,
       required String userId,
       required String postId,
-      required DateTime createdAt,
+      Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$LikesTableUpdateCompanionBuilder =
     LikesCompanion Function({
-      Value<String> id,
       Value<String> userId,
       Value<String> postId,
       Value<DateTime> createdAt,
@@ -6171,11 +6213,6 @@ class $$LikesTableFilterComposer extends Composer<_$AppDatabase, $LikesTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
@@ -6237,11 +6274,6 @@ class $$LikesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -6303,9 +6335,6 @@ class $$LikesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -6384,13 +6413,11 @@ class $$LikesTableTableManager
               $$LikesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<String> id = const Value.absent(),
                 Value<String> userId = const Value.absent(),
                 Value<String> postId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LikesCompanion(
-                id: id,
                 userId: userId,
                 postId: postId,
                 createdAt: createdAt,
@@ -6398,13 +6425,11 @@ class $$LikesTableTableManager
               ),
           createCompanionCallback:
               ({
-                required String id,
                 required String userId,
                 required String postId,
-                required DateTime createdAt,
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LikesCompanion.insert(
-                id: id,
                 userId: userId,
                 postId: postId,
                 createdAt: createdAt,
@@ -6494,7 +6519,7 @@ typedef $$CommentsTableCreateCompanionBuilder =
       required String postId,
       required String userId,
       required String textContent,
-      required DateTime createdAt,
+      Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$CommentsTableUpdateCompanionBuilder =
@@ -6803,7 +6828,7 @@ class $$CommentsTableTableManager
                 required String postId,
                 required String userId,
                 required String textContent,
-                required DateTime createdAt,
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CommentsCompanion.insert(
                 id: id,
@@ -6896,7 +6921,7 @@ typedef $$CommentsTableProcessedTableManager =
 typedef $$ConversationsTableCreateCompanionBuilder =
     ConversationsCompanion Function({
       required String id,
-      required DateTime createdAt,
+      Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$ConversationsTableUpdateCompanionBuilder =
@@ -7157,7 +7182,7 @@ class $$ConversationsTableTableManager
           createCompanionCallback:
               ({
                 required String id,
-                required DateTime createdAt,
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ConversationsCompanion.insert(
                 id: id,
@@ -7621,7 +7646,7 @@ typedef $$MessagesTableCreateCompanionBuilder =
       required String conversationId,
       required String senderId,
       required String textContent,
-      required DateTime createdAt,
+      Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$MessagesTableUpdateCompanionBuilder =
@@ -7931,7 +7956,7 @@ class $$MessagesTableTableManager
                 required String conversationId,
                 required String senderId,
                 required String textContent,
-                required DateTime createdAt,
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MessagesCompanion.insert(
                 id: id,
@@ -8025,7 +8050,7 @@ typedef $$FollowsTableCreateCompanionBuilder =
     FollowsCompanion Function({
       required String followerId,
       required String followingId,
-      required DateTime createdAt,
+      Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$FollowsTableUpdateCompanionBuilder =
@@ -8298,7 +8323,7 @@ class $$FollowsTableTableManager
               ({
                 required String followerId,
                 required String followingId,
-                required DateTime createdAt,
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FollowsCompanion.insert(
                 followerId: followerId,
