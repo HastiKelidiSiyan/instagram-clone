@@ -6,7 +6,7 @@ class StoryItemData {
   final UserModel author;
   final bool isViewedByCurrentUser;
 
-  StoryItemData({
+  const StoryItemData({
     required this.story,
     required this.author,
     required this.isViewedByCurrentUser,

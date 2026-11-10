@@ -10,7 +10,7 @@ class ProfileData {
   final bool isFollowedByCurrentUser;
   final List<StoryModel> activeStories;
 
-  ProfileData({
+  const ProfileData({
     required this.user,
     required this.posts,
     required this.followerCount,

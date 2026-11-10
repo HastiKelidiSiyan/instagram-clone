@@ -11,7 +11,7 @@ class FeedItem {
   final int commentCount;
   final bool isLikedByCurrentUser;
 
-  FeedItem({
+  const FeedItem({
     required this.post,
     required this.author,
     required this.media,

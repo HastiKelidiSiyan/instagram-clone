@@ -6,7 +6,7 @@ import 'package:instagram_clone/ui/app_icon.dart';
 
 class PostListItem extends StatelessWidget {
   final FeedItem feedItem;
-  final Function(int) onProfileTap;
+  final Function(String) onProfileTap;
 
   const PostListItem({
     super.key,
@@ -31,7 +31,7 @@ class PostListItem extends StatelessWidget {
   }
 }
 
-Widget _postHeader(FeedItem item, Function(int) onProfileTap) {
+Widget _postHeader(FeedItem item, Function(String) onProfileTap) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
     child: Row(
@@ -50,7 +50,7 @@ Widget _postHeader(FeedItem item, Function(int) onProfileTap) {
             ),
           ),
           onTap: () {
-            onProfileTap(int.tryParse(item.author.id) ?? 0);
+            onProfileTap('');
           },
         ),
         Padding(
@@ -64,7 +64,7 @@ Widget _postHeader(FeedItem item, Function(int) onProfileTap) {
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 onTap: () {
-                  onProfileTap(int.tryParse(item.author.id) ?? 0);
+                  onProfileTap('');
                 },
               ),
               Text('', style: TextStyle(fontSize: 10)),
@@ -91,7 +91,7 @@ Widget _postImage(FeedItem item) {
   );
 }
 
-Widget _postFooter(FeedItem item, Function(int) onProfileTap) {
+Widget _postFooter(FeedItem item, Function(String) onProfileTap) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: Column(
@@ -121,7 +121,7 @@ Widget _postActions() {
   );
 }
 
-Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
+Widget _postLikes(FeedItem item, Function(String) onProfileTap) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 6.0),
     child: Row(
@@ -141,7 +141,7 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
           ),
           onTap: () {
             if (item.latestLiker != null)
-              onProfileTap(int.tryParse(item.latestLiker!.id) ?? 0);
+              onProfileTap('');
           },
         ),
         SizedBox(width: 7),
@@ -156,7 +156,7 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
               ),
               onTap: () {
                 if (item.latestLiker != null)
-                  onProfileTap(int.tryParse(item.latestLiker!.id) ?? 0);
+                  onProfileTap('');
               },
             ),
             SizedBox(width: 2),
@@ -173,7 +173,7 @@ Widget _postLikes(FeedItem item, Function(int) onProfileTap) {
   );
 }
 
-Widget _postCaption(FeedItem item, Function(int) onProfileTap) {
+Widget _postCaption(FeedItem item, Function(String) onProfileTap) {
   return Row(
     children: [
       InkWell(
@@ -182,7 +182,7 @@ Widget _postCaption(FeedItem item, Function(int) onProfileTap) {
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
         onTap: () {
-          onProfileTap(int.tryParse(item.author.id) ?? 0);
+          onProfileTap('');
         },
       ),
       SizedBox(width: 2),

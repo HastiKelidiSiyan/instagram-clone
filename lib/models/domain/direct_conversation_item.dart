@@ -9,7 +9,7 @@ class DirectConversationItem {
   final MessageModel? latestMessage;
   final StoryItemData? activeStory;
 
-  DirectConversationItem({
+  const DirectConversationItem({
     required this.conversation,
     required this.otherParticipant,
     required this.latestMessage,
