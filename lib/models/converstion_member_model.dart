@@ -8,13 +8,14 @@ class ConversationMemberModel {
     required this.userId,
   });
 
-  factory ConversationMemberModel.fromJson(Map<String, dynamic> json) => ConversationMemberModel(
-    conversationId: json['conversationId'],
-    userId: json['userId'],
-  );
+  factory ConversationMemberModel.fromJson(Map<String, dynamic> json) =>
+      ConversationMemberModel(
+        conversationId: json['conversation_id'].toString(),
+        userId: json['user_id'].toString(),
+      );
 
   Map<String, dynamic> toJson() => {
-    'conversationId': conversationId,
-    'userId': userId,
+    'conversation_id': conversationId,
+    'user_id': userId,
   };
 }

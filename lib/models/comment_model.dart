@@ -15,21 +15,17 @@ class CommentModel {
 
   factory CommentModel.fromJson(Map<String, dynamic> json) => CommentModel(
     id: json['id'].toString(),
-    userId: json['userId'] ?? json['user_id'],
-    postId: json['postId'] ?? json['post_id'],
-    text: json['text'] ?? json['textContent'] ?? json['text_content'] ?? '',
-    createdAt: json['createdAt'] != null
-        ? DateTime.parse(json['createdAt'])
-        : (json['created_at'] != null
-              ? DateTime.parse(json['created_at'])
-              : DateTime.now()),
+    userId: json['user_id'].toString(),
+    postId: json['post_id'].toString(),
+    text: json['text'].toString(),
+    createdAt: DateTime.parse(json['created_at'].toString()),
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'userId': userId,
-    'postId': postId,
-    'textContent': text,
-    'createdAt': createdAt.toIso8601String(),
+    'user_id': userId,
+    'post_id': postId,
+    'text': text,
+    'created_at': createdAt.toIso8601String(),
   };
 }

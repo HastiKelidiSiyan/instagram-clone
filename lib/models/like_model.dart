@@ -1,5 +1,4 @@
-class LikeModel{
-
+class LikeModel {
   final String id;
   final String userId;
   final String postId;
@@ -13,16 +12,15 @@ class LikeModel{
   });
 
   factory LikeModel.fromJson(Map<String, dynamic> json) => LikeModel(
-        id: json['id'],
-        userId: json['userId'],
-        postId: json['postId'],
-        createdAt: DateTime.parse(json['createdAt']),
+        id: json['id'].toString(),
+        userId: json['user_id'].toString(),
+        postId: json['post_id'].toString(),
+        createdAt: DateTime.parse(json['created_at'].toString()),
       );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userId': userId,
-        'postId': postId,
-        'createdAt': createdAt.toIso8601String(),
+        'user_id': userId,
+        'post_id': postId,
+        'created_at': createdAt.toIso8601String(),
       };
 }

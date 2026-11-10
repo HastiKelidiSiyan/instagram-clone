@@ -1,8 +1,6 @@
-import 'user_model.dart';
-
 class StoryModel {
   final String id;
-  final String userId; 
+  final String userId;
   final String mediaUrl;
   final String mediaType;
   final DateTime createdAt;
@@ -18,20 +16,20 @@ class StoryModel {
   });
 
   factory StoryModel.fromJson(Map<String, dynamic> json) => StoryModel(
-        id: json['id'],
-        userId: json['userId'],
-        mediaUrl: json['mediaUrl'],
-        mediaType: json['mediaType'],
-        createdAt: DateTime.parse(json['createdAt']),
-        expiresAt: DateTime.parse(json['expiresAt']),
+        id: json['id'].toString(),
+        userId: json['user_id'].toString(),
+        mediaUrl: json['media_url'].toString(),
+        mediaType: json['media_type'].toString(),
+        createdAt: DateTime.parse(json['created_at'].toString()),
+        expiresAt: DateTime.parse(json['expires_at'].toString()),
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'userId': userId,
-        'mediaUrl': mediaUrl,
-        'mediaType': mediaType,
-        'createdAt': createdAt.toIso8601String(),
-        'expiresAt': expiresAt.toIso8601String(),
+        'user_id': userId,
+        'media_url': mediaUrl,
+        'media_type': mediaType,
+        'created_at': createdAt.toIso8601String(),
+        'expires_at': expiresAt.toIso8601String(),
       };
 }

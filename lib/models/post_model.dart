@@ -1,5 +1,3 @@
-import 'user_model.dart';
-
 class PostModel {
   final String id;
   final String userId;
@@ -15,19 +13,15 @@ class PostModel {
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
     id: json['id'].toString(),
-    userId: json['userId'] ?? json['user_id'],
-    caption: json['caption'] ?? json['text'] ?? '',
-    createdAt: json['createdAt'] != null
-        ? DateTime.parse(json['createdAt'])
-        : (json['created_at'] != null
-              ? DateTime.parse(json['created_at'])
-              : DateTime.now()),
+    userId: json['user_id'].toString(),
+    caption: json['caption'].toString(),
+    createdAt: DateTime.parse(json['created_at'].toString()),
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'userId': userId,
+    'user_id': userId,
     'caption': caption,
-    'createdAt': createdAt.toIso8601String(),
+    'created_at': createdAt.toIso8601String(),
   };
 }

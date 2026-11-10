@@ -10,14 +10,14 @@ class StoryViewModel {
   });
 
   factory StoryViewModel.fromJson(Map<String, dynamic> json) => StoryViewModel(
-        userId: json['userId'],
-        storyId: json['storyId'],
-        viewedAt: DateTime.parse(json['viewedAt']),
+        userId: json['user_id'].toString(),
+        storyId: json['story_id'].toString(),
+        viewedAt: DateTime.parse(json['viewed_at'].toString()),
       );
 
   Map<String, dynamic> toJson() => {
-        'userId': userId,
-        'storyId': storyId,
-        'viewedAt': viewedAt.toIso8601String(),
+        'user_id': userId,
+        'story_id': storyId,
+        'viewed_at': viewedAt.toIso8601String(),
       };
 }

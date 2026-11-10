@@ -15,9 +15,9 @@ class PostMediaModel {
 
   factory PostMediaModel.fromJson(Map<String, dynamic> json) => PostMediaModel(
     id: json['id'].toString(),
-    postId: json['postId'] ?? json['post_id'],
-    mediaUrl: json['mediaUrl'] ?? json['media_url'],
-    mediaType: json['mediaType'] ?? json['media_type'],
+    postId: json['post_id'].toString(),
+    mediaUrl: json['media_url'].toString(),
+    mediaType: json['media_type'].toString(),
     position: (json['position'] is int)
         ? json['position']
         : int.parse(json['position'].toString()),
@@ -25,9 +25,9 @@ class PostMediaModel {
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'postId': postId,
-    'mediaUrl': mediaUrl,
-    'mediaType': mediaType,
+    'post_id': postId,
+    'media_url': mediaUrl,
+    'media_type': mediaType,
     'position': position,
   };
 }

@@ -1,5 +1,4 @@
 class ConversationModel {
-
   final String id;
   final DateTime createdAt;
 
@@ -8,13 +7,14 @@ class ConversationModel {
     required this.createdAt,
   });
 
-  factory ConversationModel.fromJson(Map<String, dynamic> json) => ConversationModel(
-    id: json['id'],
-    createdAt: DateTime.parse(json['createdAt']),
-  );
+  factory ConversationModel.fromJson(Map<String, dynamic> json) =>
+      ConversationModel(
+        id: json['id'].toString(),
+        createdAt: DateTime.parse(json['created_at'].toString()),
+      );
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'createdAt': createdAt.toIso8601String(),
+    'created_at': createdAt.toIso8601String(),
   };
 }
