@@ -24,7 +24,7 @@ class HomeScreen extends StatefulWidget {
   });
 
   final UserModel currentUser;
-  final Function(int) onProfileTap;
+  final Function(String) onProfileTap;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _homeBody(
     UserModel me,
-    Function(int) onProfileTap,
+    Function(String) onProfileTap,
     Future<List<FeedItem>>? postsFuture,
     Future<List<StoryItemData>>? storiesFuture,
     Future<void> Function() refreshPosts,
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _postsSection(
     UserModel me,
-    Function(int) onProfileTap,
+    Function(String) onProfileTap,
     Future<List<FeedItem>>? postsFuture,
     Future<void> Function() refreshPosts,
   ) {
@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _storiesSection(
     UserModel currentUser,
-    Function(int) onProfileTap,
+    Function(String) onProfileTap,
     Future<List<StoryItemData>>? storiesFuture,
     Future<void> Function() refreshStories,
   ) {
@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final item = snapshot.data![index - 1];
                     return StoryItem(
                       storyItem: item,
-                      onTap: () => onProfileTap(index - 1),
+                      onTap: () {},
                       radius: 25,
                       isDirect: false,
                     );
