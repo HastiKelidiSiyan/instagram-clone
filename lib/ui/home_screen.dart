@@ -1,15 +1,12 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/domain/feed_item.dart';
+import 'package:instagram_clone/models/domain/post_item.dart';
 import 'package:instagram_clone/models/domain/story_item_data.dart';
-import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/app_feedback.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/ui/directs_screen.dart';
-import 'package:instagram_clone/models/post_model.dart';
 import 'package:instagram_clone/models/app_failure.dart';
-import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/widgets/story_item.dart';
 import 'package:instagram_clone/widgets/post_list_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -31,25 +28,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<List<FeedItem>> feedItems;
+  late Future<List<PostItem>> feedItems;
   late Future<List<StoryItemData>> storyItems;
 
   @override
   void initState() {
     super.initState();
-    feedItems = PostRepository().getFeedItems();
-    storyItems = StoryRepository().getActiveStoryItems();
+    feedItems = PostRepository().getFeedItems(widget.currentUser.id);
+    storyItems = StoryRepository().getActiveStoryItems(widget.currentUser.id);
   }
 
   Future<void> _refreshFeed() async {
     setState(() {
-      feedItems = PostRepository().getFeedItems();
+      feedItems = PostRepository().getFeedItems(widget.currentUser.id);
     });
   }
 
   Future<void> _refreshStories() async {
     setState(() {
-      storyItems = StoryRepository().getActiveStoryItems();
+      storyItems = StoryRepository().getActiveStoryItems(widget.currentUser.id);
     });
   }
 
@@ -118,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _homeBody(
     UserModel me,
     Function(String) onProfileTap,
-    Future<List<FeedItem>>? postsFuture,
+    Future<List<PostItem>>? postsFuture,
     Future<List<StoryItemData>>? storiesFuture,
     Future<void> Function() refreshPosts,
     Future<void> Function() refreshStories,
@@ -138,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _postsSection(
     UserModel me,
     Function(String) onProfileTap,
-    Future<List<FeedItem>>? postsFuture,
+    Future<List<PostItem>>? postsFuture,
     Future<void> Function() refreshPosts,
   ) {
     return RefreshIndicator(
@@ -150,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return ListView.separated(
               itemBuilder: (context, index) {
                 return PostListItem(
-                  feedItem: snapshot.data![index],
+                  postItem: snapshot.data![index],
                   onProfileTap: onProfileTap,
                 );
               },

@@ -1,22 +1,79 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/models/app_failure.dart';
+import 'package:instagram_clone/models/domain/post_with_media.dart';
+import 'package:instagram_clone/models/domain/profile_data.dart';
 import 'package:instagram_clone/repositories/auth_repository.dart';
+import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 import '../models/user_model.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final UserModel user;
 
   const ProfileScreen({super.key, required this.user});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late Future<ProfileData?> profileData;
+
+  @override
+  void initState() {
+    super.initState();
+    profileData = UserRepository().getProfileData(widget.user.id);
+  }
+
+  void _retry() {
+    setState(() {
+      profileData = UserRepository().getProfileData(widget.user.id);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: _profileAppBar(user),
-        body: _profileBody(user, context),
+        appBar: _profileAppBar(widget.user),
+        body: FutureBuilder<ProfileData?>(
+          future: profileData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              final message = snapshot.error is AppFailure
+                  ? failureMessage(snapshot.error as AppFailure)
+                  : snapshot.error.toString();
+
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(message),
+                    IconButton(
+                      onPressed: _retry,
+                      icon: const Icon(Icons.refresh),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final data = snapshot.data;
+
+            if (data == null) {
+              return const Center(child: Text('Profile not found.'));
+            }
+
+            return _profileBody(data, context);
+          },
+        ),
       ),
     );
   }
@@ -107,25 +164,25 @@ PreferredSizeWidget _profileAppBar(UserModel user) {
   );
 }
 
-Widget _profileBody(UserModel user, BuildContext context) {
+Widget _profileBody(ProfileData data, BuildContext context) {
   return DefaultTabController(
     length: 2,
     child: Column(
       children: [
-        _profileContents(user, context),
+        _profileContents(data, context),
         SizedBox(height: 15),
-        _editProfileButton(user),
+        _editProfileButton(data.user),
         SizedBox(height: 1),
         _highlights(),
         _tabBar(),
         Container(height: 1, color: Color(0xdacecece)),
-        Expanded(child: _tabBarView(user)),
+        Expanded(child: _tabBarView(data.posts)),
       ],
     ),
   );
 }
 
-Widget _tabBarView(UserModel user) {
+Widget _tabBarView(List<PostWithMedia> posts) {
   return TabBarView(
     children: [
       CustomScrollView(
@@ -133,12 +190,26 @@ Widget _tabBarView(UserModel user) {
           SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.teal[100 * (index % 9)],
+                final media = posts[index].media;
+
+                if (media.isEmpty) {
+                  return const Center(
+                    child: Icon(Icons.broken_image_outlined),
+                  );
+                }
+
+                return CachedNetworkImage(
+                  imageUrl: media.first.mediaUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => const Center(
+                    child: Icon(Icons.broken_image_outlined),
+                  ),
                 );
               },
-              childCount: 20,
+              childCount: posts.length,
             ),
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 140.0,
@@ -168,7 +239,9 @@ Widget _tabBar() {
   );
 }
 
-Widget _profileContents(UserModel user, BuildContext context) {
+Widget _profileContents(ProfileData data, BuildContext context) {
+  final user = data.user;
+
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16.0),
     child: Column(
@@ -177,11 +250,17 @@ Widget _profileContents(UserModel user, BuildContext context) {
           children: [
             _profileProfile(user.avatarUrl ?? '', context),
             SizedBox(width: 35),
-            ProfileInfo(number: '0', label: "Posts"),
+            ProfileInfo(number: data.posts.length.toString(), label: "Posts"),
             SizedBox(width: 21),
-            ProfileInfo(number: '0', label: "Followers"),
+            ProfileInfo(
+              number: data.followerCount.toString(),
+              label: "Followers",
+            ),
             SizedBox(width: 21),
-            ProfileInfo(number: '0', label: "Following"),
+            ProfileInfo(
+              number: data.followingCount.toString(),
+              label: "Following",
+            ),
           ],
         ),
         SizedBox(height: 12),

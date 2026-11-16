@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/models/user_model.dart';
-import 'package:instagram_clone/repositories/auth_repository.dart';
 import 'package:instagram_clone/repositories/user_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
 import 'package:instagram_clone/ui/home_screen.dart';
@@ -21,19 +20,16 @@ class Instagram extends StatefulWidget {
 class _InstagramState extends State<Instagram> {
   int index = 0;
 
-  void handleProfileTap(String userId) async {
-    String? currentUserId = await AuthRepository().getCurrentUserId();
-
-    if (currentUserId == null) {
-      return;
-    }
-
-    if (userId == currentUserId) {
+  Future<void> handleProfileTap(String userId) async {
+    if (userId == widget.me.id) {
       setState(() {
         index = 4;
       });
     } else {
-      final user = await UserRepository().getUserById(userId.toString());
+      final user = await UserRepository().getUser(userId);
+
+      if (!mounted || user == null) return;
+
       Get.to(() => ProfileScreen(user: user));
     }
   }
