@@ -19,16 +19,23 @@ void main() {
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
         ),
+                drawerTheme: DrawerThemeData(
+          backgroundColor: Colors.white
+        ),
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
-        brightness: Brightness.dark,
         appBarTheme: AppBarTheme(backgroundColor: Colors.black),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: Colors.black,
         ),
+        drawerTheme: DrawerThemeData(
+          backgroundColor: Colors.black
+        ),
+        brightness: Brightness.dark,
       ),
+      
 
       themeMode: ThemeMode.system,
     ),
