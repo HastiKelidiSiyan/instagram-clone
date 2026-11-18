@@ -36,55 +36,114 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: _profileAppBar(widget.user),
-        body: FutureBuilder<ProfileData?>(
-          future: profileData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              final message = snapshot.error is AppFailure
-                  ? failureMessage(snapshot.error as AppFailure)
-                  : snapshot.error.toString();
-
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(message),
-                    IconButton(
-                      onPressed: _retry,
-                      icon: const Icon(Icons.refresh),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            final data = snapshot.data;
-
-            if (data == null) {
-              return const Center(child: Text('Profile not found.'));
-            }
-
-            return _profileBody(data, context);
-          },
+      Future<void> logout() async {
+    final auth = AuthRepository();
+    Get.off(LoginScreen());
+    await auth.logout();
+  }
+  
+    return Scaffold(
+      endDrawer: Drawer(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 44,),
+            Padding(
+              padding: EdgeInsetsGeometry.symmetric(
+                horizontal: 15,
+                vertical: 12,
+              ),
+              child: Text(widget.user.username, textAlign: TextAlign.start,),
+            ),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Archive.png", height: 24, width: 24,),
+              title: Text('Archive'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Your_activity.png", height: 24, width: 24,),
+              title: Text('Your Activity'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Nametag.png", height: 24, width: 24,),
+              title: Text('Name Tag'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Saved.png", height: 24, width: 24,),
+              title: Text('Saved'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Close_friends.png", height: 24, width: 24,),
+              title: Text('Close Friends'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Discover_people.png", height: 24, width: 24,),
+              title: Text('Discover People'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Facebook.png", height: 24, width: 24,),
+              title: Text('Open Facebook'),
+              onTap: () {},
+            ),
+            Spacer(),
+            ListTile(
+              leading: AppIcon(asset: "assets/images/Settings.png", height: 24, width: 24,),
+              title: Text('Setings'),
+              onTap: logout,
+            )
+          ],
         ),
+      ),
+      appBar: _profileAppBar(widget.user),
+      body: FutureBuilder<ProfileData?>(
+        future: profileData,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            final message = snapshot.error is AppFailure
+                ? failureMessage(snapshot.error as AppFailure)
+                : snapshot.error.toString();
+
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(message),
+                  IconButton(
+                    onPressed: _retry,
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final data = snapshot.data;
+
+          if (data == null) {
+            return const Center(child: Text('Profile not found.'));
+          }
+
+          return _profileBody(data, context);
+        },
       ),
     );
   }
 }
 
 PreferredSizeWidget _profileAppBar(UserModel user) {
-  Future<void> logout() async {
-    final auth = AuthRepository();
-    Get.off(LoginScreen());
-    await auth.logout();
-  }
+
   Widget content = Row(
     children: [
       SizedBox(width: 15),
@@ -140,12 +199,16 @@ PreferredSizeWidget _profileAppBar(UserModel user) {
           Row(
             children: [
               Spacer(),
-              InkWell(
-                onTap: logout,
-                child: AppIcon(
-                  asset: "assets/images/MenuIcon.png",
-                  height: 17,
-                  width: 20,
+              Builder(
+                builder: (context) => InkWell(
+                  onTap: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                  child: AppIcon(
+                    asset: "assets/images/MenuIcon.png",
+                    height: 17,
+                    width: 20,
+                  ),
                 ),
               ),
             ],
@@ -160,6 +223,7 @@ PreferredSizeWidget _profileAppBar(UserModel user) {
     titleSpacing: 0,
     leadingWidth: 0,
     automaticallyImplyLeading: false,
+    automaticallyImplyActions: false,
     title: content,
   );
 }
