@@ -1,71 +1,104 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/conversation_model.dart';
-import 'package:instagram_clone/models/story_model.dart';
-import 'package:instagram_clone/models/message_model.dart';
-import 'package:instagram_clone/models/user_model.dart';
-import 'package:instagram_clone/widgets/story_item.dart';
+import 'package:instagram_clone/models/domain/direct_conversation_item.dart';
 
 class DirectListItem extends StatelessWidget {
   const DirectListItem({
     super.key,
+    required this.item,
     required this.onTap,
-    required this.conversation,
   });
 
-  final ConversationModel conversation;
+  final DirectConversationItem item;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 72,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(width: 12),
-          CircleAvatar(
-            radius: 28,
-            child: ClipOval(
-              child: Icon(Icons.person),
+    final user = item.otherParticipant;
+    final latestMessage = item.latestMessage;
+
+    final messageText =
+        latestMessage?.text ?? 'Start a conversation';
+
+    final messageTime =
+        latestMessage?.createdAt ??
+        item.conversation.createdAt;
+
+    return InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        height: 72,
+        child: Row(
+          children: [
+            const SizedBox(width: 12),
+            CircleAvatar(
+              radius: 28,
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: user.avatarUrl ?? '',
+                  width: 56,
+                  height: 56,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.person),
+                ),
+              ),
             ),
-          ),
-          SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(conversation.id, style: TextStyle(fontSize: 13)),
-              Row(
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    width: 190,
-                    child: Text(
-                      '',
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  SizedBox(width: 6),
                   Text(
-                    "· ${getTimeDistance(conversation.createdAt)}",
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                    user.username,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          messageText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '· ${getTimeDistance(messageTime)}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          Spacer(),
-          Image.asset("assets/images/CameraIcon.png", height: 22, width: 23),
-          SizedBox(width: 15),
-        ],
+            ),
+            const SizedBox(width: 10),
+            Image.asset(
+              'assets/images/CameraIcon.png',
+              height: 22,
+              width: 23,
+            ),
+            const SizedBox(width: 15),
+          ],
+        ),
       ),
     );
   }
 
-  String getTimeDistance(DateTime pastTime) {
-    final now = DateTime.now();
-    final difference = now.difference(pastTime);
+  String getTimeDistance(DateTime time) {
+    final difference = DateTime.now().difference(
+      time.toLocal(),
+    );
 
     if (difference.inSeconds < 60) {
       return 'now';
@@ -76,14 +109,11 @@ class DirectListItem extends StatelessWidget {
     } else if (difference.inDays < 7) {
       return '${difference.inDays}d';
     } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '${weeks}w';
+      return '${(difference.inDays / 7).floor()}w';
     } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '${months}mo';
+      return '${(difference.inDays / 30).floor()}mo';
     } else {
-      final years = (difference.inDays / 365).floor();
-      return '${years}y';
+      return '${(difference.inDays / 365).floor()}y';
     }
   }
 }

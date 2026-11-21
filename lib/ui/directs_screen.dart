@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/data_source/remote_data_source.dart';
+import 'package:instagram_clone/models/domain/direct_conversation_item.dart';
 import 'package:instagram_clone/models/user_model.dart';
+import 'package:instagram_clone/repositories/conversation_repository.dart';
 import 'package:instagram_clone/ui/app_icon.dart';
+import 'package:instagram_clone/widgets/direct_list_item.dart';
 
 class DirectsScreen extends StatelessWidget {
   const DirectsScreen({super.key, required this.currentUser});
@@ -13,7 +17,7 @@ class DirectsScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: _directsAppBar(currentUser),
-        body: _emptyDirectsList(),
+        body: _directsList(currentUser.id),
         bottomNavigationBar: _footer(),
       ),
     );
@@ -56,11 +60,59 @@ PreferredSizeWidget _directsAppBar(UserModel me) {
   );
 }
 
+Widget _directsList(String currentUserId) {
+  return FutureBuilder<List<DirectConversationItem>>(
+    future: ConversationRepository().getDirectConversationItems(
+      currentUserId,
+    ),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+
+      if (snapshot.hasError) {
+        debugPrint('DIRECTS ERROR: ${snapshot.error}');
+
+        return const Center(
+          child: Text('Could not load conversations'),
+        );
+      }
+
+      final conversations = snapshot.data ?? [];
+
+      if (conversations.isEmpty) {
+        return _emptyDirectsList();
+      }
+
+      return ListView.builder(
+        itemCount: conversations.length,
+        itemBuilder: (context, index) {
+          final item = conversations[index];
+
+          return DirectListItem(
+            item: item,
+            onTap: () {
+              debugPrint(
+                'Open conversation: ${item.conversation.id}',
+              );
+            },
+          );
+        },
+      );
+    },
+  );
+}
+
 Widget _emptyDirectsList() {
-  return Center(
+  return const Center(
     child: Text(
       'No conversations yet',
-      style: TextStyle(fontSize: 13, color: Colors.grey),
+      style: TextStyle(
+        fontSize: 13,
+        color: Colors.grey,
+      ),
     ),
   );
 }
