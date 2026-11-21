@@ -25,8 +25,7 @@ class RemoteDataSource {
 
   RemoteDataSource([Dio? dio]) : _dio = dio ?? DioClient.dio;
 
-  static const _profileSelect =
-      'id,username,name,avatar_url,bio,created_at';
+  static const _profileSelect = 'id,username,name,avatar_url,bio,created_at';
 
   Future<UserModel?> getUser(String userId) async {
     try {
@@ -370,6 +369,71 @@ class RemoteDataSource {
           'id': 'eq.$postId',
         },
       );
+    } on DioException catch (exception) {
+      throw mapDioException(exception);
+    }
+  }
+
+  static const _directConversationSelect = '''
+  conversation_id,
+  conversation:conversations!conversation_members_conversation_id_fkey(
+    id,
+    created_at,
+    members:conversation_members!conversation_members_conversation_id_fkey(
+      user_id,
+      profile:profiles!conversation_members_user_id_fkey(
+        id,
+        username,
+        name,
+        avatar_url,
+        bio,
+        created_at
+      )
+    ),
+    messages:messages!messages_conversation_id_fkey(
+      id,
+      conversation_id,
+      sender_id,
+      text,
+      created_at
+    )
+  )
+''';
+
+  Future<List<DirectConversationItem>> getDirectConversationItems(
+    String currentUserId,
+  ) async {
+    try {
+      final response = await _dio.get(
+        '/rest/v1/conversation_members',
+        queryParameters: {
+          'user_id': 'eq.$currentUserId',
+          'select': _compactSelect(_directConversationSelect),
+          'conversation.messages.order': 'created_at.desc',
+          'conversation.messages.limit': 1,
+        },
+      );
+
+      final items = (response.data as List)
+          .map(
+            (item) => DirectConversationItem.fromJson(
+              Map<String, dynamic>.from(item),
+              currentUserId: currentUserId,
+            ),
+          )
+          .toList();
+
+      items.sort((first, second) {
+        final firstDate =
+            first.latestMessage?.createdAt ?? first.conversation.createdAt;
+
+        final secondDate =
+            second.latestMessage?.createdAt ?? second.conversation.createdAt;
+
+        return secondDate.compareTo(firstDate);
+      });
+
+      return items;
     } on DioException catch (exception) {
       throw mapDioException(exception);
     }
